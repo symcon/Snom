@@ -1,0 +1,15 @@
+{
+	"id": "{5BB20C90-2C83-F2FC-E131-252E9C6DC769}",
+	"name": "SnomMenu",
+	"type": 3,
+	"vendor": "",
+	"aliases": 
+	[
+		"Snom (Menu)"
+	],
+	"url": "https://www.symcon.de/",
+	"parentRequirements": [],
+	"childRequirements": [],
+	"implemented": [],
+	"prefix": "SNOM"
+}

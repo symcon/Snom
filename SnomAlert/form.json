@@ -1,0 +1,28 @@
+{
+    "elements": [
+        {
+            "type": "ValidationTextBox",
+            "name": "Host",
+            "caption": "Host"
+        },
+        {
+            "type": "Select",
+            "name": "BindIP",
+            "caption": "BindIP",
+            "options": []
+        }
+    ],
+    "actions": [
+        {
+            "type": "ValidationTextBox",
+            "name": "Text",
+            "caption": "Text",
+            "value": "Alarm senden"
+        },
+        {
+            "type": "Button",
+            "caption": "Alarm senden",
+            "onClick": "SNOM_SendAlert($id, $Text);"
+        }
+    ]
+}
