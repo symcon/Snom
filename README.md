@@ -1,1 +1,1 @@
-Test PHP Modules for IP-Symcon
+Librarary for integrating [Snom IP phones](https://www.snom.com/en/products/) in the [Symcon](https://www.symcon.de/en/product/) building automation system.
