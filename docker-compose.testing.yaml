@@ -1,0 +1,24 @@
+version: '3.3'
+services:
+    symcon:
+        container_name: symcon
+        hostname: symcon
+        ports:
+            - '3777:3777'
+            - '52000:52000'
+        volumes:
+            - '/opt/symcon/data:/var/lib/symcon'
+            - '/opt/symcon/log:/var/log/symcon'
+            - '/opt/symcon:/root'
+        image: 'symcon/symcon:testing'
+
+    portainer:
+        ports:
+            - '9000:9000'
+        volumes:
+            - '/var/run/docker.sock:/var/run/docker.sock'
+            - 'portainer_data:/data'
+        image: portainer/portainer
+
+volumes:
+    portainer_data:
