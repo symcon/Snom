@@ -1,0 +1,16 @@
+{
+    "elements": [
+        {
+            "type": "ValidationTextBox",
+            "name": "PhoneIP",
+            "caption": "Phone IP address",
+            "enabled": "true"
+        },
+        {
+            "type": "ValidationTextBox",
+            "name": "LocalIP",
+            "caption": "Local IP address",
+            "enabled": "true"
+        }
+    ]
+}
