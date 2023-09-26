@@ -1,8 +1,11 @@
 {
-	"id": "{2B22C05F-8059-1DAD-9F79-A066BC456570}",
-	"author": "Symcon GmbH",
+	"id": "{BFA40326-1351-C996-1719-CCAACA70AD3B}",
+	"author": "Simón Golpe Varela",
 	"name": "Snom",
-	"url": "https://www.symcon.de",
+	"url": "https://www.snom.com/en/",
+	"compatibility": {
+		"version": 7.0
+	},
 	"version": "1.0",
 	"build": 0,
 	"date": 0

@@ -1,0 +1,15 @@
+{
+	"id": "{46B30C35-77C7-4927-F6C0-5E20700E6C0B}",
+	"name": "SnomHelloWorld",
+	"type": 3,
+	"vendor": "Snom Technology GmbH",
+	"aliases": 
+	[
+		"Snom hello world"
+	],
+	"url": "https://www.snom.com/en/",
+	"parentRequirements": [],
+	"childRequirements": [],
+	"implemented": [],
+	"prefix": "SNM"
+}
