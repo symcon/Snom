@@ -1,0 +1,34 @@
+{
+    "elements": [
+        {
+            "type": "ValidationTextBox",
+            "name": "Host",
+            "caption": "Host (Snom device)"
+        },
+        {
+            "type": "Select",
+            "name": "BindIP",
+            "caption": "BindIP",
+            "options": []
+        },
+        { 
+            "type": "SelectMedia", 
+            "name": "PropertyMediaID", 
+            "caption": "Select wav file", 
+            "extensions": ".wav,.mp3" 
+        }
+    ],
+    "actions": [
+        {
+            "type": "ValidationTextBox",
+            "name": "Text",
+            "caption": "Text",
+            "value": "Play siren"
+        },
+        {
+            "type": "Button",
+            "caption": "Alarm senden",
+            "onClick": "SNOM_PlaySiren($id, $Text);"
+        }
+    ]
+}
