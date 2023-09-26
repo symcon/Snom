@@ -1,0 +1,58 @@
+{
+    "elements": [
+        {
+            "type": "ValidationTextBox",
+            "name": "PhoneIP",
+            "caption": "Phone IP address"
+        },
+        {
+            "type": "ValidationTextBox",
+            "name": "LocalIP",
+            "caption": "Local IP address"
+        },
+        {
+            "type": "ValidationTextBox",
+            "name": "Message",
+            "caption": "Message"
+        },
+        {
+            "type": "NumberSpinner",
+            "name": "Timeout",
+            "caption": "Page timeout",
+            "minimum": 1,
+            "suffix": "miliseconds"
+        }
+    ],
+    "actions": [
+        {
+            "type": "Button",
+            "caption": "URL for local rendering",
+            "onClick": "SNM_GetRenderLocalUrl($id);"
+        },
+        {
+            "type": "Label",
+            "name": "RenderLocalUrl",
+            "caption": ""
+        },
+        {
+            "type": "Button",
+            "caption": "URL for remote rendering",
+            "onClick": "SNM_GetRenderRemoteUrl($id);"
+        },
+        {
+            "type": "Label",
+            "name": "RenderRemoteUrl",
+            "caption": ""
+        },
+        {
+            "type": "Button",
+            "caption": "Page content",
+            "onClick": "SNM_GetPageContent($id);"
+        },
+        {
+            "type": "Label",
+            "name": "PageContent",
+            "caption": ""
+        }
+    ]
+}
