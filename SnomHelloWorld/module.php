@@ -5,22 +5,24 @@ class SnomHelloWorld extends IPSModuleStrict {
     public function Create(): void {
         // Diese Zeile nicht löschen.
         parent::Create();
+
         $this->RegisterPropertyString("PhoneIP", "");
         $this->RegisterPropertyString("LocalIP", "");
-        $this->RegisterVariableString("MbRequestUrl", "Minibrowser request URL");
-        $this->RegisterVariableString("MbPage", "Minibrowser page");
+        $this->RegisterPropertyString("Message", "");
+        $this->RegisterPropertyString("Timeout", "");
+        $this->RegisterVariableString("MbRequestUrl", "MbRequestUrl");
+        $this->RegisterVariableString("MbPage", "MbPage");
         $this->RegisterHook("snom/" . $this->InstanceID);
-        $this->RegisterVariableString("SymconCurrentVersion", "Symcon Current version");
     }
     // Überschreibt die intere IPS_ApplyChanges($id) Funktion
     public function ApplyChanges(): void {
         // Diese Zeile nicht löschen
         parent::ApplyChanges();
-        $this->SetValue("SymconCurrentVersion", IPS_GetKernelVersion());
-        $this->SetValue("MbPage", $this->GetIPPhoneTextItem("Hello you", 10000));
         $this->SetValue("MbRequestUrl", $this->GetMbRequestUrl());
+        $mbPage = $this->GetIPPhoneTextItem($this->ReadPropertyString("Message"), $this->ReadPropertyString("Timeout"));
+        $this->SetValue("MbPage", $mbPage);
     }
-
+    
     /**
     * This function will be called by the hook control. Visibility should be protected!
     */
@@ -41,6 +43,7 @@ class SnomHelloWorld extends IPSModuleStrict {
         $fetchTimeout->value = $timeout;
         $fetch->appendChild($fetchTimeout);
         $xmlRoot->appendChild($fetch);
+        $xml->format_output = TRUE;
 
         return $xml->saveXML();
     }
@@ -61,6 +64,6 @@ class SnomHelloWorld extends IPSModuleStrict {
     */
 
     public function GetMbPage(): void {
-        file_get_contents($this->GetValue("MbRequestUrl"));
+        file_get_contents($this->ReadPropertyString("MbRequestUrl"));
     }
 }
