@@ -69,12 +69,7 @@
         {
             "type": "Button",
             "caption": "Ping phone",
-            "onClick": "echo 'This will ping the phone\n(Not implemented)';"
-        },
-        {
-            "type": "Label",
-            "name": "PhoneReachable",
-            "caption": ""
+            "onClick": "echo SNMD_PingPhone($id);"
         }
     ]
 }
