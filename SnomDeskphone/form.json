@@ -1,0 +1,36 @@
+{
+    "elements": [
+        {
+            "type": "ValidationTextBox",
+            "name": "PhoneIP",
+            "caption": "Phone IP address"
+        },
+        {
+            "type": "ValidationTextBox",
+            "name": "PhoneMac",
+            "caption": "Phone MAC address"
+        },
+        {
+            "type": "ValidationTextBox",
+            "name": "PhoneModel",
+            "caption": "Phone model"
+        },
+        {
+            "type": "ValidationTextBox",
+            "name": "LocalIP",
+            "caption": "Local IP address"
+        }
+    ],
+    "actions": [
+        {
+            "type": "Button",
+            "caption": "Ping phone",
+            "onClick": ""
+        },
+        {
+            "type": "Label",
+            "name": "PhoneReachable",
+            "caption": ""
+        }
+    ]
+}
