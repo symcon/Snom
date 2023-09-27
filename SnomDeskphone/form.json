@@ -6,10 +6,20 @@
             "name": "InstanceLabel"
         },
         {
-            "type": "ValidationTextBox",
-            "caption": "Phone IP address",
-            "name": "PhoneIP",
-            "validate": "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
+        "type": "RowLayout",
+        "items": [
+            {
+                "type": "ValidationTextBox",
+                "caption": "Phone IP address",
+                "name": "PhoneIP",
+                "validate": "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
+            },
+            {
+                "type": "Button",
+                "caption": "Ping",
+                "onClick": "echo SNMD_PingPhone($id);"
+            }
+        ]
         },
         {
             "type": "ValidationTextBox",
@@ -50,7 +60,7 @@
         },
         {
             "type": "ValidationTextBox",
-            "caption": "Local IP address",
+            "caption": "Local IP address", 
             "name": "LocalIP",
             "validate": "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
         },
@@ -59,13 +69,6 @@
             "caption": "Configure function keys",
             "name": "FunctionKeys",
             "onChange": "echo $PhoneIP;"
-        }
-    ],
-    "actions": [
-        {
-            "type": "Button",
-            "caption": "Ping phone",
-            "onClick": "echo SNMD_PingPhone($id);"
         }
     ]
 }
