@@ -3,6 +3,7 @@
 class SnomDeskphone extends IPSModuleStrict {
     public function Create(): void {
         parent::Create();
+        $this->RegisterPropertyBoolean("FunctionKeys", false);
     }
 
     public function ApplyChanges(): void {
