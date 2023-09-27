@@ -2,14 +2,14 @@
     "elements": [
         {
             "type": "ValidationTextBox",
-            "name": "PhoneIP",
             "caption": "Phone IP address",
-            "validate":"^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
+            "name": "PhoneIP",
+            "validate": "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
         },
         {
             "type": "ValidationTextBox",
-            "name": "PhoneMac",
             "caption": "Phone MAC address",
+            "name": "PhoneMac",
             "validate": "^((00:04:13:)([0-9a-fA-F]{2}:){2})|((000413)([0-9a-fA-F]{2}){2})[0-9a-fA-F]{2}$"
         },
         {
@@ -17,19 +17,37 @@
             "caption": "Phone model",
             "name": "PhoneModel",
             "options": [
-                { "caption": "Snom D735", "value": 0 },
-                { "caption": "Snom D785", "value": 1 },
-                { "caption": "Snom D335", "value": 2 },
-                { "caption": "Snom D385", "value": 3 },
-                { "caption": "Snom D862", "value": 4 },
-                { "caption": "Snom D865", "value": 5 }
+                {
+                    "caption": "Snom D335",
+                    "value": 2
+                },
+                {
+                    "caption": "Snom D385",
+                    "value": 3
+                },
+                {
+                    "caption": "Snom D735",
+                    "value": 0
+                },
+                {
+                    "caption": "Snom D785",
+                    "value": 1
+                },
+                {
+                    "caption": "Snom D862",
+                    "value": 4
+                },
+                {
+                    "caption": "Snom D865",
+                    "value": 5
+                }
             ]
         },
         {
             "type": "ValidationTextBox",
             "caption": "Local IP address",
             "name": "LocalIP",
-            "validate":"^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
+            "validate": "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
         },
         {
             "type": "CheckBox",
