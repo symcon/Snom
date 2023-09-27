@@ -10,7 +10,7 @@
         "items": [
             {
                 "type": "ValidationTextBox",
-                "caption": "Phone IP address",
+                "caption": "IP address",
                 "name": "PhoneIP",
                 "validate": "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
             },
@@ -23,7 +23,7 @@
         },
         {
             "type": "ValidationTextBox",
-            "caption": "Phone MAC address",
+            "caption": "MAC address",
             "name": "PhoneMac",
             "validate": "^((00:04:13:)([0-9a-fA-F]{2}:){2})|((000413)([0-9a-fA-F]{2}){2})[0-9a-fA-F]{2}$"
         },
