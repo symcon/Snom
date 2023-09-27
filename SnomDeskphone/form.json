@@ -62,14 +62,14 @@
             "type": "CheckBox",
             "caption": "Configure function keys",
             "name": "FunctionKeys",
-            "onChange": "var_dump($PhoneIP);"
+            "onChange": "echo $PhoneIP;"
         }
     ],
     "actions": [
         {
             "type": "Button",
             "caption": "Ping phone",
-            "onClick": ""
+            "onClick": "echo 'This will ping the phone';"
         },
         {
             "type": "Label",
