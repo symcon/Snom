@@ -13,9 +13,17 @@
             "validate": "^((00:04:13:)([0-9a-fA-F]{2}:){2})|((000413)([0-9a-fA-F]{2}){2})[0-9a-fA-F]{2}$"
         },
         {
-            "type": "ValidationTextBox",
+            "type": "Select",
+            "caption": "Phone model",
             "name": "PhoneModel",
-            "caption": "Phone model"
+            "options": [
+                { "caption": "Snom D735", "value": 0 },
+                { "caption": "Snom D785", "value": 1 },
+                { "caption": "Snom D335", "value": 2 },
+                { "caption": "Snom D385", "value": 3 },
+                { "caption": "Snom D862", "value": 4 },
+                { "caption": "Snom D865", "value": 5 }
+            ]
         },
         {
             "type": "ValidationTextBox",
