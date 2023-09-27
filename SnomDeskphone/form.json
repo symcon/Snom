@@ -1,6 +1,15 @@
 {
     "elements": [
         {
+            "type": "Image",
+            "mediaID": 16356
+        },
+        {
+            "type": "Label",
+            "caption": "Configure Snom IP phone",
+            "name": "InstanceLabel"
+        },
+        {
             "type": "ValidationTextBox",
             "caption": "Phone IP address",
             "name": "PhoneIP",
