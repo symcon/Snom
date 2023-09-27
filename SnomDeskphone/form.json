@@ -28,27 +28,27 @@
             "options": [
                 {
                     "caption": "Snom D335",
-                    "value": 0
+                    "value": "snomD335"
                 },
                 {
                     "caption": "Snom D385",
-                    "value": 1
+                    "value": "snomD385"
                 },
                 {
                     "caption": "Snom D735",
-                    "value": 2
+                    "value": "snomD735"
                 },
                 {
                     "caption": "Snom D785",
-                    "value": 3
+                    "value": "snomD785"
                 },
                 {
                     "caption": "Snom D862",
-                    "value": 4
+                    "value": "snomD862"
                 },
                 {
                     "caption": "Snom D865",
-                    "value": 5
+                    "value": "snomD865"
                 }
             ]
         },
@@ -69,7 +69,7 @@
         {
             "type": "Button",
             "caption": "Ping phone",
-            "onClick": "echo 'This will ping the phone';"
+            "onClick": "echo 'This will ping the phone\n(Not implemented)';"
         },
         {
             "type": "Label",
