@@ -19,19 +19,19 @@
             "options": [
                 {
                     "caption": "Snom D335",
-                    "value": 2
-                },
-                {
-                    "caption": "Snom D385",
-                    "value": 3
-                },
-                {
-                    "caption": "Snom D735",
                     "value": 0
                 },
                 {
-                    "caption": "Snom D785",
+                    "caption": "Snom D385",
                     "value": 1
+                },
+                {
+                    "caption": "Snom D735",
+                    "value": 2
+                },
+                {
+                    "caption": "Snom D785",
+                    "value": 3
                 },
                 {
                     "caption": "Snom D862",
