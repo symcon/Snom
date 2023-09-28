@@ -28,14 +28,6 @@ class SnomDeskphone extends IPSModuleStrict {
     public function ApplyChanges(): void {
         parent::ApplyChanges();
     }
-    
-    /**
-    * This function will be called by the hook control. Visibility should be protected!
-    */
-    // protected function ProcessHookData(): void {
-    //     header("Content-Type: text/xml");
-    // }
-
 
     // Usage of public functions (prefix defined in module.json):
     // SNMD_PingPhone();
@@ -43,21 +35,16 @@ class SnomDeskphone extends IPSModuleStrict {
     public function PingPhone(): string {
         $phoneIp = $this->ReadPropertyString("PhoneIP");
 
-        if (Sys_Ping($phoneIp, 10000)) {
+        if (Sys_Ping($phoneIp, 4000)) {
             return sprintf("Phone with IP %s is reachable", $phoneIp);
         }
         return sprintf("Phone with IP %s is not reachable", $phoneIp);
     }
 
     public function SetFkeySettings(int $fKeyIndex): void {
-        // http://192.168.8.26/dummy.htm?settings=save&fkey1=url http://192.168.8.79:3777/hook/snom/23983
         $actionUrl = sprintf("ActionURLfKey%d", $fKeyIndex);
         $actionUrlValue = $this->ReadPropertyString($actionUrl);
-        $fkeyType = "none";
-
-        if ($actionUrlValue) {
-            $fkeyType = "url";
-        }
+        $actionUrlValue ? $fkeyType="url" : $fkeyType = "none";
 
         $label = sprintf("LabelFkey%d", $fKeyIndex);
         $labelValue = urlencode($this->ReadPropertyString($label));
@@ -72,7 +59,7 @@ class SnomDeskphone extends IPSModuleStrict {
         $baseUrl = sprintf("http://%s/dummy.htm?", $phoneIp);
         $url = sprintf("%s%s", $baseUrl, $urlQuery);
         $this->SendDebug("URL", print_r($url, true), 0);
-        // $this->SendDebug("URL", print_r(urlencode($url), true), 0);
+
         file_get_contents($url);
     }
 
