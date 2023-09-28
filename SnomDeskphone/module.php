@@ -27,6 +27,7 @@ class SnomDeskphone extends IPSModuleStrict {
 
     public function ApplyChanges(): void {
         parent::ApplyChanges();
+        $this->IPS_SetName("bla");
     }
 
     // Usage of public functions (prefix defined in module.json):
