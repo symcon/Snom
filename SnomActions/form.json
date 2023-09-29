@@ -1,0 +1,45 @@
+{
+    "elements": [
+        {
+        "type": "List",
+        "caption": "Snom actions",
+        "name": "SnomActions",
+        "add": true,
+        "delete": true,
+        "columns": [
+            {
+                "caption": "Name",
+                "name": "ActionName",
+                "width": "auto",
+                "align": "center",
+                "add": "",
+                "edit": {
+                    "type": "ValidationTextBox"
+                }
+            },
+            {
+                "caption": "Variable",
+                "name": "ActionVariableId",
+                "width": "auto",
+                "align": "center",
+                "add": 0,
+                "edit": {
+                    "type": "SelectVariable"
+                },
+                "onChange": "SNMA_SetVariableId($id, $ActionVariableId);"
+            },
+            {
+                "caption": "Value",
+                "name": "ActionValue",
+                "width": "auto",
+                "align": "center",
+                "add": 0,
+                "edit": {
+                    "type": "SelectValue",
+                    "variableID": 0
+                }
+            }
+        ]
+        }
+    ]
+}

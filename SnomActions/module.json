@@ -1,0 +1,15 @@
+{
+	"id": "{39F83866-07BF-982C-A2F0-26C9CCC7A104}",
+	"name": "Snom Actions",
+	"type": 3,
+	"vendor": "Snom Technology GmbH",
+	"aliases": 
+	[
+		"Snom (Actions)"
+	],
+	"url": "https://www.snom.com/en/",
+	"parentRequirements": [],
+	"childRequirements": [],
+	"implemented": [],
+	"prefix": "SNMA"
+}
