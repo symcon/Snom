@@ -4,8 +4,10 @@ class SnomActions extends IPSModuleStrict {
     public function Create(): void {
         parent::Create();
         $this->RegisterPropertyString("ActionName", "");
-        $this->RegisterPropertyInteger("ActionVariableId", 47549);
-        $this->RegisterPropertyBoolean("ActionValue", true);
+        $this->RegisterPropertyInteger("ActionVariableId", 0);
+        $this->RegisterPropertyString("ActionHook", "/snom");
+        // $this->RegisterPropertyBoolean("ActionValue", true);
+        $this->RegisterHook("snom/" . $this->InstanceID);
     }
 
     public function ApplyChanges(): void {
@@ -16,7 +18,13 @@ class SnomActions extends IPSModuleStrict {
     // SNMD_SetVariableId();
 
     public function SetVariableId(int $variableId): void {
-        $this->UpdateFormField("ActionValue", "VariableID", $variableId);
-        $this->SendDebug('change', print_r('changed variable', true), 0);
+        $this->UpdateFormField("ActionValue", "variableID", $variableId);
+        $this->SendDebug('set', print_r('set variable id', true), 0);
+    }
+
+    public function CreateHook(int $variableId): void {
+        // create hook
+        $this->UpdateFormField("ActionHook", "value", sprintf("/snom/%d", $variableId));
+        $this->SendDebug('create', print_r('hook created', true), 0);
     }
 }

@@ -1,45 +1,78 @@
 {
     "elements": [
         {
-        "type": "List",
-        "caption": "Snom actions",
-        "name": "SnomActions",
-        "add": true,
-        "delete": true,
-        "columns": [
-            {
-                "caption": "Name",
-                "name": "ActionName",
-                "width": "auto",
-                "align": "center",
-                "add": "",
-                "edit": {
-                    "type": "ValidationTextBox"
-                }
-            },
-            {
-                "caption": "Variable",
-                "name": "ActionVariableId",
-                "width": "auto",
-                "align": "center",
-                "add": 0,
-                "edit": {
-                    "type": "SelectVariable"
+            "type": "List",
+            "caption": "Snom actions",
+            "name": "SnomActions",
+            "add": true,
+            "delete": true,
+            "columns": [
+                {
+                    "caption": "Name",
+                    "name": "ActionName",
+                    "width": "auto",
+                    "align": "center",
+                    "add": "",
+                    "edit": {
+                        "type": "ValidationTextBox"
+                    }
                 },
-                "onChange": "SNMA_SetVariableId($id, $ActionVariableId);"
-            },
-            {
-                "caption": "Value",
-                "name": "ActionValue",
-                "width": "auto",
-                "align": "center",
-                "add": 0,
-                "edit": {
-                    "type": "SelectValue",
-                    "variableID": 0
+                {
+                    "caption": "Variable",
+                    "name": "ActionVariableId",
+                    "width": "auto",
+                    "align": "center",
+                    "add": 0,
+                    "edit": {
+                        "type": "SelectVariable"
+                    }
+                },
+                {
+                    "caption": "Value",
+                    "name": "ActionValue",
+                    "width": "auto",
+                    "align": "center",
+                    "add": 0,
+                    "edit": {
+                        "type": "SelectValue"
+                    }
+                },
+                {
+                    "caption": "Hook",
+                    "name": "ActionHook",
+                    "width": "auto",
+                    "align": "center",
+                    "add": "",
+                    "edit": {
+                        "type": "ValidationTextBox"
+                    }
                 }
-            }
-        ]
+            ],
+            "values": [],
+            "form": [
+                {
+                    "type": "ValidationTextBox",
+                    "name": "ActionName",
+                    "caption": "Name"
+                },
+                {
+                    "type": "SelectVariable",
+                    "name": "ActionVariableId",
+                    "caption": "Variable",
+                    "onChange": "SNMA_SetVariableId($id, $ActionVariableId); SNMA_CreateHook($id, $ActionVariableId);"
+                },
+                {
+                    "type": "SelectValue",
+                    "name": "ActionValue",
+                    "caption": "Value",
+                    "variableID": 0
+                },
+                {
+                    "type": "ValidationTextBox",
+                    "name": "ActionHook",
+                    "caption": "Hook"
+                }
+            ]
         }
     ]
 }
