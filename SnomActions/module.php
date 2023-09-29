@@ -7,7 +7,6 @@ class SnomActions extends IPSModuleStrict {
         $this->RegisterPropertyInteger("ActionVariableId", 0);
         $this->RegisterPropertyString("ActionHook", "/snom");
         // $this->RegisterPropertyBoolean("ActionValue", true);
-        $this->RegisterHook("snom/" . $this->InstanceID);
     }
 
     public function ApplyChanges(): void {
@@ -23,7 +22,7 @@ class SnomActions extends IPSModuleStrict {
     }
 
     public function CreateHook(int $variableId): void {
-        // create hook
+        $this->RegisterHook("snom/" . $variableId);
         $this->UpdateFormField("ActionHook", "value", sprintf("/snom/%d", $variableId));
         $this->SendDebug('create', print_r('hook created', true), 0);
     }
