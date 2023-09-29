@@ -1,0 +1,15 @@
+{
+	"id": "{6A66A16E-5525-10FE-72D4-772C9ADD8D45}",
+	"name": "SnomDeskphone",
+	"type": 3,
+	"vendor": "Snom Technology GmbH",
+	"aliases": 
+	[
+		"Snom (Deskphone)"
+	],
+	"url": "https://www.snom.com/en/",
+	"parentRequirements": [],
+	"childRequirements": [],
+	"implemented": [],
+	"prefix": "SNMD"
+}
