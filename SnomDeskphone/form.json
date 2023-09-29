@@ -71,8 +71,12 @@
             "items": [
                 {
                     "type": "RowLayout",
-                    "caption": "Function key 1",
                     "items": [
+                        {
+                            "type": "Label",
+                            "caption": "Fkey 1",
+                            "name": "Fkey0"
+                        },
                         {
                             "type": "ValidationTextBox",
                             "caption": "Action URL",
@@ -144,8 +148,12 @@
                 },
                 {
                     "type": "RowLayout",
-                    "caption": "Function key 2",
                     "items": [
+                        {
+                            "type": "Label",
+                            "caption": "Fkey 2",
+                            "name": "Fkey1"
+                        },
                         {
                             "type": "ValidationTextBox",
                             "caption": "Action URL",

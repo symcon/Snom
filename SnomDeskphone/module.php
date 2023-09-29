@@ -20,7 +20,7 @@ class SnomDeskphone extends IPSModuleStrict {
     private function RegisterFkeyProperties(int $fkeyIndex): void {
         $this->RegisterPropertyString(sprintf("ActionURLfKey%d", $fkeyIndex), "");
         $this->RegisterPropertyString(sprintf("LabelFkey%d", $fkeyIndex), "");
-        $this->RegisterPropertyString(sprintf("LedfKey%d", $fkeyIndex), "");
+        $this->RegisterPropertyInteger(sprintf("LedfKey%d", $fkeyIndex), 0);
         $this->RegisterPropertyString(sprintf("ColorFkey%dOn", $fkeyIndex), "green");
         $this->RegisterPropertyString(sprintf("ColorFkey%dOff", $fkeyIndex), "red");
     }
