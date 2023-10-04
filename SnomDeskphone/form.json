@@ -65,166 +65,131 @@
             "validate": "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
         },
         {
-            "type": "ExpansionPanel",
+            "type": "List",
             "caption": "Function keys settings",
-            "expanded": true,
-            "items": [
+            "name": "Function keys settings",
+            "add": true,
+            "delete": true,
+            "columns": [
                 {
-                    "type": "RowLayout",
-                    "items": [
+                    "caption": "Function key",
+                    "name": "FkeyNo",
+                    "width": "auto",
+                    "align": "center",
+                    "add": -1,
+                    "edit": {
+                        "type": "NumberSpinner"
+                    }
+                },
+                {
+                    "caption": "Action variable",
+                    "name": "variable",
+                    "width": "auto",
+                    "align": "center",
+                    "add": 0,
+                    "edit": {
+                        "type": "SelectVariable"
+                    }
+                },
+                {
+                    "caption": "Label",
+                    "name": "FkeyLabel",
+                    "width": "auto",
+                    "align": "center",
+                    "add": "",
+                    "edit": {
+                        "type": "ValidationTextBox"
+                    }
+                },
+                {
+                    "caption": "LED color for on",
+                    "name": "FkeyColorOn",
+                    "width": "auto",
+                    "align": "center",
+                    "add": "",
+                    "edit": {
+                        "type": "Select"
+                    }
+                },
+                {
+                    "caption": "LED color for off",
+                    "name": "FkeyColorOff",
+                    "width": "auto",
+                    "align": "center",
+                    "add": "",
+                    "edit": {
+                        "type": "Select"
+                    }
+                }
+            ],
+            "values": [],
+            "form": [
+                {
+                    "type": "NumberSpinner",
+                    "name": "FkeyNo",
+                    "caption": "Fkey No",
+                    "minimum": 1,
+                    "maximum": 4
+                },
+                {
+                    "type": "SelectVariable",
+                    "name": "variable",
+                    "caption": "Action variable"
+                },
+                {
+                    "type": "ValidationTextBox",
+                    "name": "FkeyLabel",
+                    "caption": "Label"
+                },
+                {
+                    "type": "Select",
+                    "name": "FkeyColorOn",
+                    "caption": "LED color for on",
+                    "options": [
                         {
-                            "type": "Label",
-                            "caption": "Fkey 1",
-                            "name": "Fkey0"
+                            "caption": "Green",
+                            "value": "green"
                         },
                         {
-                            "type": "ValidationTextBox",
-                            "caption": "Action URL",
-                            "name": "ActionURLfKey0"
+                            "caption": "Red",
+                            "value": "red"
                         },
                         {
-                            "type": "ValidationTextBox",
-                            "caption": "Label",
-                            "name": "LabelFkey0"
+                            "caption": "Yellow",
+                            "value": "yellow"
                         },
                         {
-                            "type": "SelectVariable",
-                            "caption": "LED status variable",
-                            "name": "LedfKey0"
-                        },
-                        {
-                            "type": "Select",
-                            "caption": "LED color for on",
-                            "name": "ColorFkey0On",
-                            "options": [
-                                {
-                                    "caption": "Green",
-                                    "value": "green"
-                                },
-                                {
-                                    "caption": "Red",
-                                    "value": "red"
-                                },
-                                {
-                                    "caption": "Yellow",
-                                    "value": "yellow"
-                                },
-                                {
-                                    "caption": "Off",
-                                    "value": "off"
-                                }
-                                
-                            ]
-                        },
-                        {
-                            "type": "Select",
-                            "caption": "LED color for off",
-                            "name": "ColorFkey0Off",
-                            "options": [
-                                {
-                                    "caption": "Green",
-                                    "value": "green"
-                                },
-                                {
-                                    "caption": "Red",
-                                    "value": "red"
-                                },
-                                {
-                                    "caption": "Yellow",
-                                    "value": "yellow"
-                                },
-                                {
-                                    "caption": "Off",
-                                    "value": "off"
-                                }
-                            ]
-                        },
-                        {
-                            "type": "Button",
-                            "caption": "Set",
-                            "onClick": "SNMD_SetFkeySettings($id, 0);"
+                            "caption": "Off",
+                            "value": "off"
                         }
+                        
                     ]
                 },
                 {
-                    "type": "RowLayout",
-                    "items": [
+                    "type": "Select",
+                    "name": "FkeyColorOff",
+                    "caption": "LED color for off",
+                    "options": [
                         {
-                            "type": "Label",
-                            "caption": "Fkey 2",
-                            "name": "Fkey1"
+                            "caption": "Green",
+                            "value": "green"
                         },
                         {
-                            "type": "ValidationTextBox",
-                            "caption": "Action URL",
-                            "name": "ActionURLfKey1"
+                            "caption": "Red",
+                            "value": "red"
                         },
                         {
-                            "type": "ValidationTextBox",
-                            "caption": "Label",
-                            "name": "LabelFkey1"
+                            "caption": "Yellow",
+                            "value": "yellow"
                         },
                         {
-                            "type": "SelectVariable",
-                            "caption": "LED status variable",
-                            "name": "LedfKey2"
-                        },
-                        {
-                            "type": "Select",
-                            "caption": "LED color for on",
-                            "name": "ColorFkey1On",
-                            "options": [
-                                {
-                                    "caption": "Green",
-                                    "value": "green"
-                                },
-                                {
-                                    "caption": "Red",
-                                    "value": "red"
-                                },
-                                {
-                                    "caption": "Yellow",
-                                    "value": "yellow"
-                                },
-                                {
-                                    "caption": "Off",
-                                    "value": "off"
-                                }
-                                
-                            ]
-                        },
-                        {
-                            "type": "Select",
-                            "caption": "LED color for off",
-                            "name": "ColorFkey1Off",
-                            "options": [
-                                {
-                                    "caption": "Green",
-                                    "value": "green"
-                                },
-                                {
-                                    "caption": "Red",
-                                    "value": "red"
-                                },
-                                {
-                                    "caption": "Yellow",
-                                    "value": "yellow"
-                                },
-                                {
-                                    "caption": "Off",
-                                    "value": "off"
-                                }
-                            ]
-                        },
-                        {
-                            "type": "Button",
-                            "caption": "Set",
-                            "onClick": "SNMD_SetFkeySettings($id, 1);"
+                            "caption": "Off",
+                            "value": "off"
                         }
                     ]
                 }
-            ]
-
+            ],
+            "onEdit": "SNMD_SetFkeySettings($id, 0);"
         }
     ]
 }
