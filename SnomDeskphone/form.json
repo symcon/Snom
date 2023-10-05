@@ -67,7 +67,7 @@
         {
             "type": "List",
             "caption": "Function keys settings",
-            "name": "Function keys settings",
+            "name": "FkeysSettings",
             "add": true,
             "delete": true,
             "columns": [
@@ -83,12 +83,32 @@
                 },
                 {
                     "caption": "Action variable",
-                    "name": "variable",
+                    "name": "ActionVariableId",
                     "width": "auto",
                     "align": "center",
                     "add": 0,
                     "edit": {
                         "type": "SelectVariable"
+                    }
+                },
+                {
+                    "caption": "Value",
+                    "name": "ActionValue",
+                    "width": "auto",
+                    "align": "center",
+                    "add": 0,
+                    "edit": {
+                        "type": "SelectValue"
+                    }
+                },
+                {
+                    "caption": "Hook",
+                    "name": "ActionHook",
+                    "width": "auto",
+                    "align": "center",
+                    "add": "",
+                    "edit": {
+                        "type": "ValidationTextBox"
                     }
                 },
                 {
@@ -132,9 +152,27 @@
                     "maximum": 4
                 },
                 {
+                    "type": "CheckBox",
+                    "name": "RecieveOnly",
+                    "caption": "Recieve value only",
+                    "onChange": "SNMD_SetValueFieldVisibility($id, $RecieveOnly);"
+                },
+                {
                     "type": "SelectVariable",
-                    "name": "variable",
-                    "caption": "Action variable"
+                    "name": "ActionVariableId",
+                    "caption": "Action variable",
+                    "onChange": "SNMD_SetVariableId($id, $ActionVariableId); SNMD_CreateHook($id, $ActionVariableId);"
+                },
+                {
+                    "type": "SelectValue",
+                    "name": "ActionValue",
+                    "caption": "Value",
+                    "variableID": 0
+                },
+                {
+                    "type": "ValidationTextBox",
+                    "name": "ActionHook",
+                    "caption": "Hook"
                 },
                 {
                     "type": "ValidationTextBox",
@@ -187,9 +225,13 @@
                             "value": "off"
                         }
                     ]
+                },
+                {
+                    "type": "Button",
+                    "caption": "Set",
+                    "onClick": "SNMD_SetFkeySettings($id, $RecieveOnly, $FkeyNo, $ActionHook, $FkeyLabel);"
                 }
-            ],
-            "onEdit": "SNMD_SetFkeySettings($id, 0);"
+            ]
         }
     ]
 }
