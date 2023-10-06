@@ -39,6 +39,9 @@ class SnomDeskphone extends IPSModuleStrict {
 
     public function ApplyChanges(): void {
         parent::ApplyChanges();
+
+        // Transfer to Phone, better: list to actions in form.json
+
     }
 
     // Usage of public functions (prefix defined in module.json):
@@ -107,6 +110,23 @@ class SnomDeskphone extends IPSModuleStrict {
         $this->SendDebug("URL", print_r($url, true), 0);
 
         file_get_contents($url);
+    }
+
+
+    public function GetConfigurationForm(): string
+    {
+        $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
+        $data["elements"][5]["form"] = "return json_decode(SNMD_UIGetForm(\$id, \$FkeysSettings['ActionVariableId'] ?? 0, \$FkeysSettings['RecieveOnly'] ?? false), true);";
+        return json_encode($data);
+    }
+
+    public function UIGetForm(int $ActionVariableId, bool $recvOnly): string {
+        $this->SendDebug("asd", (int)$recvOnly, 0);
+
+        $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
+        $data["elements"][5]["form"][3]["variableID"] = $ActionVariableId;
+        $data["elements"][5]["form"][3]["visible"] = !$recvOnly;
+        return json_encode($data["elements"][5]["form"]);
     }
 
     // has_expanstion_module()

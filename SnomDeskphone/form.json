@@ -82,6 +82,16 @@
                     }
                 },
                 {
+                    "caption": "Recieve value only",
+                    "name": "RecieveOnly",
+                    "width": "100px",
+                    "visible": false,
+                    "add": false,
+                    "edit": {
+                        "type": "CheckBox"
+                    }
+                },
+                {
                     "caption": "Action variable",
                     "name": "ActionVariableId",
                     "width": "auto",
@@ -128,7 +138,8 @@
                     "align": "center",
                     "add": "",
                     "edit": {
-                        "type": "Select"
+                        "type": "Select",
+                        "options": []
                     }
                 },
                 {
@@ -138,7 +149,8 @@
                     "align": "center",
                     "add": "",
                     "edit": {
-                        "type": "Select"
+                        "type": "Select",
+                        "options": []
                     }
                 }
             ],
@@ -229,7 +241,7 @@
                 {
                     "type": "Button",
                     "caption": "Set",
-                    "onClick": "SNMD_SetFkeySettings($id, $FkeyNo, $RecieveOnly, $ActionHook, $FkeyLabel);"
+                    "onClick": "SNMD_SetFkeySettings($id, $RecieveOnly, $FkeyNo, $ActionHook, $FkeyLabel);"
                 }
             ]
         }
