@@ -116,7 +116,20 @@ class SnomDeskphone extends IPSModuleStrict {
     public function GetConfigurationForm(): string
     {
         $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
-        $data["elements"][5]["form"] = "return json_decode(SNMD_UIGetForm(\$id, \$FkeysSettings['ActionVariableId'] ?? 0, \$FkeysSettings['RecieveOnly'] ?? false), true);";
+        $d735fkeyRange = range(1, 8);
+
+        foreach ($d735fkeyRange as $fkeyNo) {
+            $data["actions"][0]["values"][$fkeyNo-1]["FkeyNo"] = $fkeyNo;
+            $data["actions"][0]["values"][$fkeyNo-1]["CheckBox"] = false;
+            $data["actions"][0]["values"][$fkeyNo-1]["ActionVariableId"] = "";
+            $data["actions"][0]["values"][$fkeyNo-1]["ActionValue"] = NULL;
+            $data["actions"][0]["values"][$fkeyNo-1]["ActionHook"] = "not set";
+            $data["actions"][0]["values"][$fkeyNo-1]["FkeyLabel"] = "not set";
+            $data["actions"][0]["values"][$fkeyNo-1]["FkeyColorOn"] = "none";
+            $data["actions"][0]["values"][$fkeyNo-1]["FkeyColorOff"] = "none";
+        }
+        $fkeysFormAction["form"] = "return json_decode(SNMD_UIGetForm(\$id, \$FkeysSettings['ActionVariableId'] ?? 0, \$FkeysSettings['RecieveOnly'] ?? false), true);";
+        
         return json_encode($data);
     }
 
@@ -124,9 +137,10 @@ class SnomDeskphone extends IPSModuleStrict {
         $this->SendDebug("asd", (int)$recvOnly, 0);
 
         $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
-        $data["elements"][5]["form"][3]["variableID"] = $ActionVariableId;
-        $data["elements"][5]["form"][3]["visible"] = !$recvOnly;
-        return json_encode($data["elements"][5]["form"]);
+        $data["actions"][0]["form"][3]["variableID"] = $ActionVariableId;
+        $data["actions"][0]["form"][3]["visible"] = !$recvOnly;
+
+        return json_encode($data["actions"][0]["form"]);
     }
 
     // has_expanstion_module()

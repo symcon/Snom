@@ -63,18 +63,20 @@
             "caption": "Local IP address", 
             "name": "LocalIP",
             "validate": "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
-        },
+        }
+    ],
+    "actions": [
         {
             "type": "List",
             "caption": "Function keys settings",
             "name": "FkeysSettings",
-            "add": true,
-            "delete": true,
+            "add": false,
+            "delete": false,
             "columns": [
                 {
                     "caption": "Function key",
                     "name": "FkeyNo",
-                    "width": "auto",
+                    "width": "100px",
                     "align": "center",
                     "add": -1,
                     "edit": {
@@ -94,7 +96,7 @@
                 {
                     "caption": "Action variable",
                     "name": "ActionVariableId",
-                    "width": "auto",
+                    "width": "300px",
                     "align": "center",
                     "add": 0,
                     "edit": {
@@ -104,7 +106,7 @@
                 {
                     "caption": "Value",
                     "name": "ActionValue",
-                    "width": "auto",
+                    "width": "100px",
                     "align": "center",
                     "add": 0,
                     "edit": {
@@ -114,7 +116,7 @@
                 {
                     "caption": "Hook",
                     "name": "ActionHook",
-                    "width": "auto",
+                    "width": "100px",
                     "align": "center",
                     "add": "",
                     "edit": {
@@ -124,7 +126,7 @@
                 {
                     "caption": "Label",
                     "name": "FkeyLabel",
-                    "width": "auto",
+                    "width": "300px",
                     "align": "center",
                     "add": "",
                     "edit": {
@@ -134,7 +136,7 @@
                 {
                     "caption": "LED color for on",
                     "name": "FkeyColorOn",
-                    "width": "auto",
+                    "width": "300px",
                     "align": "center",
                     "add": "",
                     "edit": {
@@ -145,7 +147,7 @@
                 {
                     "caption": "LED color for off",
                     "name": "FkeyColorOff",
-                    "width": "auto",
+                    "width": "300px",
                     "align": "center",
                     "add": "",
                     "edit": {
@@ -233,8 +235,8 @@
                             "value": "yellow"
                         },
                         {
-                            "caption": "Off",
-                            "value": "off"
+                            "caption": "None",
+                            "value": ""
                         }
                     ]
                 },
