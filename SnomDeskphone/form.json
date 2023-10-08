@@ -241,7 +241,7 @@
                 {
                     "type": "Button",
                     "caption": "Set",
-                    "onClick": "SNMD_SetFkeySettings($id, $RecieveOnly, $FkeyNo, $ActionHook, $FkeyLabel);"
+                    "onClick": "SNMD_SetFkeySettings($id, $FkeyNo, $RecieveOnly, $ActionHook, $FkeyLabel);"
                 }
             ]
         }
