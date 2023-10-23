@@ -64,14 +64,6 @@ class SnomDeskphone extends IPSModuleStrict {
     public function SetFkeySettings(int $fKey, bool $isRecieveOnly, string $variableHook, string $labelValue): void {
         $fKeyIndex = $fKey-1;
         $this->SendDebug("INFO", print_r("Configuring fkey " . $fKeyIndex, true), 0);
-        // $actionUrl = sprintf("ActionURLfKey%d", $fKeyIndex);
-        // $actionUrlValue = $this->ReadPropertyString($actionUrl);
-        // $isRecieveOnly = $this->ReadPropertyBoolean("RecieveOnly");
-        // $isRecieveOnly ? $fkeyType="none" : $fkeyType = "url";
-        // $actionUrlValue ? $fkeyType="url" : $fkeyType = "none";
-        // $variableHook = $this->ReadPropertyString("ActionHook");
-
-        // $labelValue = urlencode($this->ReadPropertyString("FkeyLabel"));
 
         if ($isRecieveOnly) {
             $fkeyType="none";
