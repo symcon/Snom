@@ -58,7 +58,7 @@ class SnomDeskphone extends IPSModuleStrict {
     public function CreateHook(int $variableId): void {
         $this->RegisterHook("snom/" . $variableId);
         $this->UpdateFormField("ActionHook", "value", sprintf("/snom/%d", $variableId));
-        $this->SendDebug('create', print_r('hook created' . $this->ReadPropertyString("ActionHook"), true), 0);
+        $this->SendDebug('create', print_r(sprintf("hook created /snom/%d", $variableId), true), 0);
     }
 
     public function SetFkeySettings(int $fKey, bool $isRecieveOnly, string $variableHook, string $labelValue): void {
@@ -75,10 +75,10 @@ class SnomDeskphone extends IPSModuleStrict {
             $fkeyValue = urlencode($fkeyType ." " . $localIp . ":3777/hook" . $variableHook);
         }
 
-        $urlQuery = sprintf("settings=save&fkey%d=%s&fkey_label%d=%s", $fKeyIndex, $fkeyValue, $fKeyIndex, $labelValue);
+        $urlQuery = sprintf("settings=save&fkey%d=%s&fkey_label%d=%s", $fKeyIndex, $fkeyValue, $fKeyIndex, urlencode($labelValue));
 
         if ($this->ReadPropertyString("PhoneModel")=="snomD735") {
-            $urlQuery = sprintf("%s&fkey_short_label%d=%s", $urlQuery, $fKeyIndex, $labelValue);
+            $urlQuery = sprintf("%s&fkey_short_label%d=%s", $urlQuery, $fKeyIndex, urlencode($labelValue));
         }
 
         $phoneIp = $this->ReadPropertyString("PhoneIP");
