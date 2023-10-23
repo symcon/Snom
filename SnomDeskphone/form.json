@@ -211,8 +211,8 @@
                             "value": "yellow"
                         },
                         {
-                            "caption": "Off",
-                            "value": "off"
+                            "caption": "None",
+                            "value": "none"
                         }
                         
                     ]
