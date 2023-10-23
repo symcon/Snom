@@ -29,6 +29,14 @@ class SnomDeskphone extends IPSModuleStrict {
 
     }
 
+    /**
+    * This function will be called by the hook control. Visibility should be protected!
+    */
+    protected function ProcessHookData(): void {
+        $this->SendDebug("GET", print_r($_GET, true), 0);
+        $this->SendDebug("SERVER", print_r($_SERVER, true), 0);
+    }
+
     // Usage of public functions (prefix defined in module.json):
     // SNMD_PingPhone();
 
