@@ -10,7 +10,7 @@ services:
             - '/opt/symcon/data:/var/lib/symcon'
             - '/opt/symcon/log:/var/log/symcon'
             - '/opt/symcon:/root'
-        image: 'symcon/symcon:testing'
+        image: 'symcon/symcon:7.0-405-amd64'
 
     portainer:
         ports:
