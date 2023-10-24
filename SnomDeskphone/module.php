@@ -33,8 +33,12 @@ class SnomDeskphone extends IPSModuleStrict {
     * This function will be called by the hook control. Visibility should be protected!
     */
     protected function ProcessHookData(): void {
-        $this->SendDebug("GET", print_r($_GET, true), 0);
-        $this->SendDebug("SERVER", print_r($_SERVER, true), 0);
+        $value = $_GET["value"];
+        $this->SendDebug("GET", print_r($value, true), 0);
+        $urlPathItems = explode("/", $_SERVER["PHP_SELF"]);
+        $variableId = (int)$urlPathItems["3"];
+        $this->SendDebug("HOOK", print_r($variableId, true), 0);
+        RequestAction($variableId, $value);
     }
 
     // Usage of public functions (prefix defined in module.json):
@@ -65,11 +69,11 @@ class SnomDeskphone extends IPSModuleStrict {
 
     public function CreateHook(int $variableId): void {
         $this->RegisterHook("snom/" . $variableId);
-        $this->UpdateFormField("ActionHook", "value", sprintf("/snom/%d", $variableId));
+        $this->UpdateFormField("ActionHook", "value", sprintf("/snom/%d/", $variableId));
         $this->SendDebug('create', print_r(sprintf("hook created /snom/%d", $variableId), true), 0);
     }
 
-    public function SetFkeySettings(int $fKey, bool $isRecieveOnly, string $variableHook, string $labelValue): void {
+    public function SetFkeySettings(int $fKey, bool $isRecieveOnly, string $variableHook, string $variableValue, string $labelValue): void {
         $fKeyIndex = $fKey-1;
         $this->SendDebug("INFO", print_r("Configuring fkey " . $fKeyIndex, true), 0);
 
@@ -80,7 +84,7 @@ class SnomDeskphone extends IPSModuleStrict {
         else {
             $fkeyType = "url";
             $localIp = $this->ReadPropertyString("LocalIP");
-            $fkeyValue = urlencode($fkeyType ." " . $localIp . ":3777/hook" . $variableHook);
+            $fkeyValue = urlencode($fkeyType ." " . $localIp . ":3777/hook" . $variableHook . "?value=" . $variableValue);
         }
 
         $urlQuery = sprintf("settings=save&fkey%d=%s&fkey_label%d=%s", $fKeyIndex, $fkeyValue, $fKeyIndex, urlencode($labelValue));
@@ -106,21 +110,21 @@ class SnomDeskphone extends IPSModuleStrict {
         foreach ($d735fkeyRange as $fkeyNo) {
             $data["actions"][0]["values"][$fkeyNo-1]["FkeyNo"] = $fkeyNo;
             $data["actions"][0]["values"][$fkeyNo-1]["CheckBox"] = false;
-            $data["actions"][0]["values"][$fkeyNo-1]["ActionVariableId"] = "";
-            $data["actions"][0]["values"][$fkeyNo-1]["ActionValue"] = NULL;
+            $data["actions"][0]["values"][$fkeyNo-1]["ActionVariableId"] = -1;
+            $data["actions"][0]["values"][$fkeyNo-1]["ActionValue"] = false;
             $data["actions"][0]["values"][$fkeyNo-1]["ActionHook"] = "not set";
             $data["actions"][0]["values"][$fkeyNo-1]["FkeyLabel"] = "not set";
             $data["actions"][0]["values"][$fkeyNo-1]["FkeyColorOn"] = "none";
             $data["actions"][0]["values"][$fkeyNo-1]["FkeyColorOff"] = "none";
         }
-        $fkeysFormAction["form"] = "return json_decode(SNMD_UIGetForm(\$id, \$FkeysSettings['ActionVariableId'] ?? 0, \$FkeysSettings['RecieveOnly'] ?? false), true);";
+
+        $data["actions"][0]["form"] = "return json_decode(SNMD_UIGetForm(\$id, \$FkeysSettings['ActionVariableId'] ?? 0, \$FkeysSettings['RecieveOnly'] ?? false, \$FkeysSettings['ActionValue']), true);";
         
         return json_encode($data);
     }
 
-    public function UIGetForm(int $ActionVariableId, bool $recvOnly): string {
-        $this->SendDebug("asd", (int)$recvOnly, 0);
-
+    public function UIGetForm(int $ActionVariableId, bool $recvOnly, bool $value): string {
+        $this->SendDebug("SETTING", print_r((int)$value, true), 0);
         $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
         $data["actions"][0]["form"][3]["variableID"] = $ActionVariableId;
         $data["actions"][0]["form"][3]["visible"] = !$recvOnly;
