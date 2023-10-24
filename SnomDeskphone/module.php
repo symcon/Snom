@@ -1,11 +1,13 @@
 <?php
 
+require_once("phoneProperties.php");
+
 class SnomDeskphone extends IPSModuleStrict {
     public function Create(): void {
         parent::Create();
         $this->RegisterPropertyString("PhoneIP", "");
         $this->RegisterPropertyString("PhoneMac", "000413");
-        $this->RegisterPropertyString("PhoneModel", "snomD785");
+        $this->RegisterPropertyString("PhoneModel", "");
         $this->RegisterPropertyString("LocalIP", "127.0.0.1");
         $this->RegisterFkeysProperties();
     }
@@ -101,13 +103,13 @@ class SnomDeskphone extends IPSModuleStrict {
         file_get_contents($url);
     }
 
-
     public function GetConfigurationForm(): string
     {
         $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
-        $d735fkeyRange = range(1, 8);
+        $phoneModel =$this->ReadPropertyString("PhoneModel");
+        $fkeyRange = PhoneProperties::getFkeysRange($phoneModel);
 
-        foreach ($d735fkeyRange as $fkeyNo) {
+        foreach ($fkeyRange as $fkeyNo) {
             $data["actions"][0]["values"][$fkeyNo-1]["FkeyNo"] = $fkeyNo;
             $data["actions"][0]["values"][$fkeyNo-1]["CheckBox"] = false;
             $data["actions"][0]["values"][$fkeyNo-1]["ActionVariableId"] = -1;
