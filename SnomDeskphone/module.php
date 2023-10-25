@@ -111,14 +111,16 @@ class SnomDeskphone extends IPSModuleStrict {
         $fkeyRange = PhoneProperties::getFkeysRange($phoneModel);
 
         foreach ($fkeyRange as $fkeyNo) {
-            $data["actions"][0]["values"][$fkeyNo-1]["FkeyNo"] = $fkeyNo;
-            $data["actions"][0]["values"][$fkeyNo-1]["CheckBox"] = false;
-            $data["actions"][0]["values"][$fkeyNo-1]["ActionVariableId"] = -1;
-            $data["actions"][0]["values"][$fkeyNo-1]["ActionValue"] = false;
-            $data["actions"][0]["values"][$fkeyNo-1]["ActionHook"] = "not set";
-            $data["actions"][0]["values"][$fkeyNo-1]["FkeyLabel"] = "not set";
-            $data["actions"][0]["values"][$fkeyNo-1]["FkeyColorOn"] = "none";
-            $data["actions"][0]["values"][$fkeyNo-1]["FkeyColorOff"] = "none";
+            $data["actions"][0]["values"][$fkeyNo-1] = [
+                "FkeyNo" => $fkeyNo,
+                "CheckBox" => false,
+                "ActionVariableId" => -1,
+                "ActionValue" => false,
+                "ActionHook" => "not set",
+                "FkeyLabel" => "not set",
+                "FkeyColorOn" => "none",
+                "FkeyColorOff" => "none",
+            ];
         }
 
         $data["actions"][0]["form"] = "return json_decode(SNMD_UIGetForm(\$id, \$FkeysSettings['ActionVariableId'] ?? 0, \$FkeysSettings['RecieveOnly'] ?? false, \$FkeysSettings['ActionValue']), true);";
