@@ -26,7 +26,7 @@ class SnomDeskphone extends IPSModuleStrict {
 
     public function ApplyChanges(): void {
         parent::ApplyChanges();
-
+        $this->SetSummary($this->ReadPropertyString("PhoneModel") . "/" . $this->ReadPropertyString("PhoneMac"));
         // Transfer to Phone, better: list to actions in form.json
 
     }
