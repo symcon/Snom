@@ -75,7 +75,10 @@ class SnomPage extends IPSModuleStrict {
         return $RenderLocalUrl;
     }
 
-    public function SendRenderRemote(): void {
+    public function SendRenderRemote(string $properties): void {
+        $this->SendDebug("PROPERTIES", print_r($this . $properties, true), 0);
+        $this->UpdateFormField("PhoneIP", "value", $properties);
+        ApplyChanges($this);
         $RenderRemoteUrl = $this->ReadAttributeString("RenderRemoteUrl");
         file_get_contents($RenderRemoteUrl);
         $this->SendDebug("RENDER_REMOTE_REQUEST", print_r($RenderRemoteUrl, true), 0);

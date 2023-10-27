@@ -104,6 +104,19 @@ class SnomDeskphone extends IPSModuleStrict {
         file_get_contents($url);
     }
 
+    public function SetLedAction(int $triggerVarId): void {
+        $this->SendDebug("LED[TRIGGER ID]", print_r($triggerVarId, true), 0);
+
+        $eventId = IPS_CreateEvent(0);                  //Ausgelöstes Ereignis
+        IPS_SetEventTrigger($eventId, 1,  $triggerVarId);       //Bei Änderung von Variable mit ID 
+        $target = 23983;
+        IPS_SetParent($eventId, $target);         //Ereignis zuordnen
+        IPS_SetEventActive($eventId, true);             //Ereignis aktivieren
+
+        // Seit IP-Symcon 6.0 erforderlich, sofern das Ereignis eine Automation ausführen soll (z.B. ein PHP-Skript)
+        IPS_SetEventAction($eventId, '{D2CB15CB-958A-AA5C-89AB-49F55CDC1DEA}', ["TARGET" => $target, "IP" => $this->ReadPropertyString("PhoneIP")]);
+    }
+
     public function GetConfigurationForm(): string
     {
         $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
