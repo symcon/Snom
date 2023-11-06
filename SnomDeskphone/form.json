@@ -164,7 +164,7 @@
                     "type": "SelectVariable",
                     "name": "ActionVariableId",
                     "caption": "Action variable",
-                    "onChange": "SNMD_SetVariableId($id, $ActionVariableId); SNMD_SetLedAction($id, $ActionVariableId);"
+                    "onChange": "SNMD_SetVariableId($id, $ActionVariableId);"
                 },
                 {
                     "type": "SelectValue",
