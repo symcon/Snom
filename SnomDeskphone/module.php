@@ -36,10 +36,19 @@ class SnomDeskphone extends IPSModuleStrict {
     */
     protected function ProcessHookData(): void {
         $this->SendDebug("GET", print_r($_GET, true), 0);
-        $value = $_GET["value"];
-        $variableId = (int)$_GET["variableId"];
-        $this->SendDebug("HOOK [ACTION]", print_r($variableId . " " . $value, true), 0);
-        RequestAction($variableId, $value);
+
+        if ((bool)$_GET["xml"]) {
+            $xml = $this->GetIPPhoneTextItem("var update", 1);
+            $this->SendDebug("CREATE_XML", print_r($xml, true), 0);
+            header("Content-Type: text/xml");
+            echo $xml;
+        }
+        else {
+            $value = $_GET["value"];
+            $variableId = (int)$_GET["variableId"];
+            $this->SendDebug("HOOK [ACTION]", print_r($variableId . " " . $value, true), 0);
+            RequestAction($variableId, $value);
+        }
     }
 
     // Usage of public functions (prefix defined in module.json):
@@ -98,23 +107,36 @@ class SnomDeskphone extends IPSModuleStrict {
         file_get_contents($url);
     }
 
-    // public function MessageSink(int $TimeStamp, int $SenderID, string $Message, array $Data): void
-    // {
-    //     IPS_LogMessage("MessageSink", "New message!!!");
-    // }
+    public function MessageSink(int $TimeStamp, int $SenderID, int $Message, array $Data): void
+    {
+        IPS_LogMessage("MessageSink", "New message!!!");
+        $this->SendDebug("VAR UPDATE", print_r($SenderID . " " . (int)$Data[0], true), 0);
+        $this->RenderXmlPage($SenderID, $Data[0]);
+    }
 
-    // public function SetLedAction(int $triggerVarId): void {
-    //     $this->SendDebug("LED[TRIGGER ID]", print_r($triggerVarId, true), 0);
+    private function GetIPPhoneTextItem(string $text, int $timeout): string {
+        header("Content-Type: text/xml");
+        $xml = new DOMDocument('1.0', 'UTF-8');
+        $xml->formatOutput = true;
+        $xmlRoot = $xml->appendChild($xml->createElement("SnomIPPhoneText"));
 
-    //     $eventId = IPS_CreateEvent(0);                  //Ausgelöstes Ereignis
-    //     IPS_SetEventTrigger($eventId, 1,  $triggerVarId);       //Bei Änderung von Variable mit ID 
-    //     $target = 50275;
-    //     IPS_SetParent($eventId, $target);         //Ereignis zuordnen
-    //     IPS_SetEventActive($eventId, true);             //Ereignis aktivieren
+        $xmlRoot->appendChild($xml->createElement('Text', $text));
+        $fetch = $xml->createElement('fetch','snom://mb_exit');
+        $fetchTimeout = $xml->createAttribute('mil');
+        $fetchTimeout->value = $timeout;
+        $fetch->appendChild($fetchTimeout);
+        $xmlRoot->appendChild($fetch);
+        $xml->format_output = TRUE;
 
-    //     // Seit IP-Symcon 6.0 erforderlich, sofern das Ereignis eine Automation ausführen soll (z.B. ein PHP-Skript)
-    //     IPS_SetEventAction($eventId, '{D2CB15CB-958A-AA5C-89AB-49F55CDC1DEA}', ["TARGET" => $target, "IP" => $this->ReadPropertyString("PhoneIP")]);
-    // }
+        return $xml->saveXML();
+    }
+
+    public function RenderXmlPage(int $variableId, int $value): void {
+        $xmlHook = sprintf("http://%s:3777/hook/snom/%d/?xml=true", $this->ReadPropertyString("LocalIP"), $this->InstanceID);
+        $RenderRemoteUrl = sprintf("http://%s/minibrowser.htm?url=%s", $this->ReadPropertyString("PhoneIP"), $xmlHook);
+        file_get_contents($RenderRemoteUrl);
+        $this->SendDebug("RENDER_REMOTE_REQUEST", print_r($RenderRemoteUrl, true), 0);
+    }
 
     public function GetConfigurationForm(): string
     {
