@@ -78,7 +78,7 @@
                     "name": "FkeyNo",
                     "width": "100px",
                     "align": "center",
-                    "add": -1,
+                    "add": 1,
                     "edit": {
                         "type": "NumberSpinner"
                     }
@@ -159,11 +159,10 @@
             "values": [],
             "form": [
                 {
-                    "type": "NumberSpinner",
+                    "type": "ValidationTextBox",
                     "name": "FkeyNo",
                     "caption": "Fkey No",
-                    "minimum": 1,
-                    "maximum": 4
+                    "enabled": false
                 },
                 {
                     "type": "CheckBox",

@@ -13,8 +13,8 @@ class SnomDeskphone extends IPSModuleStrict {
     }
 
     private function RegisterFkeysProperties(): void {
-        $this->RegisterPropertyInteger("FkeyNo", -1);
-        $this->RegisterPropertyInteger("ActionVariableId", -1);
+        $this->RegisterPropertyString("FkeyNo", 1);
+        $this->RegisterPropertyInteger("ActionVariableId", 1);
         $this->RegisterPropertyBoolean("RecieveOnly", false);
         $this->RegisterPropertyInteger("ActionValue", -1);
         $this->RegisterPropertyString("ActionHook", "/snom/myVarID");
@@ -75,8 +75,8 @@ class SnomDeskphone extends IPSModuleStrict {
         $this->SendDebug('create', print_r(sprintf("hook created /snom/%d", $variableId), true), 0);
     }
 
-    public function SetFkeySettings(int $fKey, bool $isRecieveOnly, string $variableHook, string $variableValue, string $labelValue): void {
-        $fKeyIndex = $fKey-1;
+    public function SetFkeySettings(string $fKey, bool $isRecieveOnly, string $variableHook, string $variableValue, string $labelValue): void {
+        $fKeyIndex = ((int)$fKey)-1;
         $this->SendDebug("INFO", print_r("Configuring fkey " . $fKeyIndex, true), 0);
 
         if ($isRecieveOnly) {
@@ -127,7 +127,7 @@ class SnomDeskphone extends IPSModuleStrict {
             $data["actions"][0]["values"][$fkeyNo-1] = [
                 "FkeyNo" => $fkeyNo,
                 "CheckBox" => false,
-                "ActionVariableId" => -1,
+                "ActionVariableId" => 1,
                 "ActionValue" => false,
                 "ActionHook" => "not set",
                 "FkeyLabel" => "not set",
