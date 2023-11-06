@@ -109,7 +109,7 @@ class SnomDeskphone extends IPSModuleStrict {
 
         $eventId = IPS_CreateEvent(0);                  //Ausgelöstes Ereignis
         IPS_SetEventTrigger($eventId, 1,  $triggerVarId);       //Bei Änderung von Variable mit ID 
-        $target = 23983;
+        $target = 50275;
         IPS_SetParent($eventId, $target);         //Ereignis zuordnen
         IPS_SetEventActive($eventId, true);             //Ereignis aktivieren
 
