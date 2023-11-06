@@ -114,16 +114,6 @@
                     }
                 },
                 {
-                    "caption": "Hook",
-                    "name": "ActionHook",
-                    "width": "300px",
-                    "align": "center",
-                    "add": "",
-                    "edit": {
-                        "type": "ValidationTextBox"
-                    }
-                },
-                {
                     "caption": "Label",
                     "name": "FkeyLabel",
                     "width": "200px",
@@ -174,18 +164,13 @@
                     "type": "SelectVariable",
                     "name": "ActionVariableId",
                     "caption": "Action variable",
-                    "onChange": "SNMD_SetVariableId($id, $ActionVariableId); SNMD_CreateHook($id, $ActionVariableId); SNMD_SetLedAction($id, $ActionVariableId);"
+                    "onChange": "SNMD_SetVariableId($id, $ActionVariableId); SNMD_SetLedAction($id, $ActionVariableId);"
                 },
                 {
                     "type": "SelectValue",
                     "name": "ActionValue",
                     "caption": "Value",
                     "variableID": 0
-                },
-                {
-                    "type": "ValidationTextBox",
-                    "name": "ActionHook",
-                    "caption": "Hook"
                 },
                 {
                     "type": "ValidationTextBox",
@@ -242,7 +227,7 @@
                 {
                     "type": "Button",
                     "caption": "Set",
-                    "onClick": "SNMD_SetFkeySettings($id, $FkeyNo, $RecieveOnly, $ActionHook, $ActionValue, $FkeyLabel);"
+                    "onClick": "SNMD_SetFkeySettings($id, $FkeyNo, $RecieveOnly, $ActionVariableId, $ActionValue, $FkeyLabel);"
                 }
             ]
         }

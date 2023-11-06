@@ -5,6 +5,7 @@ require_once("phoneProperties.php");
 class SnomDeskphone extends IPSModuleStrict {
     public function Create(): void {
         parent::Create();
+        $this->RegisterHook("snom/" . $this->InstanceID);
         $this->RegisterPropertyString("PhoneIP", "");
         $this->RegisterPropertyString("PhoneMac", "000413");
         $this->RegisterPropertyString("PhoneModel", "");
@@ -17,7 +18,6 @@ class SnomDeskphone extends IPSModuleStrict {
         $this->RegisterPropertyInteger("ActionVariableId", 1);
         $this->RegisterPropertyBoolean("RecieveOnly", false);
         $this->RegisterPropertyInteger("ActionValue", -1);
-        $this->RegisterPropertyString("ActionHook", "/snom/myVarID");
         $this->RegisterPropertyString("FkeyLabel", "my label");
         $this->RegisterPropertyString("FkeyColorOn", "red");
         $this->RegisterPropertyString("FkeyColorOff", "green");
@@ -35,11 +35,10 @@ class SnomDeskphone extends IPSModuleStrict {
     * This function will be called by the hook control. Visibility should be protected!
     */
     protected function ProcessHookData(): void {
+        $this->SendDebug("GET", print_r($_GET, true), 0);
         $value = $_GET["value"];
-        $this->SendDebug("GET", print_r($value, true), 0);
-        $urlPathItems = explode("/", $_SERVER["PHP_SELF"]);
-        $variableId = (int)$urlPathItems["3"];
-        $this->SendDebug("HOOK", print_r($variableId, true), 0);
+        $variableId = (int)$_GET["variableId"];
+        $this->SendDebug("HOOK [ACTION]", print_r($variableId . " " . $value, true), 0);
         RequestAction($variableId, $value);
     }
 
@@ -69,13 +68,7 @@ class SnomDeskphone extends IPSModuleStrict {
         }
     }
 
-    public function CreateHook(int $variableId): void {
-        $this->RegisterHook("snom/" . $variableId);
-        $this->UpdateFormField("ActionHook", "value", sprintf("/snom/%d/", $variableId));
-        $this->SendDebug('create', print_r(sprintf("hook created /snom/%d", $variableId), true), 0);
-    }
-
-    public function SetFkeySettings(string $fKey, bool $isRecieveOnly, string $variableHook, string $variableValue, string $labelValue): void {
+    public function SetFkeySettings(string $fKey, bool $isRecieveOnly, string $variableId, string $variableValue, string $labelValue): void {
         $fKeyIndex = ((int)$fKey)-1;
         $this->SendDebug("INFO", print_r("Configuring fkey " . $fKeyIndex, true), 0);
 
@@ -86,7 +79,7 @@ class SnomDeskphone extends IPSModuleStrict {
         else {
             $fkeyType = "url";
             $localIp = $this->ReadPropertyString("LocalIP");
-            $fkeyValue = urlencode($fkeyType ." " . $localIp . ":3777/hook" . $variableHook . "?value=" . $variableValue);
+            $fkeyValue = urlencode($fkeyType ." " . $localIp . ":3777/hook/snom/" . $this->InstanceID . "/?variableId=" . $variableId . "&value=" . $variableValue);
         }
 
         $urlQuery = sprintf("settings=save&fkey%d=%s&fkey_label%d=%s", $fKeyIndex, $fkeyValue, $fKeyIndex, urlencode($labelValue));
@@ -129,7 +122,6 @@ class SnomDeskphone extends IPSModuleStrict {
                 "CheckBox" => false,
                 "ActionVariableId" => 1,
                 "ActionValue" => false,
-                "ActionHook" => "not set",
                 "FkeyLabel" => "not set",
                 "FkeyColorOn" => "none",
                 "FkeyColorOff" => "none",
