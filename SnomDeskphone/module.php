@@ -71,6 +71,7 @@ class SnomDeskphone extends IPSModuleStrict {
     public function SetFkeySettings(string $fKey, bool $isRecieveOnly, string $variableId, string $variableValue, string $labelValue): void {
         $fKeyIndex = ((int)$fKey)-1;
         $this->SendDebug("INFO", print_r("Configuring fkey " . $fKeyIndex, true), 0);
+        $this->RegisterMessage($variableId , VM_UPDATE);
 
         if ($isRecieveOnly) {
             $fkeyType="none";
@@ -96,6 +97,11 @@ class SnomDeskphone extends IPSModuleStrict {
 
         file_get_contents($url);
     }
+
+    // public function MessageSink(int $TimeStamp, int $SenderID, string $Message, array $Data): void
+    // {
+    //     IPS_LogMessage("MessageSink", "New message!!!");
+    // }
 
     // public function SetLedAction(int $triggerVarId): void {
     //     $this->SendDebug("LED[TRIGGER ID]", print_r($triggerVarId, true), 0);
