@@ -28,7 +28,16 @@ class SnomDeskphone extends IPSModuleStrict {
         parent::ApplyChanges();
         $this->SetSummary($this->ReadPropertyString("PhoneModel") . "/" . $this->ReadPropertyString("PhoneMac"));
         // Transfer to Phone, better: list to actions in form.json
+    }
 
+    public function MessageSink(int $TimeStamp, int $SenderID, int $Message, array $Data): void
+    {
+        IPS_LogMessage("MessageSink", "New message!!!!!");
+        $instanceHook = sprintf("http://%s:3777/hook/snom/%d/", $this->ReadPropertyString("LocalIP"), $this->InstanceID);
+        $hookParameters = urlencode($instanceHook . "?xml=true&variableId=" . $SenderID . "&value=" . (int)$Data[0]);
+        $RenderRemoteUrl = sprintf("http://%s/minibrowser.htm?url=%s", $this->ReadPropertyString("PhoneIP"), $hookParameters);
+        $this->SendDebug("STATUS UPDATE", print_r($RenderRemoteUrl, true), 0);
+        file_get_contents($RenderRemoteUrl);
     }
 
     /**
@@ -36,19 +45,38 @@ class SnomDeskphone extends IPSModuleStrict {
     */
     protected function ProcessHookData(): void {
         $this->SendDebug("GET", print_r($_GET, true), 0);
+        $value = $_GET["value"];
+        $variableId = $_GET["variableId"];
 
-        if ((bool)$_GET["xml"]) {
-            $xml = $this->GetIPPhoneTextItem("var update", 1);
-            $this->SendDebug("CREATE_XML", print_r($xml, true), 0);
+        if (filter_var($_GET["xml"], FILTER_VALIDATE_BOOLEAN)) {
+            // status
+            $text = $variableId . " = " . $value;
+            $this->SendDebug("VAR UPDATE", print_r($text, true), 0);
             header("Content-Type: text/xml");
-            echo $xml;
+            echo $this->GetIPPhoneTextItem($text);
         }
         else {
-            $value = $_GET["value"];
-            $variableId = (int)$_GET["variableId"];
-            $this->SendDebug("HOOK [ACTION]", print_r($variableId . " " . $value, true), 0);
-            RequestAction($variableId, $value);
+            //write
+            $this->SendDebug("HOOK [ACTION]", print_r($variableId . "  = " . $value, true), 0);
+            RequestAction((int)$variableId, $value);
         }
+    }
+
+    private function GetIPPhoneTextItem(string $text, int $timeout=1): string {
+        header("Content-Type: text/xml");
+        $xml = new DOMDocument('1.0', 'UTF-8');
+        $xml->formatOutput = true;
+        $xmlRoot = $xml->appendChild($xml->createElement("SnomIPPhoneText"));
+
+        $xmlRoot->appendChild($xml->createElement('Text', $text));
+        $fetch = $xml->createElement('fetch','snom://mb_exit');
+        $fetchTimeout = $xml->createAttribute('mil');
+        $fetchTimeout->value = $timeout;
+        $fetch->appendChild($fetchTimeout);
+        $xmlRoot->appendChild($fetch);
+        $xml->format_output = TRUE;
+
+        return $xml->saveXML();
     }
 
     // Usage of public functions (prefix defined in module.json):
@@ -88,8 +116,9 @@ class SnomDeskphone extends IPSModuleStrict {
         }
         else {
             $fkeyType = "url";
-            $localIp = $this->ReadPropertyString("LocalIP");
-            $fkeyValue = urlencode($fkeyType ." " . $localIp . ":3777/hook/snom/" . $this->InstanceID . "/?variableId=" . $variableId . "&value=" . $variableValue);
+            $instanceHook = sprintf("http://%s:3777/hook/snom/%d/", $this->ReadPropertyString("LocalIP"), $this->InstanceID);
+            $hookParameters = "?xml=false&variableId=" . $variableId . "&value=" . $variableValue;
+            $fkeyValue = urlencode($fkeyType . " " . $instanceHook . $hookParameters);
         }
 
         $urlQuery = sprintf("settings=save&fkey%d=%s&fkey_label%d=%s", $fKeyIndex, $fkeyValue, $fKeyIndex, urlencode($labelValue));
@@ -105,37 +134,6 @@ class SnomDeskphone extends IPSModuleStrict {
         $this->SendDebug("URL", print_r($url, true), 0);
 
         file_get_contents($url);
-    }
-
-    public function MessageSink(int $TimeStamp, int $SenderID, int $Message, array $Data): void
-    {
-        IPS_LogMessage("MessageSink", "New message!!!");
-        $this->SendDebug("VAR UPDATE", print_r($SenderID . " " . (int)$Data[0], true), 0);
-        $this->RenderXmlPage($SenderID, $Data[0]);
-    }
-
-    private function GetIPPhoneTextItem(string $text, int $timeout): string {
-        header("Content-Type: text/xml");
-        $xml = new DOMDocument('1.0', 'UTF-8');
-        $xml->formatOutput = true;
-        $xmlRoot = $xml->appendChild($xml->createElement("SnomIPPhoneText"));
-
-        $xmlRoot->appendChild($xml->createElement('Text', $text));
-        $fetch = $xml->createElement('fetch','snom://mb_exit');
-        $fetchTimeout = $xml->createAttribute('mil');
-        $fetchTimeout->value = $timeout;
-        $fetch->appendChild($fetchTimeout);
-        $xmlRoot->appendChild($fetch);
-        $xml->format_output = TRUE;
-
-        return $xml->saveXML();
-    }
-
-    public function RenderXmlPage(int $variableId, int $value): void {
-        $xmlHook = sprintf("http://%s:3777/hook/snom/%d/?xml=true", $this->ReadPropertyString("LocalIP"), $this->InstanceID);
-        $RenderRemoteUrl = sprintf("http://%s/minibrowser.htm?url=%s", $this->ReadPropertyString("PhoneIP"), $xmlHook);
-        file_get_contents($RenderRemoteUrl);
-        $this->SendDebug("RENDER_REMOTE_REQUEST", print_r($RenderRemoteUrl, true), 0);
     }
 
     public function GetConfigurationForm(): string
