@@ -1,6 +1,0 @@
-{
-    "id": "{D2CB15CB-958A-AA5C-89AB-49F55CDC1DEA}",
-    "caption": "Switch snom phone LED",
-    "form": [],
-    "action": "SNM_SendRenderRemote($_IPS['TARGET'], $_IPS['IP']);"
-}
