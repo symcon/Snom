@@ -229,7 +229,8 @@
                     "caption": "Set",
                     "onClick": "SNMD_SetFkeySettings($id, $FkeyNo, $RecieveOnly, $ActionVariableId, $ActionValue, $FkeyLabel);"
                 }
-            ]
+            ],
+            "onEdit": "SNMD_UpdateFkeyValues($id, (array)$FkeysSettings);"
         }
     ]
 }

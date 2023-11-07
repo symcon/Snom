@@ -50,10 +50,14 @@ class SnomDeskphone extends IPSModuleStrict {
 
         if (filter_var($_GET["xml"], FILTER_VALIDATE_BOOLEAN)) {
             // status
+            $ledNo = 5;
+            $ledColor = "green";
+            $value ? $ledValue="On" : $ledValue="Off";
             $text = $variableId . " = " . $value;
-            $this->SendDebug("VAR UPDATE", print_r($text, true), 0);
             header("Content-Type: text/xml");
-            echo $this->GetIPPhoneTextItem($text);
+            $xml = $this->GetIPPhoneTextItem($text, $ledValue, $ledNo, $ledColor);
+            $this->SendDebug("XML", print_r($xml, true), 0);
+            echo $xml;
         }
         else {
             //write
@@ -62,18 +66,32 @@ class SnomDeskphone extends IPSModuleStrict {
         }
     }
 
-    private function GetIPPhoneTextItem(string $text, int $timeout=1): string {
+    private function GetIPPhoneTextItem(string $text, string $ledValue, int $ledNo, string $color, int $timeout=1): string {
         header("Content-Type: text/xml");
         $xml = new DOMDocument('1.0', 'UTF-8');
         $xml->formatOutput = true;
         $xmlRoot = $xml->appendChild($xml->createElement("SnomIPPhoneText"));
 
+        //text tag
         $xmlRoot->appendChild($xml->createElement('Text', $text));
+
+        //led tag
+        $led = $xml->createElement('LED', $ledValue);
+        $ledNumber = $xml->createAttribute('number');
+        $ledNumber->value = $ledNo;
+        $led->appendChild($ledNumber);
+        $ledColor = $xml->createAttribute('color');
+        $ledColor->value = $color;
+        $led->appendChild($ledColor);
+        $xmlRoot->appendChild($led);
+
+        //fetch tag
         $fetch = $xml->createElement('fetch','snom://mb_exit');
         $fetchTimeout = $xml->createAttribute('mil');
         $fetchTimeout->value = $timeout;
         $fetch->appendChild($fetchTimeout);
         $xmlRoot->appendChild($fetch);
+
         $xml->format_output = TRUE;
 
         return $xml->saveXML();
@@ -166,6 +184,12 @@ class SnomDeskphone extends IPSModuleStrict {
         $data["actions"][0]["form"][3]["visible"] = !$recvOnly;
 
         return json_encode($data["actions"][0]["form"]);
+    }
+
+    public function UpdateFkeyValues(array $settings): void {
+        // $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
+        // $data["actions"][0]["values"][$fkeyNo-1]["ActionVariableId"] = $variableId;
+        echo var_dump($settings);
     }
 
     // has_expanstion_module()
