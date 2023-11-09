@@ -63,9 +63,7 @@
             "caption": "Local IP address", 
             "name": "LocalIP",
             "validate": "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
-        }
-    ],
-    "actions": [
+        },
         {
             "type": "List",
             "caption": "Function keys settings",
@@ -110,7 +108,7 @@
                     "align": "center",
                     "add": 0,
                     "edit": {
-                        "type": "SelectValue"
+                        "type": "SelectAction"
                     }
                 },
                 {
@@ -131,7 +129,25 @@
                     "add": "",
                     "edit": {
                         "type": "Select",
-                        "options": []
+                        "options": [
+                            {
+                                "caption": "Green",
+                                "value": "green"
+                            },
+                            {
+                                "caption": "Red",
+                                "value": "red"
+                            },
+                            {
+                                "caption": "Yellow",
+                                "value": "yellow"
+                            },
+                            {
+                                "caption": "None",
+                                "value": "none"
+                            }
+                            
+                        ]
                     }
                 },
                 {
@@ -142,7 +158,25 @@
                     "add": "",
                     "edit": {
                         "type": "Select",
-                        "options": []
+                        "options": [
+                            {
+                                "caption": "Green",
+                                "value": "green"
+                            },
+                            {
+                                "caption": "Red",
+                                "value": "red"
+                            },
+                            {
+                                "caption": "Yellow",
+                                "value": "yellow"
+                            },
+                            {
+                                "caption": "None",
+                                "value": "none"
+                            }
+                            
+                        ]
                     }
                 }
             ],
@@ -167,10 +201,10 @@
                     "onChange": "SNMD_SetVariableId($id, $ActionVariableId);"
                 },
                 {
-                    "type": "SelectValue",
+                    "type": "SelectAction",
                     "name": "ActionValue",
                     "caption": "Value",
-                    "variableID": 0
+                    "targetID": 13921
                 },
                 {
                     "type": "ValidationTextBox",
@@ -229,8 +263,7 @@
                     "caption": "Set",
                     "onClick": "SNMD_SetFkeySettings($id, $FkeyNo, $RecieveOnly, $ActionVariableId, $ActionValue, $FkeyLabel);"
                 }
-            ],
-            "onEdit": "SNMD_UpdateFkeyValues($id, (array)$FkeysSettings);"
+            ]
         }
     ]
 }

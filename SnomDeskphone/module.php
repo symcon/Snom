@@ -10,6 +10,7 @@ class SnomDeskphone extends IPSModuleStrict {
         $this->RegisterPropertyString("PhoneMac", "000413");
         $this->RegisterPropertyString("PhoneModel", "");
         $this->RegisterPropertyString("LocalIP", "127.0.0.1");
+        $this->RegisterPropertyString("FkeysSettings", "[]");
         $this->RegisterFkeysProperties();
     }
 
@@ -27,12 +28,13 @@ class SnomDeskphone extends IPSModuleStrict {
     public function ApplyChanges(): void {
         parent::ApplyChanges();
         $this->SetSummary($this->ReadPropertyString("PhoneModel") . "/" . $this->ReadPropertyString("PhoneMac"));
-        // Transfer to Phone, better: list to actions in form.json
+        // Transfer to Phone
     }
 
     public function MessageSink(int $TimeStamp, int $SenderID, int $Message, array $Data): void
     {
         IPS_LogMessage("MessageSink", "New message!!!!!");
+        $list = json_decode($this->ReadPropertyString("FkeysSettings"));
         //1. search all fkeyNo. in list with action variable = senderId
         $this->SendDebug("fkeys", print_r($this, true), 0);
         //2. look up led no. for found fekys
@@ -190,15 +192,5 @@ class SnomDeskphone extends IPSModuleStrict {
 
         return json_encode($data["actions"][0]["form"]);
     }
-
-    public function UpdateFkeyValues(array $settings): void {
-        // $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
-        // $data["actions"][0]["values"][$fkeyNo-1]["ActionVariableId"] = $variableId;
-        // $selectedRow = $settings[array_keys($settings)[1]];
-        // print_r($this->ReadPropertyString("FkeyNo"));
-        // $values = $settings[array_keys($settings)[2]];
-        // print_r($values[$selectedRow]);
-    }
-
     // has_expanstion_module()
 }
