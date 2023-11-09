@@ -33,6 +33,11 @@ class SnomDeskphone extends IPSModuleStrict {
     public function MessageSink(int $TimeStamp, int $SenderID, int $Message, array $Data): void
     {
         IPS_LogMessage("MessageSink", "New message!!!!!");
+        //1. search all fkeyNo. in list with action variable = senderId
+        $this->SendDebug("fkeys", print_r($this, true), 0);
+        //2. look up led no. for found fekys
+        //3. look up in fkeyNo row which color
+        //4. led no. and color to url parameters
         $instanceHook = sprintf("http://%s:3777/hook/snom/%d/", $this->ReadPropertyString("LocalIP"), $this->InstanceID);
         $hookParameters = urlencode($instanceHook . "?xml=true&variableId=" . $SenderID . "&value=" . (int)$Data[0]);
         $RenderRemoteUrl = sprintf("http://%s/minibrowser.htm?url=%s", $this->ReadPropertyString("PhoneIP"), $hookParameters);
@@ -189,7 +194,10 @@ class SnomDeskphone extends IPSModuleStrict {
     public function UpdateFkeyValues(array $settings): void {
         // $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
         // $data["actions"][0]["values"][$fkeyNo-1]["ActionVariableId"] = $variableId;
-        echo var_dump($settings);
+        // $selectedRow = $settings[array_keys($settings)[1]];
+        // print_r($this->ReadPropertyString("FkeyNo"));
+        // $values = $settings[array_keys($settings)[2]];
+        // print_r($values[$selectedRow]);
     }
 
     // has_expanstion_module()
