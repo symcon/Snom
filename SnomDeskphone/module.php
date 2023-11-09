@@ -11,18 +11,6 @@ class SnomDeskphone extends IPSModuleStrict {
         $this->RegisterPropertyString("PhoneModel", "");
         $this->RegisterPropertyString("LocalIP", "127.0.0.1");
         $this->RegisterPropertyString("FkeysSettings", "[]");
-        $this->RegisterFkeysProperties();
-    }
-
-    private function RegisterFkeysProperties(): void {
-        $this->RegisterPropertyString("FkeyNo", 1);
-        $this->RegisterPropertyInteger("ActionVariableId", 1);
-        $this->RegisterPropertyBoolean("RecieveOnly", false);
-        $this->RegisterPropertyInteger("ActionValue", -1);
-        $this->RegisterPropertyString("FkeyLabel", "my label");
-        $this->RegisterPropertyString("FkeyColorOn", "red");
-        $this->RegisterPropertyString("FkeyColorOff", "green");
-        $this->SendDebug('INFO', print_r('Fkey properties registered', true), 0);
     }
 
     public function ApplyChanges(): void {
@@ -33,18 +21,50 @@ class SnomDeskphone extends IPSModuleStrict {
 
     public function MessageSink(int $TimeStamp, int $SenderID, int $Message, array $Data): void
     {
-        IPS_LogMessage("MessageSink", "New message!!!!!");
-        $list = json_decode($this->ReadPropertyString("FkeysSettings"));
-        //1. search all fkeyNo. in list with action variable = senderId
-        $this->SendDebug("fkeys", print_r($this, true), 0);
-        //2. look up led no. for found fekys
-        //3. look up in fkeyNo row which color
-        //4. led no. and color to url parameters
+        $fkeysSettings = json_decode($this->ReadPropertyString("FkeysSettings"), true);
+        $fkeysToUpdate = $this->getFkeysToUpdate($fkeysSettings, $SenderID, $Data);
+        $this->SendDebug("FKEYS TO UPDATE", print_r($fkeysToUpdate, true), 0);
+        
         $instanceHook = sprintf("http://%s:3777/hook/snom/%d/", $this->ReadPropertyString("LocalIP"), $this->InstanceID);
-        $hookParameters = urlencode($instanceHook . "?xml=true&variableId=" . $SenderID . "&value=" . (int)$Data[0]);
-        $RenderRemoteUrl = sprintf("http://%s/minibrowser.htm?url=%s", $this->ReadPropertyString("PhoneIP"), $hookParameters);
-        $this->SendDebug("STATUS UPDATE", print_r($RenderRemoteUrl, true), 0);
-        file_get_contents($RenderRemoteUrl);
+
+        //4. led no. and color to url parameters
+
+        foreach ($fkeysToUpdate as $fkeyNo => $data) {
+            $this->SendDebug("fkeyled", print_r($data["ledNo"], true), 0);
+            $hookParameters = urlencode(
+                $instanceHook . 
+                "?xml=true&variableId=" . $SenderID . 
+                "&value=" . (int)$Data[0] . 
+                "&ledNo=" . $data["ledNo"] . 
+                "&color=" . $data["color"]
+            );
+            $RenderRemoteUrl = sprintf("http://%s/minibrowser.htm?url=%s", $this->ReadPropertyString("PhoneIP"), $hookParameters);
+            $this->SendDebug("UPDATE_FKEY". $fkeyNo, print_r($RenderRemoteUrl, true), 0);
+            file_get_contents($RenderRemoteUrl);
+        }
+    }
+
+    protected function GetFkeysToUpdate(array $fkeysSettings, int $SenderID, array $SenderData): array {
+        $this->SendDebug("sender data 0", print_r(gettype($SenderData[0]), true), 0);
+        $this->SendDebug("sender data 0", print_r($SenderData[0], true), 0);
+        $fkeysToUpdate = array();
+
+        foreach ($fkeysSettings as $fkey => $settings) {
+        //1. search all fkeyNo. in list with action variable = senderId
+            if ($settings["ActionVariableId"]==$SenderID) {
+                $fkeyNo = (int)$settings["FkeyNo"] - 1;
+                $SenderValue = $SenderData[0] ? "On" : "Off";
+                $this->SendDebug("sender data 0", print_r($SenderValue, true), 0);
+                $fkeysToUpdate[$fkeyNo] = array(
+        //2. look up led no. for found fekys
+                    "ledNo" => PhoneProperties::getFkeyLedNo("snomD785", $fkeyNo),
+        //3. look up in fkeyNo row which color
+                    "color" => $settings["FkeyColor" . $SenderValue]
+                );
+            }
+        }
+
+        return $fkeysToUpdate;
     }
 
     /**
@@ -57,12 +77,11 @@ class SnomDeskphone extends IPSModuleStrict {
 
         if (filter_var($_GET["xml"], FILTER_VALIDATE_BOOLEAN)) {
             // status
-            $ledNo = 5;
-            $ledColor = "green";
-            $value ? $ledValue="On" : $ledValue="Off";
+            // $value ? $ledValue="On" : $ledValue="Off";
+            $ledValue = ($_GET["color"]==="none") ? "Off" : "On";
             $text = $variableId . " = " . $value;
             header("Content-Type: text/xml");
-            $xml = $this->GetIPPhoneTextItem($text, $ledValue, $ledNo, $ledColor);
+            $xml = $this->GetIPPhoneTextItem($text, $ledValue, $_GET["ledNo"], $_GET["color"]);
             $this->SendDebug("XML", print_r($xml, true), 0);
             echo $xml;
         }
@@ -120,8 +139,10 @@ class SnomDeskphone extends IPSModuleStrict {
         $this->UpdateFormField("ActionValue", "visible", !$RecieveOnly);
     }
 
-    public function SetVariableId(int $variableId): void {
-        if ($this->ReadPropertyBoolean("RecieveOnly")) {
+    public function SetVariableId(int $variableId, bool $RecieveOnly): void {
+        $this->SendDebug('SET', print_r($RecieveOnly, true), 0);
+
+        if ($RecieveOnly) {
             $this->SendDebug('SET', print_r('Recieve only fkey', true), 0);
         }
         else {
@@ -132,7 +153,6 @@ class SnomDeskphone extends IPSModuleStrict {
 
     public function SetFkeySettings(string $fKey, bool $isRecieveOnly, string $variableId, string $variableValue, string $labelValue): void {
         $fKeyIndex = ((int)$fKey)-1;
-        $this->SendDebug("INFO", print_r("Configuring fkey " . $fKeyIndex, true), 0);
         $this->RegisterMessage($variableId , VM_UPDATE);
 
         if ($isRecieveOnly) {
@@ -168,7 +188,7 @@ class SnomDeskphone extends IPSModuleStrict {
         $fkeyRange = PhoneProperties::getFkeysRange($phoneModel);
 
         foreach ($fkeyRange as $fkeyNo) {
-            $data["actions"][0]["values"][$fkeyNo-1] = [
+            $data["elements"][5]["values"][$fkeyNo-1] = [
                 "FkeyNo" => $fkeyNo,
                 "CheckBox" => false,
                 "ActionVariableId" => 1,
@@ -179,7 +199,7 @@ class SnomDeskphone extends IPSModuleStrict {
             ];
         }
 
-        $data["actions"][0]["form"] = "return json_decode(SNMD_UIGetForm(\$id, \$FkeysSettings['ActionVariableId'] ?? 0, \$FkeysSettings['RecieveOnly'] ?? false, \$FkeysSettings['ActionValue']), true);";
+        $data["elements"][5]["form"] = "return json_decode(SNMD_UIGetForm(\$id, \$FkeysSettings['ActionVariableId'] ?? 0, \$FkeysSettings['RecieveOnly'] ?? false, \$FkeysSettings['ActionValue']), true);";
         
         return json_encode($data);
     }
@@ -187,10 +207,10 @@ class SnomDeskphone extends IPSModuleStrict {
     public function UIGetForm(int $ActionVariableId, bool $recvOnly, bool $value): string {
         $this->SendDebug("SETTING", print_r((int)$value, true), 0);
         $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
-        $data["actions"][0]["form"][3]["variableID"] = $ActionVariableId;
-        $data["actions"][0]["form"][3]["visible"] = !$recvOnly;
+        $data["elements"][5]["form"][3]["variableID"] = $ActionVariableId;
+        $data["elements"][5]["form"][3]["visible"] = !$recvOnly;
 
-        return json_encode($data["actions"][0]["form"]);
+        return json_encode($data["elements"][5]["form"]);
     }
     // has_expanstion_module()
 }

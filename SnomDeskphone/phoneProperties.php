@@ -27,4 +27,13 @@ class PhoneProperties {
     public static function hasSmartLabel(string $phoneType): bool {
         return self::HAS_SMART_LABEL[$phoneType];
     } 
+
+    public static function getFkeyLedNo(string $phoneType, int $fkeyNo): int {
+        switch ($phoneType) {
+            case "snomD785":
+                $ledOffset = 5;
+                return $fkeyNo + $ledOffset;
+                break;
+        }
+    } 
 } 

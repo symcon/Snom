@@ -108,7 +108,7 @@
                     "align": "center",
                     "add": 0,
                     "edit": {
-                        "type": "SelectAction"
+                        "type": "SelectValue"
                     }
                 },
                 {
@@ -198,13 +198,12 @@
                     "type": "SelectVariable",
                     "name": "ActionVariableId",
                     "caption": "Action variable",
-                    "onChange": "SNMD_SetVariableId($id, $ActionVariableId);"
+                    "onChange": "SNMD_SetVariableId($id, $ActionVariableId, $RecieveOnly);"
                 },
                 {
-                    "type": "SelectAction",
+                    "type": "SelectValue",
                     "name": "ActionValue",
-                    "caption": "Value",
-                    "targetID": 13921
+                    "caption": "Value"
                 },
                 {
                     "type": "ValidationTextBox",
