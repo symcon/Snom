@@ -1,6 +1,7 @@
 <?php
 
-class PhoneProperties {
+class PhoneProperties
+{
     const FKEYS_NO = array(
         "" => 1,
         "snomD335" => 32,
@@ -28,16 +29,19 @@ class PhoneProperties {
         "snomD862" => 5,
         "snomD865" => 5,
     );
-    
-    public static function getFkeysRange(string $phoneType): array {
+
+    public static function getFkeysRange(string $phoneType): array
+    {
         return range(1, self::FKEYS_NO[$phoneType]);
     }
 
-    public static function hasSmartLabel(string $phoneType): bool {
+    public static function hasSmartLabel(string $phoneType): bool
+    {
         return self::HAS_SMART_LABEL[$phoneType];
-    } 
+    }
 
-    public static function getFkeyLedNo(string $phoneType, int $fkeyNo): int {
+    public static function getFkeyLedNo(string $phoneType, int $fkeyNo): int
+    {
         return $fkeyNo + self::FKEY_LED_OFFSET[$phoneType];
-    } 
-} 
+    }
+}
