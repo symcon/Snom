@@ -22,15 +22,32 @@ class SnomDeskphone extends IPSModuleStrict {
     public function MessageSink(int $TimeStamp, int $SenderID, int $Message, array $Data): void
     {
         $fkeysSettings = json_decode($this->ReadPropertyString("FkeysSettings"), true);
-        $fkeysToUpdate = $this->getFkeysToUpdate($fkeysSettings, $SenderID, $Data);
+        $fkeysToUpdate = $this->GetFkeysToUpdate($fkeysSettings, $SenderID, $Data);
+        $this->UpdateFkeys($fkeysToUpdate);
+    }
+
+    protected function GetFkeysToUpdate(array $fkeysSettings, int $SenderID, array $SenderData): array {
+        $fkeysToUpdate = array();
+
+        foreach ($fkeysSettings as $fkey => $settings) {
+            if ($settings["ActionVariableId"]==$SenderID) {
+                $fkeyNo = (int)$settings["FkeyNo"] - 1;
+                $SenderValue = $SenderData[0] ? "On" : "Off";
+                $fkeysToUpdate[$fkeyNo] = array(
+                    "ledNo" => PhoneProperties::getFkeyLedNo("snomD785", $fkeyNo),
+                    "color" => $settings["FkeyColor" . $SenderValue]
+                );
+            }
+        }
+
+        return $fkeysToUpdate;
+    }
+
+    protected function UpdateFkeys(array $fkeysToUpdate): void {
         $this->SendDebug("FKEYS TO UPDATE", print_r($fkeysToUpdate, true), 0);
-        
         $instanceHook = sprintf("http://%s:3777/hook/snom/%d/", $this->ReadPropertyString("LocalIP"), $this->InstanceID);
 
-        //4. led no. and color to url parameters
-
         foreach ($fkeysToUpdate as $fkeyNo => $data) {
-            $this->SendDebug("fkeyled", print_r($data["ledNo"], true), 0);
             $hookParameters = urlencode(
                 $instanceHook . 
                 "?xml=true&variableId=" . $SenderID . 
@@ -39,32 +56,8 @@ class SnomDeskphone extends IPSModuleStrict {
                 "&color=" . $data["color"]
             );
             $RenderRemoteUrl = sprintf("http://%s/minibrowser.htm?url=%s", $this->ReadPropertyString("PhoneIP"), $hookParameters);
-            $this->SendDebug("UPDATE_FKEY". $fkeyNo, print_r($RenderRemoteUrl, true), 0);
             file_get_contents($RenderRemoteUrl);
         }
-    }
-
-    protected function GetFkeysToUpdate(array $fkeysSettings, int $SenderID, array $SenderData): array {
-        $this->SendDebug("sender data 0", print_r(gettype($SenderData[0]), true), 0);
-        $this->SendDebug("sender data 0", print_r($SenderData[0], true), 0);
-        $fkeysToUpdate = array();
-
-        foreach ($fkeysSettings as $fkey => $settings) {
-        //1. search all fkeyNo. in list with action variable = senderId
-            if ($settings["ActionVariableId"]==$SenderID) {
-                $fkeyNo = (int)$settings["FkeyNo"] - 1;
-                $SenderValue = $SenderData[0] ? "On" : "Off";
-                $this->SendDebug("sender data 0", print_r($SenderValue, true), 0);
-                $fkeysToUpdate[$fkeyNo] = array(
-        //2. look up led no. for found fekys
-                    "ledNo" => PhoneProperties::getFkeyLedNo("snomD785", $fkeyNo),
-        //3. look up in fkeyNo row which color
-                    "color" => $settings["FkeyColor" . $SenderValue]
-                );
-            }
-        }
-
-        return $fkeysToUpdate;
     }
 
     /**
@@ -199,7 +192,7 @@ class SnomDeskphone extends IPSModuleStrict {
             ];
         }
 
-        $data["elements"][5]["form"] = "return json_decode(SNMD_UIGetForm(\$id, \$FkeysSettings['ActionVariableId'] ?? 0, \$FkeysSettings['RecieveOnly'] ?? false, \$FkeysSettings['ActionValue']), true);";
+        $data["elements"][5]["form"] = "return json_decode(SNMD_UIGetForm(\$id, \$FkeysSettings['ActionVariableId'] ?? 0, \$FkeysSettings['RecieveOnly'] ?? false, \$FkeysSettings['ActionValue'] ?? false), true);";
         
         return json_encode($data);
     }
@@ -209,6 +202,7 @@ class SnomDeskphone extends IPSModuleStrict {
         $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
         $data["elements"][5]["form"][3]["variableID"] = $ActionVariableId;
         $data["elements"][5]["form"][3]["visible"] = !$recvOnly;
+        $data["elements"][5]["form"][3]["value"] = $value;
 
         return json_encode($data["elements"][5]["form"]);
     }
