@@ -16,11 +16,10 @@ class SnomDeskphone extends IPSModuleStrict {
     public function ApplyChanges(): void {
         parent::ApplyChanges();
         $this->SetSummary($this->ReadPropertyString("PhoneModel") . "/" . $this->ReadPropertyString("PhoneMac"));
-        // Transfer to Phone
+        $this->SetFkeySettings();
     }
 
-    public function MessageSink(int $TimeStamp, int $SenderID, int $Message, array $Data): void
-    {
+    public function MessageSink(int $TimeStamp, int $SenderID, int $Message, array $Data): void {
         $fkeysSettings = json_decode($this->ReadPropertyString("FkeysSettings"), true);
         $fkeysToUpdate = $this->GetFkeysToUpdate($fkeysSettings, $SenderID, $Data);
         $this->UpdateFkeys($fkeysToUpdate);
@@ -70,7 +69,6 @@ class SnomDeskphone extends IPSModuleStrict {
 
         if (filter_var($_GET["xml"], FILTER_VALIDATE_BOOLEAN)) {
             // status
-            // $value ? $ledValue="On" : $ledValue="Off";
             $ledValue = ($_GET["color"]==="none") ? "Off" : "On";
             $text = $variableId . " = " . $value;
             header("Content-Type: text/xml");
@@ -144,38 +142,39 @@ class SnomDeskphone extends IPSModuleStrict {
         }
     }
 
-    public function SetFkeySettings(string $fKey, bool $isRecieveOnly, string $variableId, string $variableValue, string $labelValue): void {
-        $fKeyIndex = ((int)$fKey)-1;
-        $this->RegisterMessage($variableId , VM_UPDATE);
+    public function SetFkeySettings(): void {
+        $fkeysSettings = json_decode($this->ReadPropertyString("FkeysSettings"), true);
 
-        if ($isRecieveOnly) {
-            $fkeyType="none";
-            $fkeyValue = urlencode($fkeyType);
+        foreach ($fkeysSettings as $fkeySettings) {
+            $fKeyIndex = ((int)$fkeySettings["FkeyNo"])-1;
+            $this->RegisterMessage($fkeySettings["ActionVariableId"] , VM_UPDATE);
+
+            if ($fkeySettings["RecieveOnly"]) {
+                $fkeyValue = urlencode("none");
+            }
+            else {
+                $instanceHook = sprintf("http://%s:3777/hook/snom/%d/", $this->ReadPropertyString("LocalIP"), $this->InstanceID);
+                $hookParameters = "?xml=false&variableId=" . $fkeySettings["ActionVariableId"] . "&value=" . $fkeySettings["ActionValue"];
+                $fkeyValue = urlencode("url " . $instanceHook . $hookParameters);
+            }
+
+            $urlQuery = sprintf("settings=save&fkey%d=%s&fkey_label%d=%s", $fKeyIndex, $fkeyValue, $fKeyIndex, urlencode($fkeySettings["FkeyLabel"]));
+            $phoneModel =$this->ReadPropertyString("PhoneModel");
+        
+            if (PhoneProperties::hasSmartLabel($phoneModel)) {
+                $urlQuery = sprintf("%s&fkey_short_label%d=%s", $urlQuery, $fKeyIndex, urlencode($fkeySettings["FkeyLabel"]));
+            }
+
+            $phoneIp = $this->ReadPropertyString("PhoneIP");
+            $baseUrl = sprintf("http://%s/dummy.htm?", $phoneIp);
+            $url = sprintf("%s%s", $baseUrl, $urlQuery);
+            $this->SendDebug("MINIBROWSER URL", print_r($url, true), 0);
+
+            file_get_contents($url);
         }
-        else {
-            $fkeyType = "url";
-            $instanceHook = sprintf("http://%s:3777/hook/snom/%d/", $this->ReadPropertyString("LocalIP"), $this->InstanceID);
-            $hookParameters = "?xml=false&variableId=" . $variableId . "&value=" . $variableValue;
-            $fkeyValue = urlencode($fkeyType . " " . $instanceHook . $hookParameters);
-        }
-
-        $urlQuery = sprintf("settings=save&fkey%d=%s&fkey_label%d=%s", $fKeyIndex, $fkeyValue, $fKeyIndex, urlencode($labelValue));
-        $phoneModel =$this->ReadPropertyString("PhoneModel");
-    
-        if (PhoneProperties::hasSmartLabel($phoneModel)) {
-            $urlQuery = sprintf("%s&fkey_short_label%d=%s", $urlQuery, $fKeyIndex, urlencode($labelValue));
-        }
-
-        $phoneIp = $this->ReadPropertyString("PhoneIP");
-        $baseUrl = sprintf("http://%s/dummy.htm?", $phoneIp);
-        $url = sprintf("%s%s", $baseUrl, $urlQuery);
-        $this->SendDebug("URL", print_r($url, true), 0);
-
-        file_get_contents($url);
     }
 
-    public function GetConfigurationForm(): string
-    {
+    public function GetConfigurationForm(): string {
         $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
         $phoneModel =$this->ReadPropertyString("PhoneModel");
         $fkeyRange = PhoneProperties::getFkeysRange($phoneModel);
@@ -198,7 +197,6 @@ class SnomDeskphone extends IPSModuleStrict {
     }
 
     public function UIGetForm(int $ActionVariableId, bool $recvOnly, bool $value): string {
-        $this->SendDebug("SETTING", print_r((int)$value, true), 0);
         $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
         $data["elements"][5]["form"][3]["variableID"] = $ActionVariableId;
         $data["elements"][5]["form"][3]["visible"] = !$recvOnly;

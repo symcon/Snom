@@ -256,11 +256,6 @@
                             "value": "none"
                         }
                     ]
-                },
-                {
-                    "type": "Button",
-                    "caption": "Set",
-                    "onClick": "SNMD_SetFkeySettings($id, $FkeyNo, $RecieveOnly, $ActionVariableId, $ActionValue, $FkeyLabel);"
                 }
             ]
         }
