@@ -34,7 +34,7 @@ class SnomDeskphone extends IPSModuleStrict {
                 $fkeyNo = (int)$settings["FkeyNo"] - 1;
                 $SenderValue = $SenderData[0] ? "On" : "Off";
                 $fkeysToUpdate[$fkeyNo] = array(
-                    "ledNo" => PhoneProperties::getFkeyLedNo("snomD785", $fkeyNo),
+                    "ledNo" => PhoneProperties::getFkeyLedNo($this->ReadPropertyString("PhoneModel"), $fkeyNo),
                     "color" => $settings["FkeyColor" . $SenderValue]
                 );
             }
