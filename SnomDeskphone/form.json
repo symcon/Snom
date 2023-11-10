@@ -63,9 +63,7 @@
             "caption": "Local IP address", 
             "name": "LocalIP",
             "validate": "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
-        }
-    ],
-    "actions": [
+        },
         {
             "type": "List",
             "caption": "Function keys settings",
@@ -78,7 +76,7 @@
                     "name": "FkeyNo",
                     "width": "100px",
                     "align": "center",
-                    "add": -1,
+                    "add": 1,
                     "edit": {
                         "type": "NumberSpinner"
                     }
@@ -114,16 +112,6 @@
                     }
                 },
                 {
-                    "caption": "Hook",
-                    "name": "ActionHook",
-                    "width": "300px",
-                    "align": "center",
-                    "add": "",
-                    "edit": {
-                        "type": "ValidationTextBox"
-                    }
-                },
-                {
                     "caption": "Label",
                     "name": "FkeyLabel",
                     "width": "200px",
@@ -141,7 +129,25 @@
                     "add": "",
                     "edit": {
                         "type": "Select",
-                        "options": []
+                        "options": [
+                            {
+                                "caption": "Green",
+                                "value": "green"
+                            },
+                            {
+                                "caption": "Red",
+                                "value": "red"
+                            },
+                            {
+                                "caption": "Yellow",
+                                "value": "yellow"
+                            },
+                            {
+                                "caption": "None",
+                                "value": "none"
+                            }
+                            
+                        ]
                     }
                 },
                 {
@@ -152,18 +158,35 @@
                     "add": "",
                     "edit": {
                         "type": "Select",
-                        "options": []
+                        "options": [
+                            {
+                                "caption": "Green",
+                                "value": "green"
+                            },
+                            {
+                                "caption": "Red",
+                                "value": "red"
+                            },
+                            {
+                                "caption": "Yellow",
+                                "value": "yellow"
+                            },
+                            {
+                                "caption": "None",
+                                "value": "none"
+                            }
+                            
+                        ]
                     }
                 }
             ],
             "values": [],
             "form": [
                 {
-                    "type": "NumberSpinner",
+                    "type": "ValidationTextBox",
                     "name": "FkeyNo",
                     "caption": "Fkey No",
-                    "minimum": 1,
-                    "maximum": 4
+                    "enabled": false
                 },
                 {
                     "type": "CheckBox",
@@ -175,18 +198,12 @@
                     "type": "SelectVariable",
                     "name": "ActionVariableId",
                     "caption": "Action variable",
-                    "onChange": "SNMD_SetVariableId($id, $ActionVariableId); SNMD_CreateHook($id, $ActionVariableId);"
+                    "onChange": "SNMD_SetVariableId($id, $ActionVariableId, $RecieveOnly);"
                 },
                 {
                     "type": "SelectValue",
                     "name": "ActionValue",
-                    "caption": "Value",
-                    "variableID": 0
-                },
-                {
-                    "type": "ValidationTextBox",
-                    "name": "ActionHook",
-                    "caption": "Hook"
+                    "caption": "Value"
                 },
                 {
                     "type": "ValidationTextBox",
@@ -243,7 +260,7 @@
                 {
                     "type": "Button",
                     "caption": "Set",
-                    "onClick": "SNMD_SetFkeySettings($id, $FkeyNo, $RecieveOnly, $ActionHook, $ActionValue, $FkeyLabel);"
+                    "onClick": "SNMD_SetFkeySettings($id, $FkeyNo, $RecieveOnly, $ActionVariableId, $ActionValue, $FkeyLabel);"
                 }
             ]
         }

@@ -19,6 +19,15 @@ class PhoneProperties {
         "snomD862" => false,
         "snomD865" => false,
     );
+
+    const FKEY_LED_OFFSET = array(
+        "snomD335" => 2,
+        "snomD385" => 2,
+        "snomD735" => 5,
+        "snomD785" => 5,
+        "snomD862" => 5,
+        "snomD865" => 5,
+    );
     
     public static function getFkeysRange(string $phoneType): array {
         return range(1, self::FKEYS_NO[$phoneType]);
@@ -26,5 +35,9 @@ class PhoneProperties {
 
     public static function hasSmartLabel(string $phoneType): bool {
         return self::HAS_SMART_LABEL[$phoneType];
+    } 
+
+    public static function getFkeyLedNo(string $phoneType, int $fkeyNo): int {
+        return $fkeyNo + self::FKEY_LED_OFFSET[$phoneType];
     } 
 } 
