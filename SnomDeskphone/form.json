@@ -6,20 +6,20 @@
             "name": "InstanceLabel"
         },
         {
-        "type": "RowLayout",
-        "items": [
-            {
-                "type": "ValidationTextBox",
-                "caption": "IP address",
-                "name": "PhoneIP",
-                "validate": "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
-            },
-            {
-                "type": "Button",
-                "caption": "Ping",
-                "onClick": "echo SNMD_PingPhone($id);"
-            }
-        ]
+            "type": "RowLayout",
+            "items": [
+                {
+                    "type": "ValidationTextBox",
+                    "caption": "IP address",
+                    "name": "PhoneIP",
+                    "validate": "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
+                },
+                {
+                    "type": "Button",
+                    "caption": "Ping",
+                    "onClick": "echo SNMD_PingPhone($id);"
+                }
+            ]
         },
         {
             "type": "ValidationTextBox",
@@ -60,7 +60,7 @@
         },
         {
             "type": "ValidationTextBox",
-            "caption": "Local IP address", 
+            "caption": "Local IP address",
             "name": "LocalIP",
             "validate": "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
         },
@@ -108,7 +108,7 @@
                     "align": "center",
                     "add": 0,
                     "edit": {
-                        "type": "SelectValue"
+                        "type": "SelectAction"
                     }
                 },
                 {
@@ -146,7 +146,6 @@
                                 "caption": "None",
                                 "value": "none"
                             }
-                            
                         ]
                     }
                 },
@@ -175,7 +174,6 @@
                                 "caption": "None",
                                 "value": "none"
                             }
-                            
                         ]
                     }
                 }
@@ -198,10 +196,10 @@
                     "type": "SelectVariable",
                     "name": "ActionVariableId",
                     "caption": "Action variable",
-                    "onChange": "SNMD_SetVariableId($id, $ActionVariableId, $RecieveOnly);"
+                    "onChange": "SNMD_SetTargetId($id, $ActionVariableId, $RecieveOnly);"
                 },
                 {
-                    "type": "SelectValue",
+                    "type": "SelectAction",
                     "name": "ActionValue",
                     "caption": "Value"
                 },
@@ -231,7 +229,6 @@
                             "caption": "None",
                             "value": "none"
                         }
-                        
                     ]
                 },
                 {
