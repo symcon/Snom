@@ -26,7 +26,7 @@ class SnomDeskphone extends IPSModuleStrict
     {
         $fkeysSettings = json_decode($this->ReadPropertyString("FkeysSettings"), true);
         $fkeysToUpdate = $this->GetFkeysToUpdate($fkeysSettings, $SenderID, $Data);
-        $this->UpdateFkeys($fkeysToUpdate);
+        $this->UpdateFkeys($fkeysToUpdate, $SenderID, $Data);
     }
 
     protected function GetFkeysToUpdate(array $fkeysSettings, int $SenderID, array $SenderData): array
@@ -47,7 +47,7 @@ class SnomDeskphone extends IPSModuleStrict
         return $fkeysToUpdate;
     }
 
-    protected function UpdateFkeys(array $fkeysToUpdate): void
+    protected function UpdateFkeys(array $fkeysToUpdate, int $SenderID, array $Data): void
     {
         $this->SendDebug("FKEYS TO UPDATE", print_r($fkeysToUpdate, true), 0);
         $instanceHook = sprintf("http://%s:3777/hook/snom/%d/", $this->ReadPropertyString("LocalIP"), $this->InstanceID);
