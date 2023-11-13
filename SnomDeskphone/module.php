@@ -146,6 +146,13 @@ class SnomDeskphone extends IPSModuleStrict
         $this->UpdateFormField("ActionValue", "visible", !$RecieveOnly);
     }
 
+    public function SetVariableId(string $actionValue): void
+    {
+        $action = json_decode($actionValue, true);
+        $this->UpdateFormField("ActionVariableId", "value", $action['parameters']['TARGET']);
+    }
+
+
     public function SetFkeySettings(): void
     {
         $fkeysSettings = json_decode($this->ReadPropertyString("FkeysSettings"), true);
@@ -187,28 +194,29 @@ class SnomDeskphone extends IPSModuleStrict
         foreach ($fkeyRange as $fkeyNo) {
             $data["elements"][5]["values"][$fkeyNo - 1] = [
                 "FkeyNo" => $fkeyNo,
-                "CheckBox" => false,
+                "RecieveOnly" => false,
                 "ActionVariableId" => 1,
                 "ActionValue" => false,
-                "FkeyLabel" => "not set",
+                "FkeyLabel" => "not set", 
                 "FkeyColorOn" => "none",
                 "FkeyColorOff" => "none",
             ];
         }
 
-        $data["elements"][5]["form"] = "return json_decode(SNMD_UIGetForm(\$id, \$FkeysSettings['ActionVariableId'] ?? 0, \$FkeysSettings['RecieveOnly'] ?? false, \$FkeysSettings['ActionValue'] ?? false), true);";
+        $data["elements"][5]["form"] = "return json_decode(SNMD_UpdateForm(\$id, \$FkeysSettings['RecieveOnly'] ?? false), true);";
 
         return json_encode($data);
     }
 
-    public function UIGetForm(int $ActionVariableId, bool $recvOnly, bool $value): string
+
+    public function UpdateForm(bool $recvOnly): string
     {
+        $this->SetFormValueType($recvOnly);
+        $this->SendDebug("STATUS LED", print_r($recvOnly, true), 0);
         $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
-        $data["elements"][5]["form"][3]["variableID"] = $ActionVariableId;
-        $data["elements"][5]["form"][3]["visible"] = !$recvOnly;
-        $data["elements"][5]["form"][3]["value"] = $value;
 
         return json_encode($data["elements"][5]["form"]);
     }
+
     // has_expanstion_module()
 }
