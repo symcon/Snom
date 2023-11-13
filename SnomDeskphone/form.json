@@ -200,7 +200,8 @@
                 {
                     "type": "SelectAction",
                     "name": "ActionValue",
-                    "caption": "Value"
+                    "caption": "Action",
+                    "onChange": "SNMD_SetVariableId($id, $ActionValue);"
                 },
                 {
                     "type": "ValidationTextBox",
