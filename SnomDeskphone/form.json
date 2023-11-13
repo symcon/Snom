@@ -108,7 +108,7 @@
                     "align": "center",
                     "add": 0,
                     "edit": {
-                        "type": "SelectValue"
+                        "type": "SelectAction"
                     }
                 },
                 {
@@ -196,10 +196,10 @@
                     "type": "SelectVariable",
                     "name": "ActionVariableId",
                     "caption": "Action variable",
-                    "onChange": "SNMD_SetVariableId($id, $ActionVariableId, $RecieveOnly);"
+                    "onChange": "SNMD_SetTargetId($id, $ActionVariableId, $RecieveOnly);"
                 },
                 {
-                    "type": "SelectValue",
+                    "type": "SelectAction",
                     "name": "ActionValue",
                     "caption": "Value"
                 },

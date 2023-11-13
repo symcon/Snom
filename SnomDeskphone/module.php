@@ -49,7 +49,6 @@ class SnomDeskphone extends IPSModuleStrict
 
     protected function UpdateFkeys(array $fkeysToUpdate, int $SenderID, array $Data): void
     {
-        $this->SendDebug("FKEYS TO UPDATE", print_r($fkeysToUpdate, true), 0);
         $instanceHook = sprintf("http://%s:3777/hook/snom/%d/", $this->ReadPropertyString("LocalIP"), $this->InstanceID);
 
         foreach ($fkeysToUpdate as $data) {
@@ -70,27 +69,27 @@ class SnomDeskphone extends IPSModuleStrict
      */
     protected function ProcessHookData(): void
     {
-        $value = $_GET["value"];
-        $variableId = $_GET["variableId"];
-
         if (filter_var($_GET["xml"], FILTER_VALIDATE_BOOLEAN)) {
-            // status
-            $ledValue = ($_GET["color"] === "none") ? "Off" : "On";
-            $text = $variableId . " = " . $value;
-            header("Content-Type: text/xml");
-            $xml = $this->GetIPPhoneTextItem($text, $ledValue, $_GET["ledNo"], $_GET["color"]);
-            $this->SendDebug("XML", print_r($xml, true), 0);
-            echo $xml;
+            $this->UpdatePhonesStatusLed($_GET);
         } else {
-            //write
-            $this->SendDebug("HOOK [ACTION]", print_r($variableId . "  = " . $value, true), 0);
-            RequestAction((int) $variableId, $value);
+            $this->ExecuteAction($_GET["value"]);
         }
     }
 
+    private function UpdatePhonesStatusLed(array $requestParameters): void
+    {
+        $ledValue = ($requestParameters["color"] === "none") ? "Off" : "On";
+        $variableId = $requestParameters["variableId"];
+        $value = $requestParameters["value"];
+        $text = $variableId . " = " . $value;
+        header("Content-Type: text/xml");
+        $xml = $this->GetIPPhoneTextItem($text, $ledValue, $requestParameters["ledNo"], $requestParameters["color"]);
+        $this->SendDebug("STATUS LED", print_r($xml, true), 0);
+        echo $xml;
+    }
     private function GetIPPhoneTextItem(string $text, string $ledValue, int $ledNo, string $color, int $timeout = 1): string
     {
-        header("Content-Type: text/xml");
+        // header("Content-Type: text/xml");
         $xml = new DOMDocument('1.0', 'UTF-8');
         $xml->formatOutput = true;
         $xmlRoot = $xml->appendChild($xml->createElement("SnomIPPhoneText"));
@@ -120,6 +119,13 @@ class SnomDeskphone extends IPSModuleStrict
         return $xml->saveXML();
     }
 
+    private function ExecuteAction(string $action): void
+    {
+        $action = json_decode($action, true);
+        $parameters = $action['parameters'];
+        IPS_RunAction($action['actionID'], $parameters);
+    }
+
     // Usage of public functions (prefix defined in module.json):
     // SNMD_PingPhone();
 
@@ -139,15 +145,12 @@ class SnomDeskphone extends IPSModuleStrict
         $this->UpdateFormField("ActionValue", "visible", !$RecieveOnly);
     }
 
-    public function SetVariableId(int $variableId, bool $RecieveOnly): void
+    public function SetTargetId(int $variableId, bool $RecieveOnly): void
     {
-        $this->SendDebug('SET', print_r($RecieveOnly, true), 0);
-
         if ($RecieveOnly) {
             $this->SendDebug('SET', print_r('Recieve only fkey', true), 0);
         } else {
-            $this->UpdateFormField("ActionValue", "variableID", $variableId);
-            $this->SendDebug('SET', print_r('set variable id', true), 0);
+            $this->UpdateFormField("ActionValue", "targetID", $variableId);
         }
     }
 
@@ -159,6 +162,7 @@ class SnomDeskphone extends IPSModuleStrict
             $fKeyIndex = ((int) $fkeySettings["FkeyNo"]) - 1;
             $this->RegisterMessage($fkeySettings["ActionVariableId"], VM_UPDATE);
 
+            // Move this if/else to a separated method
             if ($fkeySettings["RecieveOnly"]) {
                 $fkeyValue = urlencode("none");
             } else {
