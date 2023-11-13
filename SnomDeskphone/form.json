@@ -190,13 +190,12 @@
                     "type": "CheckBox",
                     "name": "RecieveOnly",
                     "caption": "Recieve value only",
-                    "onChange": "SNMD_SetValueFieldVisibility($id, $RecieveOnly);"
+                    "onChange": "SNMD_SetFormValueType($id, $RecieveOnly);"
                 },
                 {
                     "type": "SelectVariable",
                     "name": "ActionVariableId",
-                    "caption": "Action variable",
-                    "onChange": "SNMD_SetTargetId($id, $ActionVariableId, $RecieveOnly);"
+                    "caption": "Action variable"
                 },
                 {
                     "type": "SelectAction",

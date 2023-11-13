@@ -140,18 +140,10 @@ class SnomDeskphone extends IPSModuleStrict
         return sprintf("Phone with IP %s is not reachable", $phoneIp);
     }
 
-    public function SetValueFieldVisibility(bool $RecieveOnly): void
+    public function SetFormValueType(bool $RecieveOnly): void
     {
+        $this->UpdateFormField("ActionVariableId", "visible", $RecieveOnly);
         $this->UpdateFormField("ActionValue", "visible", !$RecieveOnly);
-    }
-
-    public function SetTargetId(int $variableId, bool $RecieveOnly): void
-    {
-        if ($RecieveOnly) {
-            $this->SendDebug('SET', print_r('Recieve only fkey', true), 0);
-        } else {
-            $this->UpdateFormField("ActionValue", "targetID", $variableId);
-        }
     }
 
     public function SetFkeySettings(): void
