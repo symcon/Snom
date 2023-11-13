@@ -112,6 +112,26 @@
                     }
                 },
                 {
+                    "caption": "Target is status variable",
+                    "name": "TargetIsStatus",
+                    "width": "100px",
+                    "visible": false,
+                    "add": false,
+                    "edit": {
+                        "type": "CheckBox"
+                    }
+                },
+                {
+                    "caption": "Status variable",
+                    "name": "StatusVariableId",
+                    "width": "100px",
+                    "align": "center",
+                    "add": 0,
+                    "edit": {
+                        "type": "SelectVariable"
+                    }
+                },            
+                {
                     "caption": "Label",
                     "name": "FkeyLabel",
                     "width": "200px",
@@ -202,6 +222,19 @@
                     "name": "ActionValue",
                     "caption": "Action",
                     "onChange": "SNMD_SetVariableId($id, $ActionValue);"
+                },
+                {
+                    "type": "CheckBox",
+                    "name": "TargetIsStatus",
+                    "caption": "Target is status variable",
+                    "value": true,
+                    "onChange": "SNMD_ChangeStatusVariable($id, $TargetIsStatus);"
+                },
+                {
+                    "type": "SelectVariable",
+                    "name": "StatusVariableId",
+                    "caption": "Status variable",
+                    "onChange": "echo 'status var id';"
                 },
                 {
                     "type": "ValidationTextBox",

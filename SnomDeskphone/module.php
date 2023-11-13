@@ -146,6 +146,11 @@ class SnomDeskphone extends IPSModuleStrict
         $this->UpdateFormField("ActionValue", "visible", !$RecieveOnly);
     }
 
+    public function ChangeStatusVariable(bool $TargetIsStatus): void
+    {
+        $this->UpdateFormField("StatusVariableId", "visible", !$TargetIsStatus);
+    }
+
     public function SetVariableId(string $actionValue): void
     {
         $action = json_decode($actionValue, true);
@@ -159,7 +164,12 @@ class SnomDeskphone extends IPSModuleStrict
 
         foreach ($fkeysSettings as $fkeySettings) {
             $fKeyIndex = ((int) $fkeySettings["FkeyNo"]) - 1;
-            $this->RegisterMessage($fkeySettings["ActionVariableId"], VM_UPDATE);
+
+            if ($fkeySettings["TargetIsStatus"]) {
+                $this->RegisterMessage($fkeySettings["StatusVariableId"], VM_UPDATE);
+            } else {
+                $this->RegisterMessage($fkeySettings["ActionVariableId"], VM_UPDATE);
+            }
 
             // Move this if/else to a separated method
             if ($fkeySettings["RecieveOnly"]) {
@@ -203,16 +213,19 @@ class SnomDeskphone extends IPSModuleStrict
             ];
         }
 
-        $data["elements"][5]["form"] = "return json_decode(SNMD_UpdateForm(\$id, \$FkeysSettings['RecieveOnly'] ?? false), true);";
+        $data["elements"][5]["form"] = "return json_decode(SNMD_UpdateForm(\$id, \$FkeysSettings['RecieveOnly'] ?? false, \$FkeysSettings['TargetIsStatus'] ?? true), true);";
 
         return json_encode($data);
     }
 
 
-    public function UpdateForm(bool $recvOnly): string
+    public function UpdateForm(bool $recvOnly, bool $targetIsStatusVariable): string
     {
         $this->SetFormValueType($recvOnly);
-        $this->SendDebug("STATUS LED", print_r($recvOnly, true), 0);
+        $this->SendDebug("ONLY STATUS", print_r($recvOnly, true), 0);
+        $this->ChangeStatusVariable($targetIsStatusVariable);
+        $this->SendDebug("TARGET IS STATUS", print_r($targetIsStatusVariable, true), 0);
+        
         $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
 
         return json_encode($data["elements"][5]["form"]);
