@@ -209,7 +209,7 @@
                 {
                     "type": "CheckBox",
                     "name": "RecieveOnly",
-                    "caption": "Recieve value only",
+                    "caption": "Update LED only",
                     "onChange": "SNMD_SetFormValueType($id, $RecieveOnly);"
                 },
                 {

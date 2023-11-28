@@ -162,7 +162,6 @@ class SnomDeskphone extends IPSModuleStrict
         $this->UpdateFormField("ActionVariableId", "value", $action['parameters']['TARGET']);
     }
 
-
     public function SetFkeySettings(): void
     {
         $fkeysSettings = json_decode($this->ReadPropertyString("FkeysSettings"), true);
