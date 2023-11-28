@@ -221,12 +221,10 @@ class SnomDeskphone extends IPSModuleStrict
 
     public function UpdateForm(bool $recvOnly, bool $targetIsStatusVariable): string
     {
-        $this->SetFormValueType($recvOnly);
-        $this->SendDebug("ONLY STATUS", print_r($recvOnly, true), 0);
-        $this->ChangeStatusVariable($targetIsStatusVariable);
-        $this->SendDebug("TARGET IS STATUS", print_r($targetIsStatusVariable, true), 0);
-        
         $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
+        $data["elements"][5]["form"][2]["visible"] = $recvOnly;
+        $data["elements"][5]["form"][3]["visible"] = !$recvOnly;
+        $data["elements"][5]["form"][5]["visible"] = !$targetIsStatusVariable;
 
         return json_encode($data["elements"][5]["form"]);
     }
