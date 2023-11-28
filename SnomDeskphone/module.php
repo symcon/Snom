@@ -146,8 +146,13 @@ class SnomDeskphone extends IPSModuleStrict
         $this->UpdateFormField("ActionValue", "visible", !$RecieveOnly);
     }
 
-    public function ChangeStatusVariable(bool $TargetIsStatus): void
+    public function UpdateStatusVariable(bool $TargetIsStatus, int $ActionVariableId): void
     {
+        if ($TargetIsStatus)
+        {
+            $this->UpdateFormField("StatusVariableId", "value", $ActionVariableId);
+        }
+        
         $this->UpdateFormField("StatusVariableId", "visible", !$TargetIsStatus);
     }
 
@@ -207,6 +212,8 @@ class SnomDeskphone extends IPSModuleStrict
                 "RecieveOnly" => false,
                 "ActionVariableId" => 1,
                 "ActionValue" => false,
+                "TargetIsStatus" => true,
+                "StatusVariableId" => 1,
                 "FkeyLabel" => "not set", 
                 "FkeyColorOn" => "none",
                 "FkeyColorOff" => "none",

@@ -227,14 +227,12 @@
                     "type": "CheckBox",
                     "name": "TargetIsStatus",
                     "caption": "Target is status variable",
-                    "value": true,
-                    "onChange": "SNMD_ChangeStatusVariable($id, $TargetIsStatus);"
+                    "onChange": "SNMD_UpdateStatusVariable($id, $TargetIsStatus, $ActionVariableId);"
                 },
                 {
                     "type": "SelectVariable",
                     "name": "StatusVariableId",
-                    "caption": "Status variable",
-                    "onChange": "echo 'status var id';"
+                    "caption": "Status variable"
                 },
                 {
                     "type": "ValidationTextBox",
