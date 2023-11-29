@@ -144,6 +144,7 @@ class SnomDeskphone extends IPSModuleStrict
     {
         $this->UpdateFormField("ActionVariableId", "visible", $RecieveOnly);
         $this->UpdateFormField("ActionValue", "visible", !$RecieveOnly);
+        $this->UpdateFormField("TargetIsStatus", "visible", !$RecieveOnly);
     }
 
     public function UpdateStatusVariable(bool $TargetIsStatus, int $ActionVariableId): void
@@ -160,6 +161,7 @@ class SnomDeskphone extends IPSModuleStrict
     {
         $action = json_decode($actionValue, true);
         $this->UpdateFormField("ActionVariableId", "value", $action['parameters']['TARGET']);
+        // update status variable if target is status variable
     }
 
     public function SetFkeySettings(): void
@@ -230,6 +232,7 @@ class SnomDeskphone extends IPSModuleStrict
         $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
         $data["elements"][5]["form"][2]["visible"] = $recvOnly;
         $data["elements"][5]["form"][3]["visible"] = !$recvOnly;
+        $data["elements"][5]["form"][4]["visible"] = !$recvOnly;
         $data["elements"][5]["form"][5]["visible"] = !$targetIsStatusVariable;
 
         return json_encode($data["elements"][5]["form"]);
