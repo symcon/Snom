@@ -112,6 +112,26 @@
                     }
                 },
                 {
+                    "caption": "Target is status variable",
+                    "name": "TargetIsStatus",
+                    "width": "100px",
+                    "visible": false,
+                    "add": false,
+                    "edit": {
+                        "type": "CheckBox"
+                    }
+                },
+                {
+                    "caption": "Status variable",
+                    "name": "StatusVariableId",
+                    "width": "100px",
+                    "align": "center",
+                    "add": 0,
+                    "edit": {
+                        "type": "SelectVariable"
+                    }
+                },            
+                {
                     "caption": "Label",
                     "name": "FkeyLabel",
                     "width": "200px",
@@ -189,7 +209,7 @@
                 {
                     "type": "CheckBox",
                     "name": "RecieveOnly",
-                    "caption": "Recieve value only",
+                    "caption": "Update LED only",
                     "onChange": "SNMD_SetFormValueType($id, $RecieveOnly);"
                 },
                 {
@@ -202,6 +222,17 @@
                     "name": "ActionValue",
                     "caption": "Action",
                     "onChange": "SNMD_SetVariableId($id, $ActionValue);"
+                },
+                {
+                    "type": "CheckBox",
+                    "name": "TargetIsStatus",
+                    "caption": "Target is status variable",
+                    "onChange": "SNMD_UpdateStatusVariable($id, $TargetIsStatus, $ActionVariableId);"
+                },
+                {
+                    "type": "SelectVariable",
+                    "name": "StatusVariableId",
+                    "caption": "Status variable"
                 },
                 {
                     "type": "ValidationTextBox",

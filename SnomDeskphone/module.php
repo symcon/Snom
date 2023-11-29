@@ -11,6 +11,7 @@ class SnomDeskphone extends IPSModuleStrict
         $this->RegisterPropertyString("PhoneIP", "");
         $this->RegisterPropertyString("PhoneMac", "000413");
         $this->RegisterPropertyString("PhoneModel", "");
+        //TODO: local ip only if symcon runs in docker, otherwise retreive local ip
         $this->RegisterPropertyString("LocalIP", "127.0.0.1");
         $this->RegisterPropertyString("FkeysSettings", "[]");
     }
@@ -144,14 +145,25 @@ class SnomDeskphone extends IPSModuleStrict
     {
         $this->UpdateFormField("ActionVariableId", "visible", $RecieveOnly);
         $this->UpdateFormField("ActionValue", "visible", !$RecieveOnly);
+        $this->UpdateFormField("TargetIsStatus", "visible", !$RecieveOnly);
+    }
+
+    public function UpdateStatusVariable(bool $TargetIsStatus, int $ActionVariableId): void
+    {
+        if ($TargetIsStatus)
+        {
+            $this->UpdateFormField("StatusVariableId", "value", $ActionVariableId);
+        }
+        
+        $this->UpdateFormField("StatusVariableId", "visible", !$TargetIsStatus);
     }
 
     public function SetVariableId(string $actionValue): void
     {
         $action = json_decode($actionValue, true);
         $this->UpdateFormField("ActionVariableId", "value", $action['parameters']['TARGET']);
+        // update status variable if target is status variable
     }
-
 
     public function SetFkeySettings(): void
     {
@@ -159,7 +171,12 @@ class SnomDeskphone extends IPSModuleStrict
 
         foreach ($fkeysSettings as $fkeySettings) {
             $fKeyIndex = ((int) $fkeySettings["FkeyNo"]) - 1;
-            $this->RegisterMessage($fkeySettings["ActionVariableId"], VM_UPDATE);
+
+            if ($fkeySettings["TargetIsStatus"]) {
+                $this->RegisterMessage($fkeySettings["StatusVariableId"], VM_UPDATE);
+            } else {
+                $this->RegisterMessage($fkeySettings["ActionVariableId"], VM_UPDATE);
+            }
 
             // Move this if/else to a separated method
             if ($fkeySettings["RecieveOnly"]) {
@@ -197,23 +214,27 @@ class SnomDeskphone extends IPSModuleStrict
                 "RecieveOnly" => false,
                 "ActionVariableId" => 1,
                 "ActionValue" => false,
+                "TargetIsStatus" => true,
+                "StatusVariableId" => 1,
                 "FkeyLabel" => "not set", 
                 "FkeyColorOn" => "none",
                 "FkeyColorOff" => "none",
             ];
         }
 
-        $data["elements"][5]["form"] = "return json_decode(SNMD_UpdateForm(\$id, \$FkeysSettings['RecieveOnly'] ?? false), true);";
+        $data["elements"][5]["form"] = "return json_decode(SNMD_UpdateForm(\$id, \$FkeysSettings['RecieveOnly'] ?? false, \$FkeysSettings['TargetIsStatus'] ?? true), true);";
 
         return json_encode($data);
     }
 
 
-    public function UpdateForm(bool $recvOnly): string
+    public function UpdateForm(bool $recvOnly, bool $targetIsStatusVariable): string
     {
-        $this->SetFormValueType($recvOnly);
-        $this->SendDebug("STATUS LED", print_r($recvOnly, true), 0);
         $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
+        $data["elements"][5]["form"][2]["visible"] = $recvOnly;
+        $data["elements"][5]["form"][3]["visible"] = !$recvOnly;
+        $data["elements"][5]["form"][4]["visible"] = !$recvOnly;
+        $data["elements"][5]["form"][5]["visible"] = !$targetIsStatusVariable;
 
         return json_encode($data["elements"][5]["form"]);
     }
