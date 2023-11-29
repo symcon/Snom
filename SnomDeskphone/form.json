@@ -88,7 +88,7 @@
                     "visible": false,
                     "add": false,
                     "edit": {
-                        "type": "CheckBox"
+                        "type": "Select"
                     }
                 },
                 {
@@ -207,10 +207,20 @@
                     "enabled": false
                 },
                 {
-                    "type": "CheckBox",
+                    "type": "Select",
                     "name": "RecieveOnly",
-                    "caption": "Update LED only",
-                    "onChange": "SNMD_SetFormValueType($id, $RecieveOnly);"
+                    "caption": "Fkey functionality",
+                    "options": [
+                        {
+                            "caption": "Update status LED",
+                            "value": true
+                        },
+                        {
+                            "caption": "Update status LED and trigger action",
+                            "value": false
+                        }
+                    ],
+                    "onChange": "SNMD_setFkeyFunctionality($id, $RecieveOnly);"
                 },
                 {
                     "type": "SelectVariable",
