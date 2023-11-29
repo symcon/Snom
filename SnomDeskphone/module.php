@@ -163,6 +163,7 @@ class SnomDeskphone extends IPSModuleStrict
         $action = json_decode($actionValue, true);
         $this->UpdateFormField("ActionVariableId", "value", $action['parameters']['TARGET']);
         // update status variable if target is status variable
+        $this->UpdateFormField("StatusVariableId", "value", $action['parameters']['TARGET']);
     }
 
     public function SetFkeySettings(): void
