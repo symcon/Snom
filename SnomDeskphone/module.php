@@ -35,7 +35,7 @@ class SnomDeskphone extends IPSModuleStrict
         $fkeysToUpdate = array();
 
         foreach ($fkeysSettings as $settings) {
-            if ($settings["ActionVariableId"] == $SenderID) {
+            if ($settings["StatusVariableId"] == $SenderID) {
                 $fkeyNo = (int) $settings["FkeyNo"] - 1;
                 $SenderValue = $SenderData[0] ? "On" : "Off";
                 $fkeysToUpdate[$fkeyNo] = array(
@@ -162,7 +162,6 @@ class SnomDeskphone extends IPSModuleStrict
     {
         $action = json_decode($actionValue, true);
         $this->UpdateFormField("ActionVariableId", "value", $action['parameters']['TARGET']);
-        // update status variable if target is status variable
         $this->UpdateFormField("StatusVariableId", "value", $action['parameters']['TARGET']);
     }
 
@@ -174,9 +173,9 @@ class SnomDeskphone extends IPSModuleStrict
             $fKeyIndex = ((int) $fkeySettings["FkeyNo"]) - 1;
 
             if ($fkeySettings["TargetIsStatus"]) {
-                $this->RegisterMessage($fkeySettings["StatusVariableId"], VM_UPDATE);
-            } else {
                 $this->RegisterMessage($fkeySettings["ActionVariableId"], VM_UPDATE);
+            } else {
+                $this->RegisterMessage($fkeySettings["StatusVariableId"], VM_UPDATE);
             }
 
             // Move this if/else to a separated method
