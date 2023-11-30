@@ -214,7 +214,7 @@
                 {
                     "type": "Select",
                     "name": "FkeyColorOn",
-                    "caption": "Fkey color for on",
+                    "caption": "Fkey color for status on",
                     "options": [
                         {
                             "caption": "Green",
@@ -237,7 +237,7 @@
                 {
                     "type": "Select",
                     "name": "FkeyColorOff",
-                    "caption": "Fkey color for off",
+                    "caption": "Fkey color for status off",
                     "options": [
                         {
                             "caption": "Green",
@@ -282,13 +282,13 @@
                     "type": "SelectAction",
                     "name": "ActionValue",
                     "caption": "Action",
-                    "onChange": "SNMD_SetVariableId($id, $ActionValue);"
+                    "onChange": "SNMD_SetVariablesIds($id, $ActionValue, true);"
                 },
                 {
                     "type": "CheckBox",
                     "name": "TargetIsStatus",
-                    "caption": "Target is status variable",
-                    "onChange": "SNMD_UpdateStatusVariable($id, $TargetIsStatus, $ActionVariableId);"
+                    "caption": "Use action target for status LED",
+                    "onChange": "SNMD_SetVariablesIds($id, $ActionValue, $TargetIsStatus);"
                 },
                 {
                     "type": "SelectVariable",

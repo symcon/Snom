@@ -143,26 +143,22 @@ class SnomDeskphone extends IPSModuleStrict
 
     public function setFkeyFunctionality(bool $RecieveOnly): void
     {
-        $this->UpdateFormField("ActionVariableId", "visible", $RecieveOnly);
+        $this->UpdateFormField("ActionVariableId", "visible", !$RecieveOnly);
         $this->UpdateFormField("ActionValue", "visible", !$RecieveOnly);
         $this->UpdateFormField("TargetIsStatus", "visible", !$RecieveOnly);
     }
 
-    public function UpdateStatusVariable(bool $TargetIsStatus, int $ActionVariableId): void
-    {
-        if ($TargetIsStatus)
-        {
-            $this->UpdateFormField("StatusVariableId", "value", $ActionVariableId);
-        }
-        
-        $this->UpdateFormField("StatusVariableId", "visible", !$TargetIsStatus);
-    }
-
-    public function SetVariableId(string $actionValue): void
+    public function SetVariablesIds(string $actionValue, bool $TargetIsStatus = true): void
     {
         $action = json_decode($actionValue, true);
         $this->UpdateFormField("ActionVariableId", "value", $action['parameters']['TARGET']);
-        $this->UpdateFormField("StatusVariableId", "value", $action['parameters']['TARGET']);
+
+        if ($TargetIsStatus)
+        {
+            $this->UpdateFormField("StatusVariableId", "value", $action['parameters']['TARGET']);
+        }
+
+        $this->UpdateFormField("StatusVariableId", "visible", !$TargetIsStatus);
     }
 
     public function SetFkeySettings(): void
@@ -231,7 +227,7 @@ class SnomDeskphone extends IPSModuleStrict
     public function UpdateForm(bool $recvOnly, bool $targetIsStatusVariable): string
     {
         $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
-        $data["elements"][5]["form"][5]["visible"] = $recvOnly;
+        $data["elements"][5]["form"][5]["visible"] = !$recvOnly;
         $data["elements"][5]["form"][6]["visible"] = !$recvOnly;
         $data["elements"][5]["form"][7]["visible"] = !$recvOnly;
         $data["elements"][5]["form"][8]["visible"] = !$targetIsStatusVariable;
