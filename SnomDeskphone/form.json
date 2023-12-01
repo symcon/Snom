@@ -80,6 +80,72 @@
                     "edit": {
                         "type": "NumberSpinner"
                     }
+                },            
+                {
+                    "caption": "Label",
+                    "name": "FkeyLabel",
+                    "width": "200px",
+                    "align": "center",
+                    "add": "",
+                    "edit": {
+                        "type": "ValidationTextBox"
+                    }
+                },
+                {
+                    "caption": "Color for on",
+                    "name": "FkeyColorOn",
+                    "width": "300px",
+                    "align": "center",
+                    "add": "",
+                    "edit": {
+                        "type": "Select",
+                        "options": [
+                            {
+                                "caption": "Green",
+                                "value": "green"
+                            },
+                            {
+                                "caption": "Red",
+                                "value": "red"
+                            },
+                            {
+                                "caption": "Yellow",
+                                "value": "yellow"
+                            },
+                            {
+                                "caption": "None",
+                                "value": "none"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "caption": "Color for off",
+                    "name": "FkeyColorOff",
+                    "width": "300px",
+                    "align": "center",
+                    "add": "",
+                    "edit": {
+                        "type": "Select",
+                        "options": [
+                            {
+                                "caption": "Green",
+                                "value": "green"
+                            },
+                            {
+                                "caption": "Red",
+                                "value": "red"
+                            },
+                            {
+                                "caption": "Yellow",
+                                "value": "yellow"
+                            },
+                            {
+                                "caption": "None",
+                                "value": "none"
+                            }
+                        ]
+                    }
                 },
                 {
                     "caption": "Recieve value only",
@@ -88,7 +154,7 @@
                     "visible": false,
                     "add": false,
                     "edit": {
-                        "type": "CheckBox"
+                        "type": "Select"
                     }
                 },
                 {
@@ -130,72 +196,6 @@
                     "edit": {
                         "type": "SelectVariable"
                     }
-                },            
-                {
-                    "caption": "Label",
-                    "name": "FkeyLabel",
-                    "width": "200px",
-                    "align": "center",
-                    "add": "",
-                    "edit": {
-                        "type": "ValidationTextBox"
-                    }
-                },
-                {
-                    "caption": "LED color for on",
-                    "name": "FkeyColorOn",
-                    "width": "300px",
-                    "align": "center",
-                    "add": "",
-                    "edit": {
-                        "type": "Select",
-                        "options": [
-                            {
-                                "caption": "Green",
-                                "value": "green"
-                            },
-                            {
-                                "caption": "Red",
-                                "value": "red"
-                            },
-                            {
-                                "caption": "Yellow",
-                                "value": "yellow"
-                            },
-                            {
-                                "caption": "None",
-                                "value": "none"
-                            }
-                        ]
-                    }
-                },
-                {
-                    "caption": "LED color for off",
-                    "name": "FkeyColorOff",
-                    "width": "300px",
-                    "align": "center",
-                    "add": "",
-                    "edit": {
-                        "type": "Select",
-                        "options": [
-                            {
-                                "caption": "Green",
-                                "value": "green"
-                            },
-                            {
-                                "caption": "Red",
-                                "value": "red"
-                            },
-                            {
-                                "caption": "Yellow",
-                                "value": "yellow"
-                            },
-                            {
-                                "caption": "None",
-                                "value": "none"
-                            }
-                        ]
-                    }
                 }
             ],
             "values": [],
@@ -207,42 +207,14 @@
                     "enabled": false
                 },
                 {
-                    "type": "CheckBox",
-                    "name": "RecieveOnly",
-                    "caption": "Update LED only",
-                    "onChange": "SNMD_SetFormValueType($id, $RecieveOnly);"
-                },
-                {
-                    "type": "SelectVariable",
-                    "name": "ActionVariableId",
-                    "caption": "Action variable"
-                },
-                {
-                    "type": "SelectAction",
-                    "name": "ActionValue",
-                    "caption": "Action",
-                    "onChange": "SNMD_SetVariableId($id, $ActionValue);"
-                },
-                {
-                    "type": "CheckBox",
-                    "name": "TargetIsStatus",
-                    "caption": "Target is status variable",
-                    "onChange": "SNMD_UpdateStatusVariable($id, $TargetIsStatus, $ActionVariableId);"
-                },
-                {
-                    "type": "SelectVariable",
-                    "name": "StatusVariableId",
-                    "caption": "Status variable"
-                },
-                {
                     "type": "ValidationTextBox",
                     "name": "FkeyLabel",
-                    "caption": "Label"
+                    "caption": "Fkey label"
                 },
                 {
                     "type": "Select",
                     "name": "FkeyColorOn",
-                    "caption": "LED color for on",
+                    "caption": "Fkey color for status on",
                     "options": [
                         {
                             "caption": "Green",
@@ -265,7 +237,7 @@
                 {
                     "type": "Select",
                     "name": "FkeyColorOff",
-                    "caption": "LED color for off",
+                    "caption": "Fkey color for status off",
                     "options": [
                         {
                             "caption": "Green",
@@ -284,6 +256,45 @@
                             "value": "none"
                         }
                     ]
+                },
+                {
+                    "type": "Select",
+                    "name": "RecieveOnly",
+                    "caption": "Fkey functionality",
+                    "options": [
+                        {
+                            "caption": "Update status LED",
+                            "value": true
+                        },
+                        {
+                            "caption": "Update status LED and trigger action",
+                            "value": false
+                        }
+                    ],
+                    "onChange": "SNMD_setFkeyFunctionality($id, $RecieveOnly);"
+                },
+                {
+                    "type": "SelectVariable",
+                    "name": "ActionVariableId",
+                    "caption": "Action variable",
+                    "visible": false
+                },
+                {
+                    "type": "SelectAction",
+                    "name": "ActionValue",
+                    "caption": "Action",
+                    "onChange": "SNMD_SetVariablesIds($id, $ActionValue, true);"
+                },
+                {
+                    "type": "CheckBox",
+                    "name": "TargetIsStatus",
+                    "caption": "Use action target for status LED",
+                    "onChange": "SNMD_SetVariablesIds($id, $ActionValue, $TargetIsStatus);"
+                },
+                {
+                    "type": "SelectVariable",
+                    "name": "StatusVariableId",
+                    "caption": "Status variable"
                 }
             ]
         }
