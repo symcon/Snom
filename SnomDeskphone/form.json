@@ -276,7 +276,8 @@
                 {
                     "type": "SelectVariable",
                     "name": "ActionVariableId",
-                    "caption": "Action variable"
+                    "caption": "Action variable",
+                    "visible": false
                 },
                 {
                     "type": "SelectAction",

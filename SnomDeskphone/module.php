@@ -143,9 +143,10 @@ class SnomDeskphone extends IPSModuleStrict
 
     public function setFkeyFunctionality(bool $RecieveOnly): void
     {
-        $this->UpdateFormField("ActionVariableId", "visible", !$RecieveOnly);
         $this->UpdateFormField("ActionValue", "visible", !$RecieveOnly);
         $this->UpdateFormField("TargetIsStatus", "visible", !$RecieveOnly);
+        $this->UpdateFormField("TargetIsStatus", "value", !$RecieveOnly);
+        $this->UpdateFormField("StatusVariableId", "visible", $RecieveOnly);
     }
 
     public function SetVariablesIds(string $actionValue, bool $TargetIsStatus = true): void
@@ -153,8 +154,7 @@ class SnomDeskphone extends IPSModuleStrict
         $action = json_decode($actionValue, true);
         $this->UpdateFormField("ActionVariableId", "value", $action['parameters']['TARGET']);
 
-        if ($TargetIsStatus)
-        {
+        if ($TargetIsStatus) {
             $this->UpdateFormField("StatusVariableId", "value", $action['parameters']['TARGET']);
         }
 
@@ -212,7 +212,7 @@ class SnomDeskphone extends IPSModuleStrict
                 "ActionValue" => false,
                 "TargetIsStatus" => true,
                 "StatusVariableId" => 1,
-                "FkeyLabel" => "not set", 
+                "FkeyLabel" => "not set",
                 "FkeyColorOn" => "none",
                 "FkeyColorOff" => "none",
             ];
@@ -227,10 +227,14 @@ class SnomDeskphone extends IPSModuleStrict
     public function UpdateForm(bool $recvOnly, bool $targetIsStatusVariable): string
     {
         $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
-        $data["elements"][5]["form"][5]["visible"] = !$recvOnly;
         $data["elements"][5]["form"][6]["visible"] = !$recvOnly;
         $data["elements"][5]["form"][7]["visible"] = !$recvOnly;
-        $data["elements"][5]["form"][8]["visible"] = !$targetIsStatusVariable;
+
+        if ($recvOnly) {
+            $data["elements"][5]["form"][7]["value"] = false;
+        }
+
+        $data["elements"][5]["form"][8]["visible"] = $recvOnly or !$targetIsStatusVariable;
 
         return json_encode($data["elements"][5]["form"]);
     }
