@@ -84,7 +84,7 @@
                 {
                     "caption": "Label",
                     "name": "FkeyLabel",
-                    "width": "200px",
+                    "width": "150px",
                     "align": "center",
                     "add": "",
                     "edit": {
@@ -94,7 +94,7 @@
                 {
                     "caption": "Color for on",
                     "name": "FkeyColorOn",
-                    "width": "300px",
+                    "width": "100px",
                     "align": "center",
                     "add": "",
                     "edit": {
@@ -122,7 +122,7 @@
                 {
                     "caption": "Color for off",
                     "name": "FkeyColorOff",
-                    "width": "300px",
+                    "width": "100px",
                     "align": "center",
                     "add": "",
                     "edit": {
@@ -190,7 +190,7 @@
                 {
                     "caption": "Status variable",
                     "name": "StatusVariableId",
-                    "width": "100px",
+                    "width": "300px",
                     "align": "center",
                     "add": 0,
                     "edit": {
