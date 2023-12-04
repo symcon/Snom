@@ -212,7 +212,7 @@ class SnomDeskphone extends IPSModuleStrict
                 "ActionValue" => false,
                 "TargetIsStatus" => true,
                 "StatusVariableId" => 1,
-                "FkeyLabel" => "not set",
+                "FkeyLabel" => "",
                 "FkeyColorOn" => "none",
                 "FkeyColorOff" => "none",
             ];
@@ -230,11 +230,7 @@ class SnomDeskphone extends IPSModuleStrict
         $data["elements"][5]["form"][6]["visible"] = !$recvOnly;
         $data["elements"][5]["form"][7]["visible"] = !$recvOnly;
 
-        if ($recvOnly) {
-            $data["elements"][5]["form"][7]["value"] = false;
-        }
 
-        $data["elements"][5]["form"][8]["visible"] = $recvOnly or !$targetIsStatusVariable;
 
         return json_encode($data["elements"][5]["form"]);
     }
