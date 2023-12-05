@@ -1,0 +1,48 @@
+{
+    "translations": {
+        "de": { 
+            "Configure Snom IP phone": "Snom IP Phone Konfiguration",
+            "IP address": "IP Addresse",
+            "MAC address": "MAC Addresse",
+            "Phone model": "Telefon Typ",
+            "Local IP address": "Lokale IP Addresse",
+            "Function keys settings": "Funktionstaste Einstellungen",
+            "Function key": "Funktionstaste",
+            "Label": "Beschriftung",
+            "Color for status on": "Farbe für status 'an'",
+            "Color for status off": "Farbe für status 'aus'",
+            "Green": "Grün",
+            "Red": "Rot",
+            "Yellow": "Gelb",
+            "None": "Keine",
+            "Functionality": "Funktionalität",
+            "Action variable": "Aktionsvariable",
+            "Action": "Aktion",
+            "Use action target for status LED": "Aktionsvariable benutzen für status LED",
+            "Status variable": "Status variable",
+            "Update status LED and trigger action": "Update status LED und Aktion auslösen"
+        },
+        "de_DE": { 
+            "Configure Snom IP phone": "Snom IP Phone Konfiguration",
+            "IP address": "IP Addresse",
+            "MAC address": "MAC Addresse",
+            "Phone model": "Telefon Typ",
+            "Local IP address": "Lokale IP Addresse",
+            "Function keys settings": "Funktionstaste Einstellungen",
+            "Function key": "Funktionstaste",
+            "Label": "Beschriftung",
+            "Color for status on": "Farbe für status 'an'",
+            "Color for status off": "Farbe für status 'aus'",
+            "Green": "Grün",
+            "Red": "Rot",
+            "Yellow": "Gelb",
+            "None": "Keine",
+            "Functionality": "Funktionalität",
+            "Action variable": "Aktionsvariable",
+            "Action": "Aktion",
+            "Use action target for status LED": "Aktionsvariable benutzen für status LED",
+            "Status variable": "Status variable",
+            "Update status LED and trigger action": "Update status LED und Aktion auslösen"
+        }
+    }
+}
