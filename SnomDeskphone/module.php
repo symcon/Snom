@@ -19,7 +19,20 @@ class SnomDeskphone extends IPSModuleStrict
     {
         parent::ApplyChanges();
         $this->SetSummary($this->ReadPropertyString("PhoneModel") . "/" . $this->ReadPropertyString("PhoneMac"));
-        $this->SetFkeySettings();
+
+        if (!$this->ReadPropertyString("PhoneIP") or $this->isSnomPhone()) {
+            $this->SetFkeySettings();
+        } else {
+            echo "Ip does not correspond to a Snom phone";
+        }
+    }
+
+    public function isSnomPhone(): bool
+    {
+        $phoneIp = $this->ReadPropertyString("PhoneIP");
+        exec('arp '.$phoneIp.' | awk \'{print $4}\'', $output, $exec_status);
+
+        return str_contains($output[0], '00:04:13:');
     }
 
     public function MessageSink(int $TimeStamp, int $SenderID, int $Message, array $Data): void
