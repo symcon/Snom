@@ -208,7 +208,7 @@ class SnomDeskphone extends IPSModuleStrict
                 "FkeyNo" => $fkeyNo,
                 "RecieveOnly" => false,
                 "ActionVariableId" => 1,
-                "ActionValue" => false,
+                "ActionValue" => "None",
                 "TargetIsStatus" => true,
                 "StatusVariableId" => 1,
                 "FkeyLabel" => "",
@@ -228,8 +228,6 @@ class SnomDeskphone extends IPSModuleStrict
         $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
         $data["elements"][5]["form"][6]["visible"] = !$recvOnly;
         $data["elements"][5]["form"][7]["visible"] = !$recvOnly;
-
-
 
         return json_encode($data["elements"][5]["form"]);
     }
