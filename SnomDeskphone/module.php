@@ -11,8 +11,7 @@ class SnomDeskphone extends IPSModuleStrict
         $this->RegisterPropertyString("PhoneIP", "");
         $this->RegisterPropertyString("PhoneMac", "000413");
         $this->RegisterPropertyString("PhoneModel", "");
-        //TODO: local ip only if symcon runs in docker, otherwise retreive local ip
-        $this->RegisterPropertyString("LocalIP", "127.0.0.1");
+        $this->RegisterPropertyString('LocalIP', Sys_GetNetworkInfo()[0]['IP']);
         $this->RegisterPropertyString("FkeysSettings", "[]");
     }
 
@@ -127,6 +126,22 @@ class SnomDeskphone extends IPSModuleStrict
         IPS_RunAction($action['actionID'], $parameters);
     }
 
+    private function getSnomDevices(): array
+    {
+        exec('arp | grep 00:04:13:', $output, $exec_status);
+        $snom_devices = [];
+        
+        foreach ($output as $output_item)
+        {
+            $out = explode(' ', $output_item);
+            $ip = trim($out[1], '()');
+            $mac = $out[3];
+            $snom_devices[$mac] = $ip;
+        }
+
+        return $snom_devices;
+    }
+
     // Usage of public functions (prefix defined in module.json):
     // SNMD_PingPhone();
 
@@ -201,6 +216,15 @@ class SnomDeskphone extends IPSModuleStrict
     public function GetConfigurationForm(): string
     {
         $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
+        $snom_devices = $this->getSnomDevices();
+
+        foreach ($snom_devices as $mac => $ip) {
+            $data["elements"][1]["items"][0]["options"][] = [
+                "caption" => $ip,
+                "value" => $ip
+            ];
+        }
+
         $phoneModel = $this->ReadPropertyString("PhoneModel");
         $fkeyRange = PhoneProperties::getFkeysRange($phoneModel);
 
@@ -229,8 +253,6 @@ class SnomDeskphone extends IPSModuleStrict
         $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
         $data["elements"][5]["form"][6]["visible"] = !$recvOnly;
         $data["elements"][5]["form"][7]["visible"] = !$recvOnly;
-
-
 
         return json_encode($data["elements"][5]["form"]);
     }

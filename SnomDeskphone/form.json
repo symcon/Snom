@@ -9,10 +9,10 @@
             "type": "RowLayout",
             "items": [
                 {
-                    "type": "ValidationTextBox",
+                    "type": "Select",
                     "caption": "IP address",
                     "name": "PhoneIP",
-                    "validate": "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
+                    "options": []
                 },
                 {
                     "type": "Button",
@@ -62,7 +62,14 @@
             "type": "ValidationTextBox",
             "caption": "Local IP address",
             "name": "LocalIP",
-            "validate": "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
+            "validate": "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
+            "enabled": false
+        },
+        {
+            "type": "Button",
+            "caption": "See current function keys settings",
+            "link": true,
+            "onClick": "echo 'http://' . $PhoneIP . '/fkey.htm';"
         },
         {
             "type": "List",
