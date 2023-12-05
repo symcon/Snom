@@ -92,7 +92,7 @@
                     }
                 },
                 {
-                    "caption": "Color for on",
+                    "caption": "Color for status on",
                     "name": "FkeyColorOn",
                     "width": "100px",
                     "align": "center",
@@ -120,7 +120,7 @@
                     }
                 },
                 {
-                    "caption": "Color for off",
+                    "caption": "Color for status off",
                     "name": "FkeyColorOff",
                     "width": "100px",
                     "align": "center",
@@ -148,7 +148,7 @@
                     }
                 },
                 {
-                    "caption": "Recieve value only",
+                    "caption": "Functionality",
                     "name": "RecieveOnly",
                     "width": "100px",
                     "visible": false,
@@ -168,7 +168,7 @@
                     }
                 },
                 {
-                    "caption": "Value",
+                    "caption": "Action",
                     "name": "ActionValue",
                     "width": "100px",
                     "align": "center",
@@ -178,7 +178,7 @@
                     }
                 },
                 {
-                    "caption": "Target is status variable",
+                    "caption": "Use action target for status LED",
                     "name": "TargetIsStatus",
                     "width": "100px",
                     "visible": false,
@@ -203,18 +203,18 @@
                 {
                     "type": "ValidationTextBox",
                     "name": "FkeyNo",
-                    "caption": "Fkey No",
+                    "caption": "Function key",
                     "enabled": false
                 },
                 {
                     "type": "ValidationTextBox",
                     "name": "FkeyLabel",
-                    "caption": "Fkey label"
+                    "caption": "Label"
                 },
                 {
                     "type": "Select",
                     "name": "FkeyColorOn",
-                    "caption": "Fkey color for status on",
+                    "caption": "Color for status on",
                     "options": [
                         {
                             "caption": "Green",
@@ -237,7 +237,7 @@
                 {
                     "type": "Select",
                     "name": "FkeyColorOff",
-                    "caption": "Fkey color for status off",
+                    "caption": "Color for status off",
                     "options": [
                         {
                             "caption": "Green",
@@ -260,7 +260,7 @@
                 {
                     "type": "Select",
                     "name": "RecieveOnly",
-                    "caption": "Fkey functionality",
+                    "caption": "Functionality",
                     "options": [
                         {
                             "caption": "Update status LED",
