@@ -65,6 +65,12 @@
             "validate": "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
         },
         {
+            "type": "Button",
+            "caption": "See current function keys settings",
+            "link": true,
+            "onClick": "echo 'http://' . $PhoneIP . '/fkey.htm';"
+        },
+        {
             "type": "List",
             "caption": "Function keys settings",
             "name": "FkeysSettings",
