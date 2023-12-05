@@ -11,8 +11,7 @@ class SnomDeskphone extends IPSModuleStrict
         $this->RegisterPropertyString("PhoneIP", "");
         $this->RegisterPropertyString("PhoneMac", "000413");
         $this->RegisterPropertyString("PhoneModel", "");
-        //TODO: local ip only if symcon runs in docker, otherwise retreive local ip
-        $this->RegisterPropertyString("LocalIP", "127.0.0.1");
+        $this->RegisterPropertyString('LocalIP', Sys_GetNetworkInfo()[0]['IP']);
         $this->RegisterPropertyString("FkeysSettings", "[]");
     }
 
