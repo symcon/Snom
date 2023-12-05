@@ -20,7 +20,8 @@
             "Action": "Aktion",
             "Use action target for status LED": "Aktionsvariable benutzen für status LED",
             "Status variable": "Status variable",
-            "Update status LED and trigger action": "Update status LED und Aktion auslösen"
+            "Update status LED and trigger action": "Update status LED und Aktion auslösen",
+            "See current function keys settings": "Aktuelle Funktionstasten Einstellungen sehen"
         },
         "de_DE": { 
             "Configure Snom IP phone": "Snom IP Phone Konfiguration",
@@ -42,7 +43,8 @@
             "Action": "Aktion",
             "Use action target for status LED": "Aktionsvariable benutzen für status LED",
             "Status variable": "Status variable",
-            "Update status LED and trigger action": "Update status LED und Aktion auslösen"
+            "Update status LED and trigger action": "Update status LED und Aktion auslösen",
+            "See current function keys settings": "Aktuelle Funktionstasten Einstellungen sehen"
         }
     }
 }
