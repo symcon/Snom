@@ -9,7 +9,6 @@ class SnomDeskphone extends IPSModuleStrict
         parent::Create();
         $this->RegisterHook("snom/" . $this->InstanceID);
         $this->RegisterPropertyString("PhoneIP", "");
-        $this->RegisterPropertyString("PhoneMac", "000413");
         $this->RegisterPropertyString("PhoneModel", "");
         $this->RegisterPropertyString('LocalIP', Sys_GetNetworkInfo()[0]['IP']);
         $this->RegisterPropertyString("FkeysSettings", "[]");
@@ -18,21 +17,8 @@ class SnomDeskphone extends IPSModuleStrict
     public function ApplyChanges(): void
     {
         parent::ApplyChanges();
-        $this->SetSummary($this->ReadPropertyString("PhoneModel") . "/" . $this->ReadPropertyString("PhoneMac"));
-
-        if (!$this->ReadPropertyString("PhoneIP") or $this->isSnomPhone()) {
-            $this->SetFkeySettings();
-        } else {
-            echo "Ip does not correspond to a Snom phone";
-        }
-    }
-
-    public function isSnomPhone(): bool
-    {
-        $phoneIp = $this->ReadPropertyString("PhoneIP");
-        exec('arp '.$phoneIp.' | awk \'{print $4}\'', $output, $exec_status);
-
-        return str_contains($output[0], '00:04:13:');
+        $phone_model = str_replace("snom", "", $this->ReadPropertyString('PhoneModel'));
+        $this->SetSummary( $this->ReadPropertyString('PhoneIP') . ' - ' . $phone_model);
     }
 
     public function MessageSink(int $TimeStamp, int $SenderID, int $Message, array $Data): void
@@ -215,13 +201,26 @@ class SnomDeskphone extends IPSModuleStrict
         $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
         $phoneModel = $this->ReadPropertyString("PhoneModel");
         $fkeyRange = PhoneProperties::getFkeysRange($phoneModel);
+        $device_info = $this->getDeviceInformation();
+        $data["elements"][2]["value"] = $device_info['mac address'];
+
+        if (!$this->ReadPropertyString("PhoneIP") or $device_info['is snom phone']) {
+            $data["elements"][1]["items"][2]["visible"] = false;
+            $data["elements"][5]["enabled"] = true;
+            $data["elements"][6]["visible"] = true;
+            $this->SetFkeySettings();
+        } else {
+            $data["elements"][1]["items"][2]["visible"] = true;
+            $data["elements"][5]["enabled"] = false;
+            $data["elements"][6]["visible"] = false;
+        }
 
         foreach ($fkeyRange as $fkeyNo) {
-            $data["elements"][5]["values"][$fkeyNo - 1] = [
+            $data["elements"][6]["values"][$fkeyNo - 1] = [
                 "FkeyNo" => $fkeyNo,
                 "RecieveOnly" => false,
                 "ActionVariableId" => 1,
-                "ActionValue" => "None",
+                "ActionValue" => 0,
                 "TargetIsStatus" => true,
                 "StatusVariableId" => 1,
                 "FkeyLabel" => "",
@@ -230,19 +229,38 @@ class SnomDeskphone extends IPSModuleStrict
             ];
         }
 
-        $data["elements"][5]["form"] = "return json_decode(SNMD_UpdateForm(\$id, \$FkeysSettings['RecieveOnly'] ?? false, \$FkeysSettings['TargetIsStatus'] ?? true), true);";
+        $data["elements"][6]["form"] = "return json_decode(SNMD_UpdateForm(\$id, \$FkeysSettings['RecieveOnly'] ?? false, \$FkeysSettings['TargetIsStatus'] ?? true), true);";
 
         return json_encode($data);
     }
 
+    public function getDeviceInformation(): array
+    {
+        $phoneIp = $this->ReadPropertyString("PhoneIP");
+        exec('arp ' . $phoneIp . ' | awk \'{print $4}\'', $output, $exec_status);
+
+        if (str_contains($output[0], '00:04:13:')) {
+            return array(
+                "is snom phone" => true,
+                "mac address" => $output[0],
+            );
+        } else {
+            return array(
+                "is snom phone" => false,
+                "mac address" => '00:04:13:',
+            );
+        }
+
+    }
 
     public function UpdateForm(bool $recvOnly, bool $targetIsStatusVariable): string
     {
         $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
-        $data["elements"][5]["form"][6]["visible"] = !$recvOnly;
-        $data["elements"][5]["form"][7]["visible"] = !$recvOnly;
+        $data["elements"][6]["form"][6]["visible"] = !$recvOnly;
+        $data["elements"][6]["form"][7]["visible"] = !$recvOnly;
+        $data["elements"][6]["form"][8]["visible"] = !$targetIsStatusVariable;
 
-        return json_encode($data["elements"][5]["form"]);
+        return json_encode($data["elements"][6]["form"]);
     }
 
     // has_expanstion_module()
