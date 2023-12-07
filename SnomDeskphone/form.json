@@ -62,7 +62,8 @@
                     "caption": "Snom D865",
                     "value": "snomD865"
                 }
-            ]
+            ],
+            "onChange": "echo IPS_HasChanges($id);"
         },
         {
             "type": "ValidationTextBox",
@@ -81,8 +82,8 @@
             "type": "List",
             "caption": "Function keys settings",
             "name": "FkeysSettings",
-            "add": false,
-            "delete": false,
+            "add": true,
+            "delete": true,
             "columns": [
                 {
                     "caption": "Function key",
@@ -93,7 +94,7 @@
                     "edit": {
                         "type": "NumberSpinner"
                     }
-                },            
+                },
                 {
                     "caption": "Label",
                     "name": "FkeyLabel",
@@ -109,7 +110,7 @@
                     "name": "FkeyColorOn",
                     "width": "100px",
                     "align": "center",
-                    "add": "",
+                    "add": "none",
                     "edit": {
                         "type": "Select",
                         "options": [
@@ -137,7 +138,7 @@
                     "name": "FkeyColorOff",
                     "width": "100px",
                     "align": "center",
-                    "add": "",
+                    "add": "none",
                     "edit": {
                         "type": "Select",
                         "options": [
@@ -214,10 +215,10 @@
             "values": [],
             "form": [
                 {
-                    "type": "ValidationTextBox",
+                    "type": "NumberSpinner",
                     "name": "FkeyNo",
                     "caption": "Function key",
-                    "enabled": false
+                    "minimum": 1
                 },
                 {
                     "type": "ValidationTextBox",

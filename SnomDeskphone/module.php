@@ -18,7 +18,7 @@ class SnomDeskphone extends IPSModuleStrict
     {
         parent::ApplyChanges();
         $phone_model = str_replace("snom", "", $this->ReadPropertyString('PhoneModel'));
-        $this->SetSummary( $this->ReadPropertyString('PhoneIP') . ' - ' . $phone_model);
+        $this->SetSummary($this->ReadPropertyString('PhoneIP') . ' - ' . $phone_model);
     }
 
     public function MessageSink(int $TimeStamp, int $SenderID, int $Message, array $Data): void
@@ -199,12 +199,13 @@ class SnomDeskphone extends IPSModuleStrict
     public function GetConfigurationForm(): string
     {
         $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
-        $phoneModel = $this->ReadPropertyString("PhoneModel");
-        $fkeyRange = PhoneProperties::getFkeysRange($phoneModel);
         $device_info = $this->getDeviceInformation();
         $data["elements"][2]["value"] = $device_info['mac address'];
 
-        if (!$this->ReadPropertyString("PhoneIP") or $device_info['is snom phone']) {
+        if (!$this->ReadPropertyString("PhoneIP")) {
+            $data["elements"][5]["enabled"] = false;
+            $data["elements"][6]["visible"] = false;
+        } elseif ($device_info['is snom phone']) {
             $data["elements"][1]["items"][2]["visible"] = false;
             $data["elements"][5]["enabled"] = true;
             $data["elements"][6]["visible"] = true;
@@ -213,20 +214,6 @@ class SnomDeskphone extends IPSModuleStrict
             $data["elements"][1]["items"][2]["visible"] = true;
             $data["elements"][5]["enabled"] = false;
             $data["elements"][6]["visible"] = false;
-        }
-
-        foreach ($fkeyRange as $fkeyNo) {
-            $data["elements"][6]["values"][$fkeyNo - 1] = [
-                "FkeyNo" => $fkeyNo,
-                "RecieveOnly" => false,
-                "ActionVariableId" => 1,
-                "ActionValue" => 0,
-                "TargetIsStatus" => true,
-                "StatusVariableId" => 1,
-                "FkeyLabel" => "",
-                "FkeyColorOn" => "none",
-                "FkeyColorOff" => "none",
-            ];
         }
 
         $data["elements"][6]["form"] = "return json_decode(SNMD_UpdateForm(\$id, \$FkeysSettings['RecieveOnly'] ?? false, \$FkeysSettings['TargetIsStatus'] ?? true), true);";
@@ -255,7 +242,9 @@ class SnomDeskphone extends IPSModuleStrict
 
     public function UpdateForm(bool $recvOnly, bool $targetIsStatusVariable): string
     {
+        $phoneModel = $this->ReadPropertyString("PhoneModel");
         $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
+        $data["elements"][6]["form"][0]["maximum"] = PhoneProperties::FKEYS_NO[$phoneModel];
         $data["elements"][6]["form"][6]["visible"] = !$recvOnly;
         $data["elements"][6]["form"][7]["visible"] = !$recvOnly;
         $data["elements"][6]["form"][8]["visible"] = !$targetIsStatusVariable;
