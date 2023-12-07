@@ -203,8 +203,8 @@
                 {
                     "caption": "Status variable",
                     "name": "StatusVariableId",
-                    "width": "300px",
-                    "align": "center",
+                    "width": "auto",
+                    "align": "left",
                     "add": 0,
                     "edit": {
                         "type": "SelectVariable"
