@@ -63,7 +63,7 @@
                     "value": "snomD865"
                 }
             ],
-            "onChange": "echo IPS_HasChanges($id);"
+            "onChange": "echo 'Apply the changes below before adding or modifying function keys.\nIt will update phone model related properties';"
         },
         {
             "type": "ValidationTextBox",
