@@ -17,7 +17,7 @@
                 {
                     "type": "Button",
                     "caption": "Ping",
-                    "onClick": "echo SNMD_PingPhone($id);"
+                    "onClick": "echo SNMD_PingPhone($id, $PhoneIP);"
                 },
                 {
                     "type": "Label",
@@ -63,7 +63,7 @@
                     "value": "snomD865"
                 }
             ],
-            "onChange": "echo 'Apply the changes below before adding or modifying function keys.\nIt will update phone model related properties';"
+            "onChange": "echo 'Apply the changes below before adding or modifying function keys.\nIt will update phone model related properties.';"
         },
         {
             "type": "ValidationTextBox",

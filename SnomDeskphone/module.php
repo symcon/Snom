@@ -128,15 +128,13 @@ class SnomDeskphone extends IPSModuleStrict
     // Usage of public functions (prefix defined in module.json):
     // SNMD_PingPhone();
 
-    public function PingPhone(): string
+    public function PingPhone(string $phone_ip): string
     {
-        $phoneIp = $this->ReadPropertyString("PhoneIP");
-
-        if (Sys_Ping($phoneIp, 4000)) {
-            return sprintf("Phone with IP %s is reachable", $phoneIp);
+        if (Sys_Ping($phone_ip, 4000)) {
+            return sprintf("Phone with IP %s is reachable", $phone_ip);
         }
 
-        return sprintf("Phone with IP %s is not reachable", $phoneIp);
+        return sprintf("Phone with IP %s is not reachable", $phone_ip);
     }
 
     public function setFkeyFunctionality(bool $RecieveOnly): void
