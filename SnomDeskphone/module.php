@@ -19,6 +19,8 @@ class SnomDeskphone extends IPSModuleStrict
     {
         parent::ApplyChanges();
         $this->SetSummary($this->ReadPropertyString('PhoneIP'));
+        $this->SetValue('PhoneModel', "");
+        $this->SetValue('PhoneMac', "");
     }
 
     public function MessageSink(int $TimeStamp, int $SenderID, int $Message, array $Data): void
