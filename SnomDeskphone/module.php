@@ -130,6 +130,8 @@ class SnomDeskphone extends IPSModuleStrict
 
     public function PingPhone(string $phone_ip): string
     {
+        echo "Trying to reach $phone_ip. Please wait...";
+        
         if (Sys_Ping($phone_ip, 4000)) {
             return sprintf("Phone with IP %s is reachable", $phone_ip);
         }
