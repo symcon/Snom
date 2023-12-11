@@ -34,36 +34,10 @@
             "enabled": false
         },
         {
-            "type": "Select",
+            "type": "ValidationTextBox",
             "caption": "Phone model",
             "name": "PhoneModel",
-            "options": [
-                {
-                    "caption": "Snom D335",
-                    "value": "snomD335"
-                },
-                {
-                    "caption": "Snom D385",
-                    "value": "snomD385"
-                },
-                {
-                    "caption": "Snom D735",
-                    "value": "snomD735"
-                },
-                {
-                    "caption": "Snom D785",
-                    "value": "snomD785"
-                },
-                {
-                    "caption": "Snom D862",
-                    "value": "snomD862"
-                },
-                {
-                    "caption": "Snom D865",
-                    "value": "snomD865"
-                }
-            ],
-            "onChange": "echo 'Apply the changes below before adding or modifying function keys.\nIt will update phone model related properties.';"
+            "enabled": false
         },
         {
             "type": "ValidationTextBox",

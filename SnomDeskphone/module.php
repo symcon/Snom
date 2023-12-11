@@ -7,9 +7,10 @@ class SnomDeskphone extends IPSModuleStrict
     public function Create(): void
     {
         parent::Create();
+        $this->RegisterVariableString("PhoneModel", "");
+        $this->RegisterVariableString("PhoneMac", "");
         $this->RegisterHook("snom/" . $this->InstanceID);
         $this->RegisterPropertyString("PhoneIP", "");
-        $this->RegisterPropertyString("PhoneModel", "");
         $this->RegisterPropertyString('LocalIP', Sys_GetNetworkInfo()[0]['IP']);
         $this->RegisterPropertyString("FkeysSettings", "[]");
     }
@@ -17,8 +18,7 @@ class SnomDeskphone extends IPSModuleStrict
     public function ApplyChanges(): void
     {
         parent::ApplyChanges();
-        $phone_model = str_replace("snom", "", $this->ReadPropertyString('PhoneModel'));
-        $this->SetSummary($this->ReadPropertyString('PhoneIP') . ' - ' . $phone_model);
+        $this->SetSummary($this->ReadPropertyString('PhoneIP'));
     }
 
     public function MessageSink(int $TimeStamp, int $SenderID, int $Message, array $Data): void
@@ -37,7 +37,7 @@ class SnomDeskphone extends IPSModuleStrict
                 $fkeyNo = (int) $settings["FkeyNo"] - 1;
                 $SenderValue = $SenderData[0] ? "On" : "Off";
                 $fkeysToUpdate[$fkeyNo] = array(
-                    "ledNo" => PhoneProperties::getFkeyLedNo($this->ReadPropertyString("PhoneModel"), $fkeyNo),
+                    "ledNo" => PhoneProperties::getFkeyLedNo($this->GetValue("PhoneModel"), $fkeyNo),
                     "color" => $settings["FkeyColor" . $SenderValue]
                 );
             }
@@ -180,9 +180,8 @@ class SnomDeskphone extends IPSModuleStrict
             }
 
             $urlQuery = sprintf("settings=save&fkey%d=%s&fkey_label%d=%s", $fKeyIndex, $fkeyValue, $fKeyIndex, urlencode($fkeySettings["FkeyLabel"]));
-            $phoneModel = $this->ReadPropertyString("PhoneModel");
 
-            if (PhoneProperties::hasSmartLabel($phoneModel)) {
+            if (PhoneProperties::hasSmartLabel($this->GetValue("PhoneModel"))) {
                 $urlQuery = sprintf("%s&fkey_short_label%d=%s", $urlQuery, $fKeyIndex, urlencode($fkeySettings["FkeyLabel"]));
             }
 
@@ -220,6 +219,7 @@ class SnomDeskphone extends IPSModuleStrict
         $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
         $device_info = $this->getDeviceInformation();
         $data["elements"][2]["value"] = $device_info['mac address'];
+        $data["elements"][3]["value"] = $device_info['phone model'];
 
         if (!$this->ReadPropertyString("PhoneIP")) {
             $data["elements"][5]["enabled"] = false;
@@ -242,18 +242,25 @@ class SnomDeskphone extends IPSModuleStrict
 
     public function getDeviceInformation(): array
     {
-        $phoneIp = $this->ReadPropertyString("PhoneIP");
-        exec('arp ' . $phoneIp . ' | awk \'{print $4}\'', $output, $exec_status);
+        $phone_ip = $this->ReadPropertyString("PhoneIP");
+        exec('arp ' . $phone_ip . ' | awk \'{print $4}\'', $output, $exec_status);
 
         if (str_contains($output[0], '00:04:13:')) {
+            $phone_settings_xml = simplexml_load_file("http://$phone_ip/settings.xml") or die("Error: Cannot create object");
+            $phone_model = (string)$phone_settings_xml->{'phone-settings'}->phone_type[0];
+            $this->SetValue('PhoneModel', $phone_model);
+            $this->SetValue('PhoneMac', $output[0]);
+
             return array(
                 "is snom phone" => true,
                 "mac address" => $output[0],
+                "phone model" => $phone_model,
             );
         } else {
             return array(
                 "is snom phone" => false,
                 "mac address" => '00:04:13:',
+                "phone model" => '',
             );
         }
 
@@ -261,7 +268,7 @@ class SnomDeskphone extends IPSModuleStrict
 
     public function UpdateForm(bool $recvOnly, bool $targetIsStatusVariable): string
     {
-        $phoneModel = $this->ReadPropertyString("PhoneModel");
+        $phoneModel = $this->GetValue("PhoneModel");
         $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
         $data["elements"][6]["form"][0]["maximum"] = PhoneProperties::FKEYS_NO[$phoneModel];
         $data["elements"][6]["form"][6]["visible"] = !$recvOnly;
