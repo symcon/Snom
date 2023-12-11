@@ -90,7 +90,7 @@
                     "name": "FkeyNo",
                     "width": "100px",
                     "align": "center",
-                    "add": 1,
+                    "add": 0,
                     "edit": {
                         "type": "NumberSpinner"
                     }
@@ -310,7 +310,17 @@
                     "name": "StatusVariableId",
                     "caption": "Status variable"
                 }
-            ]
+            ],
+            "onEdit": [
+                "if (!SNMD_fkeysAreUnique($id, (array)$FkeysSettings)) {",
+                "echo 'Fkey already exists in current list';",
+                "} else {",
+                "echo 'Are you sure?\n",
+                "Applying the changes, will override the edited function(s) key(s) settings in your phone.\n",
+                "For seeing the current fkey settings, press the button \"See current function keys settings\"';",
+                "}"
+            ],
+            "onAdd": "if (!SNMD_fkeysAreUnique($id, (array)$FkeysSettings)) {echo 'Fkey already exists in current list';};"
         }
     ]
 }

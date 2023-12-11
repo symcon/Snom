@@ -196,6 +196,27 @@ class SnomDeskphone extends IPSModuleStrict
         }
     }
 
+    public function fkeysAreUnique(array $fkeys_settings): bool
+    {
+        $fkeys_are_unique = true;
+        $fkeys = [];
+
+        foreach ($fkeys_settings as $key => $value) {
+            if (str_contains($key, 'array')) {
+                foreach ($value as $fkey_settings) {
+                    if (!in_array($fkey_settings['FkeyNo'],$fkeys)) {
+                        array_push($fkeys, $fkey_settings["FkeyNo"]);
+                    } else {
+                        $fkeys_are_unique = false;
+                    }
+                }
+
+            }
+        }
+
+        return $fkeys_are_unique;
+    }
+
     public function GetConfigurationForm(): string
     {
         $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
