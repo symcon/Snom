@@ -17,7 +17,7 @@
                 {
                     "type": "Button",
                     "caption": "Ping",
-                    "onClick": "echo SNMD_PingPhone($id, $PhoneIP);"
+                    "onClick": "SNMD_PingPhone($id, $PhoneIP);"
                 },
                 {
                     "type": "Label",
