@@ -17,7 +17,7 @@
                 {
                     "type": "Button",
                     "caption": "Ping",
-                    "onClick": "echo SNMD_PingPhone($id);"
+                    "onClick": "SNMD_PingPhone($id, $PhoneIP);"
                 },
                 {
                     "type": "Label",
@@ -34,35 +34,10 @@
             "enabled": false
         },
         {
-            "type": "Select",
+            "type": "ValidationTextBox",
             "caption": "Phone model",
             "name": "PhoneModel",
-            "options": [
-                {
-                    "caption": "Snom D335",
-                    "value": "snomD335"
-                },
-                {
-                    "caption": "Snom D385",
-                    "value": "snomD385"
-                },
-                {
-                    "caption": "Snom D735",
-                    "value": "snomD735"
-                },
-                {
-                    "caption": "Snom D785",
-                    "value": "snomD785"
-                },
-                {
-                    "caption": "Snom D862",
-                    "value": "snomD862"
-                },
-                {
-                    "caption": "Snom D865",
-                    "value": "snomD865"
-                }
-            ]
+            "enabled": false
         },
         {
             "type": "ValidationTextBox",
@@ -81,19 +56,19 @@
             "type": "List",
             "caption": "Function keys settings",
             "name": "FkeysSettings",
-            "add": false,
-            "delete": false,
+            "add": true,
+            "delete": true,
             "columns": [
                 {
                     "caption": "Function key",
                     "name": "FkeyNo",
                     "width": "100px",
                     "align": "center",
-                    "add": 1,
+                    "add": 0,
                     "edit": {
                         "type": "NumberSpinner"
                     }
-                },            
+                },
                 {
                     "caption": "Label",
                     "name": "FkeyLabel",
@@ -109,7 +84,7 @@
                     "name": "FkeyColorOn",
                     "width": "100px",
                     "align": "center",
-                    "add": "",
+                    "add": "none",
                     "edit": {
                         "type": "Select",
                         "options": [
@@ -137,7 +112,7 @@
                     "name": "FkeyColorOff",
                     "width": "100px",
                     "align": "center",
-                    "add": "",
+                    "add": "none",
                     "edit": {
                         "type": "Select",
                         "options": [
@@ -203,8 +178,8 @@
                 {
                     "caption": "Status variable",
                     "name": "StatusVariableId",
-                    "width": "300px",
-                    "align": "center",
+                    "width": "auto",
+                    "align": "left",
                     "add": 0,
                     "edit": {
                         "type": "SelectVariable"
@@ -214,10 +189,10 @@
             "values": [],
             "form": [
                 {
-                    "type": "ValidationTextBox",
+                    "type": "NumberSpinner",
                     "name": "FkeyNo",
                     "caption": "Function key",
-                    "enabled": false
+                    "minimum": 1
                 },
                 {
                     "type": "ValidationTextBox",
@@ -296,19 +271,38 @@
                     "type": "SelectAction",
                     "name": "ActionValue",
                     "caption": "Action",
-                    "onChange": "SNMD_SetVariablesIds($id, $ActionValue, true);"
+                    "onChange": "SNMD_SetVariablesIds($id, $ActionValue, false);"
                 },
                 {
                     "type": "CheckBox",
                     "name": "TargetIsStatus",
-                    "caption": "Use action target for status LED",
+                    "caption": "Use other variable for status LED",
                     "onChange": "SNMD_SetVariablesIds($id, $ActionValue, $TargetIsStatus);"
                 },
                 {
                     "type": "SelectVariable",
                     "name": "StatusVariableId",
-                    "caption": "Status variable"
+                    "caption": "Status variable",
+                    "visible": false
                 }
+            ],
+            "onEdit": [
+                "if (!SNMD_fkeysAreUnique($id, (array)$FkeysSettings)) {",
+                "echo 'Fkey already exists in current list';",
+                "} else {",
+                "echo 'Are you sure?\n",
+                "Applying the changes, will override the edited function(s) key(s) settings in your phone.\n",
+                "For seeing the current fkey settings, press the button \"See current function keys settings\"';",
+                "}"
+            ],
+            "onAdd": [
+                "if (!SNMD_fkeysAreUnique($id, (array)$FkeysSettings)) {",
+                "echo 'Fkey already exists in current list';",
+                "} else {",
+                "echo 'Are you sure?\n",
+                "Applying the changes, will override the edited function(s) key(s) settings in your phone.\n",
+                "For seeing the current fkey settings, press the button \"See current function keys settings\"';",
+                "}"
             ]
         }
     ]

@@ -7,9 +7,10 @@ class SnomDeskphone extends IPSModuleStrict
     public function Create(): void
     {
         parent::Create();
+        $this->RegisterVariableString("PhoneModel", "");
+        $this->RegisterVariableString("PhoneMac", "");
         $this->RegisterHook("snom/" . $this->InstanceID);
         $this->RegisterPropertyString("PhoneIP", "");
-        $this->RegisterPropertyString("PhoneModel", "");
         $this->RegisterPropertyString('LocalIP', Sys_GetNetworkInfo()[0]['IP']);
         $this->RegisterPropertyString("FkeysSettings", "[]");
     }
@@ -17,8 +18,7 @@ class SnomDeskphone extends IPSModuleStrict
     public function ApplyChanges(): void
     {
         parent::ApplyChanges();
-        $phone_model = str_replace("snom", "", $this->ReadPropertyString('PhoneModel'));
-        $this->SetSummary( $this->ReadPropertyString('PhoneIP') . ' - ' . $phone_model);
+        $this->SetSummary($this->ReadPropertyString('PhoneIP'));
     }
 
     public function MessageSink(int $TimeStamp, int $SenderID, int $Message, array $Data): void
@@ -37,7 +37,7 @@ class SnomDeskphone extends IPSModuleStrict
                 $fkeyNo = (int) $settings["FkeyNo"] - 1;
                 $SenderValue = $SenderData[0] ? "On" : "Off";
                 $fkeysToUpdate[$fkeyNo] = array(
-                    "ledNo" => PhoneProperties::getFkeyLedNo($this->ReadPropertyString("PhoneModel"), $fkeyNo),
+                    "ledNo" => PhoneProperties::getFkeyLedNo($this->GetValue("PhoneModel"), $fkeyNo),
                     "color" => $settings["FkeyColor" . $SenderValue]
                 );
             }
@@ -128,26 +128,24 @@ class SnomDeskphone extends IPSModuleStrict
     // Usage of public functions (prefix defined in module.json):
     // SNMD_PingPhone();
 
-    public function PingPhone(): string
+    public function PingPhone(string $phone_ip): void
     {
-        $phoneIp = $this->ReadPropertyString("PhoneIP");
-
-        if (Sys_Ping($phoneIp, 4000)) {
-            return sprintf("Phone with IP %s is reachable", $phoneIp);
+        if (Sys_Ping($phone_ip, 4000)) {
+            echo "IP $phone_ip is reachable";
+        } else {
+            echo "IP $phone_ip is not reachable";
         }
-
-        return sprintf("Phone with IP %s is not reachable", $phoneIp);
     }
 
     public function setFkeyFunctionality(bool $RecieveOnly): void
     {
         $this->UpdateFormField("ActionValue", "visible", !$RecieveOnly);
         $this->UpdateFormField("TargetIsStatus", "visible", !$RecieveOnly);
-        $this->UpdateFormField("TargetIsStatus", "value", !$RecieveOnly);
+        $this->UpdateFormField("TargetIsStatus", "value", $RecieveOnly);
         $this->UpdateFormField("StatusVariableId", "visible", $RecieveOnly);
     }
 
-    public function SetVariablesIds(string $actionValue, bool $TargetIsStatus = true): void
+    public function SetVariablesIds(string $actionValue, bool $TargetIsStatus): void
     {
         $action = json_decode($actionValue, true);
         $this->UpdateFormField("ActionVariableId", "value", $action['parameters']['TARGET']);
@@ -156,7 +154,7 @@ class SnomDeskphone extends IPSModuleStrict
             $this->UpdateFormField("StatusVariableId", "value", $action['parameters']['TARGET']);
         }
 
-        $this->UpdateFormField("StatusVariableId", "visible", !$TargetIsStatus);
+        $this->UpdateFormField("StatusVariableId", "visible", $TargetIsStatus);
     }
 
     public function SetFkeySettings(): void
@@ -167,9 +165,9 @@ class SnomDeskphone extends IPSModuleStrict
             $fKeyIndex = ((int) $fkeySettings["FkeyNo"]) - 1;
 
             if ($fkeySettings["TargetIsStatus"]) {
-                $this->RegisterMessage($fkeySettings["ActionVariableId"], VM_UPDATE);
-            } else {
                 $this->RegisterMessage($fkeySettings["StatusVariableId"], VM_UPDATE);
+            } else {
+                $this->RegisterMessage($fkeySettings["ActionVariableId"], VM_UPDATE);
             }
 
             // Move this if/else to a separated method
@@ -182,9 +180,8 @@ class SnomDeskphone extends IPSModuleStrict
             }
 
             $urlQuery = sprintf("settings=save&fkey%d=%s&fkey_label%d=%s", $fKeyIndex, $fkeyValue, $fKeyIndex, urlencode($fkeySettings["FkeyLabel"]));
-            $phoneModel = $this->ReadPropertyString("PhoneModel");
 
-            if (PhoneProperties::hasSmartLabel($phoneModel)) {
+            if (PhoneProperties::hasSmartLabel($this->GetValue("PhoneModel"))) {
                 $urlQuery = sprintf("%s&fkey_short_label%d=%s", $urlQuery, $fKeyIndex, urlencode($fkeySettings["FkeyLabel"]));
             }
 
@@ -196,15 +193,46 @@ class SnomDeskphone extends IPSModuleStrict
         }
     }
 
+    public function fkeysAreUnique(array $fkeys_settings): bool
+    {
+        $fkeys_are_unique = true;
+
+        foreach ($fkeys_settings as $key => $value) {
+            if (str_contains($key, 'array')) {
+                $fkeys = [];
+                foreach ($value as $fkey_settings) {
+                    if (!in_array($fkey_settings['FkeyNo'],$fkeys)) {
+                        array_push($fkeys, $fkey_settings["FkeyNo"]);
+                    } else {
+                        $fkeys_are_unique = false;
+                    }
+                }
+
+            }
+        }
+
+        return $fkeys_are_unique;
+    }
+
     public function GetConfigurationForm(): string
     {
         $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
-        $phoneModel = $this->ReadPropertyString("PhoneModel");
-        $fkeyRange = PhoneProperties::getFkeysRange($phoneModel);
-        $device_info = $this->getDeviceInformation();
-        $data["elements"][2]["value"] = $device_info['mac address'];
+        $device_info = array(
+            "is snom phone" => false,
+            "mac address" => '00:04:13:',
+            "phone model" => '',
+        );
+        if ($this->ReadPropertyString("PhoneIP")) {
+            $device_info = $this->getDeviceInformation();
+        }
 
-        if (!$this->ReadPropertyString("PhoneIP") or $device_info['is snom phone']) {
+        $data["elements"][2]["value"] = $device_info['mac address'];
+        $data["elements"][3]["value"] = $device_info['phone model'];
+
+        if (!$this->ReadPropertyString("PhoneIP")) {
+            $data["elements"][5]["enabled"] = false;
+            $data["elements"][6]["visible"] = false;
+        } elseif ($device_info['is snom phone']) {
             $data["elements"][1]["items"][2]["visible"] = false;
             $data["elements"][5]["enabled"] = true;
             $data["elements"][6]["visible"] = true;
@@ -215,20 +243,6 @@ class SnomDeskphone extends IPSModuleStrict
             $data["elements"][6]["visible"] = false;
         }
 
-        foreach ($fkeyRange as $fkeyNo) {
-            $data["elements"][6]["values"][$fkeyNo - 1] = [
-                "FkeyNo" => $fkeyNo,
-                "RecieveOnly" => false,
-                "ActionVariableId" => 1,
-                "ActionValue" => 0,
-                "TargetIsStatus" => true,
-                "StatusVariableId" => 1,
-                "FkeyLabel" => "",
-                "FkeyColorOn" => "none",
-                "FkeyColorOff" => "none",
-            ];
-        }
-
         $data["elements"][6]["form"] = "return json_decode(SNMD_UpdateForm(\$id, \$FkeysSettings['RecieveOnly'] ?? false, \$FkeysSettings['TargetIsStatus'] ?? true), true);";
 
         return json_encode($data);
@@ -236,18 +250,33 @@ class SnomDeskphone extends IPSModuleStrict
 
     public function getDeviceInformation(): array
     {
-        $phoneIp = $this->ReadPropertyString("PhoneIP");
-        exec('arp ' . $phoneIp . ' | awk \'{print $4}\'', $output, $exec_status);
+        $phone_ip = $this->ReadPropertyString("PhoneIP");
+        // symbox 7.0 november 2023
+        exec('arp ' . $phone_ip . ' | awk \'{print $4}\'', $output, $exec_status);
+        $output_mac = $output[0];
 
-        if (str_contains($output[0], '00:04:13:')) {
+        if (!str_contains($output_mac, ':')) {
+            // raspberry os
+            exec('arp ' . $phone_ip . ' | awk \'{print $3}\'', $output_raspberrypi, $exec_status);
+            $output_mac = $output_raspberrypi[1];
+        }
+
+        if (str_contains($output_mac, '00:04:13:')) {
+            $phone_settings_xml = simplexml_load_file("http://$phone_ip/settings.xml");
+            $phone_model = (string)$phone_settings_xml->{'phone-settings'}->phone_type[0];
+            $this->SetValue('PhoneModel', $phone_model);
+            $this->SetValue('PhoneMac', $output_mac);
+
             return array(
                 "is snom phone" => true,
-                "mac address" => $output[0],
+                "mac address" => $output_mac,
+                "phone model" => $phone_model,
             );
         } else {
             return array(
                 "is snom phone" => false,
                 "mac address" => '00:04:13:',
+                "phone model" => '',
             );
         }
 
@@ -255,10 +284,12 @@ class SnomDeskphone extends IPSModuleStrict
 
     public function UpdateForm(bool $recvOnly, bool $targetIsStatusVariable): string
     {
+        $phoneModel = $this->GetValue("PhoneModel");
         $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
+        $data["elements"][6]["form"][0]["maximum"] = PhoneProperties::FKEYS_NO[$phoneModel];
         $data["elements"][6]["form"][6]["visible"] = !$recvOnly;
         $data["elements"][6]["form"][7]["visible"] = !$recvOnly;
-        $data["elements"][6]["form"][8]["visible"] = !$targetIsStatusVariable;
+        $data["elements"][6]["form"][8]["visible"] = $targetIsStatusVariable;
 
         return json_encode($data["elements"][6]["form"]);
     }
