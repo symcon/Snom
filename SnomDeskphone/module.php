@@ -141,11 +141,11 @@ class SnomDeskphone extends IPSModuleStrict
     {
         $this->UpdateFormField("ActionValue", "visible", !$RecieveOnly);
         $this->UpdateFormField("TargetIsStatus", "visible", !$RecieveOnly);
-        $this->UpdateFormField("TargetIsStatus", "value", !$RecieveOnly);
+        $this->UpdateFormField("TargetIsStatus", "value", $RecieveOnly);
         $this->UpdateFormField("StatusVariableId", "visible", $RecieveOnly);
     }
 
-    public function SetVariablesIds(string $actionValue, bool $TargetIsStatus = true): void
+    public function SetVariablesIds(string $actionValue, bool $TargetIsStatus): void
     {
         $action = json_decode($actionValue, true);
         $this->UpdateFormField("ActionVariableId", "value", $action['parameters']['TARGET']);
@@ -154,7 +154,7 @@ class SnomDeskphone extends IPSModuleStrict
             $this->UpdateFormField("StatusVariableId", "value", $action['parameters']['TARGET']);
         }
 
-        $this->UpdateFormField("StatusVariableId", "visible", !$TargetIsStatus);
+        $this->UpdateFormField("StatusVariableId", "visible", $TargetIsStatus);
     }
 
     public function SetFkeySettings(): void
@@ -165,9 +165,9 @@ class SnomDeskphone extends IPSModuleStrict
             $fKeyIndex = ((int) $fkeySettings["FkeyNo"]) - 1;
 
             if ($fkeySettings["TargetIsStatus"]) {
-                $this->RegisterMessage($fkeySettings["ActionVariableId"], VM_UPDATE);
-            } else {
                 $this->RegisterMessage($fkeySettings["StatusVariableId"], VM_UPDATE);
+            } else {
+                $this->RegisterMessage($fkeySettings["ActionVariableId"], VM_UPDATE);
             }
 
             // Move this if/else to a separated method
@@ -279,7 +279,7 @@ class SnomDeskphone extends IPSModuleStrict
         $data["elements"][6]["form"][0]["maximum"] = PhoneProperties::FKEYS_NO[$phoneModel];
         $data["elements"][6]["form"][6]["visible"] = !$recvOnly;
         $data["elements"][6]["form"][7]["visible"] = !$recvOnly;
-        $data["elements"][6]["form"][8]["visible"] = !$targetIsStatusVariable;
+        $data["elements"][6]["form"][8]["visible"] = $targetIsStatusVariable;
 
         return json_encode($data["elements"][6]["form"]);
     }

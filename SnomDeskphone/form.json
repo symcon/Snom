@@ -271,18 +271,19 @@
                     "type": "SelectAction",
                     "name": "ActionValue",
                     "caption": "Action",
-                    "onChange": "SNMD_SetVariablesIds($id, $ActionValue, true);"
+                    "onChange": "SNMD_SetVariablesIds($id, $ActionValue, false);"
                 },
                 {
                     "type": "CheckBox",
                     "name": "TargetIsStatus",
-                    "caption": "Use action target for status LED",
+                    "caption": "Use other variable for status LED",
                     "onChange": "SNMD_SetVariablesIds($id, $ActionValue, $TargetIsStatus);"
                 },
                 {
                     "type": "SelectVariable",
                     "name": "StatusVariableId",
-                    "caption": "Status variable"
+                    "caption": "Status variable",
+                    "visible": false
                 }
             ],
             "onEdit": [
