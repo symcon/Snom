@@ -243,17 +243,23 @@ class SnomDeskphone extends IPSModuleStrict
     public function getDeviceInformation(): array
     {
         $phone_ip = $this->ReadPropertyString("PhoneIP");
+        /* // symbox 7.0 november
         exec('arp ' . $phone_ip . ' | awk \'{print $4}\'', $output, $exec_status);
+        $output_mac = $output[0];
+        */
+        // raspberry os
+        exec('arp ' . $phone_ip . ' | awk \'{print $3}\'', $output, $exec_status);
+        $output_mac = $output[1];
 
-        if (str_contains($output[0], '00:04:13:')) {
+        if (str_contains($output_mac, '00:04:13:')) {
             $phone_settings_xml = simplexml_load_file("http://$phone_ip/settings.xml") or die("Error: Cannot create object");
             $phone_model = (string)$phone_settings_xml->{'phone-settings'}->phone_type[0];
             $this->SetValue('PhoneModel', $phone_model);
-            $this->SetValue('PhoneMac', $output[0]);
+            $this->SetValue('PhoneMac', $output_mac);
 
             return array(
                 "is snom phone" => true,
-                "mac address" => $output[0],
+                "mac address" => $output_mac,
                 "phone model" => $phone_model,
             );
         } else {
