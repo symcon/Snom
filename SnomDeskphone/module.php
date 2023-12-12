@@ -217,7 +217,15 @@ class SnomDeskphone extends IPSModuleStrict
     public function GetConfigurationForm(): string
     {
         $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
-        $device_info = $this->getDeviceInformation();
+        $device_info = array(
+            "is snom phone" => false,
+            "mac address" => '00:04:13:',
+            "phone model" => '',
+        );
+        if ($this->ReadPropertyString("PhoneIP")) {
+            $device_info = $this->getDeviceInformation();
+        }
+
         $data["elements"][2]["value"] = $device_info['mac address'];
         $data["elements"][3]["value"] = $device_info['phone model'];
 
@@ -243,16 +251,18 @@ class SnomDeskphone extends IPSModuleStrict
     public function getDeviceInformation(): array
     {
         $phone_ip = $this->ReadPropertyString("PhoneIP");
-        /* // symbox 7.0 november
+        // symbox 7.0 november 2023
         exec('arp ' . $phone_ip . ' | awk \'{print $4}\'', $output, $exec_status);
         $output_mac = $output[0];
-        */
-        // raspberry os
-        exec('arp ' . $phone_ip . ' | awk \'{print $3}\'', $output, $exec_status);
-        $output_mac = $output[1];
+
+        if (!str_contains($output_mac, ':')) {
+            // raspberry os
+            exec('arp ' . $phone_ip . ' | awk \'{print $3}\'', $output_raspberrypi, $exec_status);
+            $output_mac = $output_raspberrypi[1];
+        }
 
         if (str_contains($output_mac, '00:04:13:')) {
-            $phone_settings_xml = simplexml_load_file("http://$phone_ip/settings.xml") or die("Error: Cannot create object");
+            $phone_settings_xml = simplexml_load_file("http://$phone_ip/settings.xml");
             $phone_model = (string)$phone_settings_xml->{'phone-settings'}->phone_type[0];
             $this->SetValue('PhoneModel', $phone_model);
             $this->SetValue('PhoneMac', $output_mac);
