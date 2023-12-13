@@ -222,14 +222,15 @@ class SnomDeskphone extends IPSModuleStrict
             "mac address" => '00:04:13:',
             "phone model" => '',
         );
-        if ($this->ReadPropertyString("PhoneIP")) {
+        $phone_ip = $this->ReadPropertyString("PhoneIP");
+        if ($phone_ip and Sys_Ping($phone_ip, 2000)) { // ping to ad to arp table
             $device_info = $this->getDeviceInformation();
         }
 
         $data["elements"][2]["value"] = $device_info['mac address'];
         $data["elements"][3]["value"] = $device_info['phone model'];
 
-        if (!$this->ReadPropertyString("PhoneIP")) {
+        if (!$phone_ip) {
             $data["elements"][5]["enabled"] = false;
             $data["elements"][6]["visible"] = false;
         } elseif ($device_info['is snom phone']) {
@@ -251,6 +252,7 @@ class SnomDeskphone extends IPSModuleStrict
     public function getDeviceInformation(): array
     {
         $phone_ip = $this->ReadPropertyString("PhoneIP");
+
         // symbox 7.0 november 2023
         exec('arp ' . $phone_ip . ' | awk \'{print $4}\'', $output, $exec_status);
         $output_mac = $output[0];
