@@ -7,8 +7,8 @@ class SnomDeskphone extends IPSModuleStrict
     public function Create(): void
     {
         parent::Create();
-        $this->RegisterVariableString("PhoneModel", "Phone Model");
-        $this->RegisterVariableString("PhoneMac", "Phone Mac");
+        $this->RegisterVariableString("PhoneModel", "Phone model");
+        $this->RegisterVariableString("PhoneMac", "MAC address");
         $this->RegisterHook("snom/" . $this->InstanceID);
         $this->RegisterPropertyString("PhoneIP", "");
         $this->RegisterPropertyString('LocalIP', Sys_GetNetworkInfo()[0]['IP']);
