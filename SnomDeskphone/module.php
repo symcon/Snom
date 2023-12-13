@@ -7,8 +7,8 @@ class SnomDeskphone extends IPSModuleStrict
     public function Create(): void
     {
         parent::Create();
-        $this->RegisterVariableString("PhoneModel", "");
-        $this->RegisterVariableString("PhoneMac", "");
+        $this->RegisterVariableString("PhoneModel", "Phone Model");
+        $this->RegisterVariableString("PhoneMac", "Phone Mac");
         $this->RegisterHook("snom/" . $this->InstanceID);
         $this->RegisterPropertyString("PhoneIP", "");
         $this->RegisterPropertyString('LocalIP', Sys_GetNetworkInfo()[0]['IP']);
@@ -223,7 +223,8 @@ class SnomDeskphone extends IPSModuleStrict
             "phone model" => '',
         );
         $phone_ip = $this->ReadPropertyString("PhoneIP");
-        if ($phone_ip and Sys_Ping($phone_ip, 2000)) { // ping to ad to arp table
+
+        if ($phone_ip and Sys_Ping($phone_ip, 2000)) {
             $device_info = $this->getDeviceInformation();
         }
 
