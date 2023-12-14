@@ -179,7 +179,7 @@ class SnomDeskphone extends IPSModuleStrict
                 $fkeyValue = urlencode("url " . $instanceHook . $hookParameters);
             }
 
-            $urlQuery = sprintf("settings=save&fkey%d=%s&fkey_label%d=%s", $fKeyIndex, $fkeyValue, $fKeyIndex, urlencode($fkeySettings["FkeyLabel"]));
+            $urlQuery = sprintf("settings=save&store_settings=save&fkey%d=%s&fkey_label%d=%s", $fKeyIndex, $fkeyValue, $fKeyIndex, urlencode($fkeySettings["FkeyLabel"]));
 
             if (PhoneProperties::hasSmartLabel($this->GetValue("PhoneModel"))) {
                 $urlQuery = sprintf("%s&fkey_short_label%d=%s", $urlQuery, $fKeyIndex, urlencode($fkeySettings["FkeyLabel"]));
