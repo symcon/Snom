@@ -15,10 +15,25 @@ class SnomDeskphone extends IPSModuleStrict
         $this->RegisterPropertyString("FkeysSettings", "[]");
     }
 
-    public function ApplyChanges(): void
+    // public function ApplyChanges(): void
+    // {
+    //     parent::ApplyChanges();
+    // }
+
+    public function instanceIpExists(): bool
     {
-        parent::ApplyChanges();
-        $this->SetSummary($this->ReadPropertyString('PhoneIP'));
+        $phone_ip = $this->ReadPropertyString('PhoneIP');
+        $module_id = IPS_GetInstance($this->InstanceID)['ModuleInfo']['ModuleID'];
+        $deskphones_instances = IPS_GetInstanceListByModuleID($module_id);
+
+        foreach ($deskphones_instances as $deskphone_id) {
+            $instance_phone_ip = IPS_GetProperty($deskphone_id, "PhoneIP");
+
+            if ($deskphone_id != $this->InstanceID and $instance_phone_ip === $phone_ip) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public function MessageSink(int $TimeStamp, int $SenderID, int $Message, array $Data): void
@@ -201,7 +216,7 @@ class SnomDeskphone extends IPSModuleStrict
             if (str_contains($key, 'array')) {
                 $fkeys = [];
                 foreach ($value as $fkey_settings) {
-                    if (!in_array($fkey_settings['FkeyNo'],$fkeys)) {
+                    if (!in_array($fkey_settings['FkeyNo'], $fkeys)) {
                         array_push($fkeys, $fkey_settings["FkeyNo"]);
                     } else {
                         $fkeys_are_unique = false;
@@ -235,10 +250,18 @@ class SnomDeskphone extends IPSModuleStrict
             $data["elements"][5]["enabled"] = false;
             $data["elements"][6]["visible"] = false;
         } elseif ($device_info['is snom phone']) {
-            $data["elements"][1]["items"][2]["visible"] = false;
-            $data["elements"][5]["enabled"] = true;
-            $data["elements"][6]["visible"] = true;
-            $this->SetFkeySettings();
+            if ($this->instanceIpExists()) {
+                $data["elements"][1]["items"][2]["caption"] = "Instance with IP $phone_ip already exists";
+                $data["elements"][1]["items"][2]["visible"] = true;
+                $data["elements"][5]["enabled"] = false;
+                $data["elements"][6]["visible"] = false;
+            } else {
+                $this->SetSummary($phone_ip);
+                $data["elements"][1]["items"][2]["visible"] = false;
+                $data["elements"][5]["enabled"] = true;
+                $data["elements"][6]["visible"] = true;
+                $this->SetFkeySettings();
+            }
         } else {
             $data["elements"][1]["items"][2]["visible"] = true;
             $data["elements"][5]["enabled"] = false;
@@ -266,7 +289,7 @@ class SnomDeskphone extends IPSModuleStrict
 
         if (str_contains($output_mac, '00:04:13:')) {
             $phone_settings_xml = simplexml_load_file("http://$phone_ip/settings.xml");
-            $phone_model = (string)$phone_settings_xml->{'phone-settings'}->phone_type[0];
+            $phone_model = (string) $phone_settings_xml->{'phone-settings'}->phone_type[0];
             $this->SetValue('PhoneModel', $phone_model);
             $this->SetValue('PhoneMac', $output_mac);
 
