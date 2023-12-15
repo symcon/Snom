@@ -222,7 +222,6 @@ class SnomDeskphone extends IPSModuleStrict
                         $fkeys_are_unique = false;
                     }
                 }
-
             }
         }
 
@@ -268,8 +267,8 @@ class SnomDeskphone extends IPSModuleStrict
             $data["elements"][6]["visible"] = false;
         }
 
-        $data["elements"][6]["columns"][0]["edit"]["options"] = $this->getFkeysOptions();
-        $data["elements"][6]["form"] = "return json_decode(SNMD_UpdateForm(\$id, \$FkeysSettings['RecieveOnly'] ?? false, \$FkeysSettings['TargetIsStatus'] ?? true), true);";
+        $data["elements"][6]["columns"][0]["edit"]["options"] = $this->getFkeysColumnsOptions();
+        $data["elements"][6]["form"] = "return json_decode(SNMD_UpdateForm(\$id, (array) \$FkeysSettings, \$FkeysSettings['RecieveOnly'] ?? false, \$FkeysSettings['TargetIsStatus'] ?? true), true);";
 
         return json_encode($data);
     }
@@ -309,10 +308,11 @@ class SnomDeskphone extends IPSModuleStrict
 
     }
 
-    public function UpdateForm(bool $recvOnly, bool $targetIsStatusVariable): string
+    public function UpdateForm(array $FkeysSettings, bool $recvOnly, bool $targetIsStatusVariable): string
     {
         $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
-        $data["elements"][6]["form"][0]["options"] = $this->getFkeysOptions();
+        $data["elements"][6]["form"][0]["options"] = $this->getFkeysFormOptions($FkeysSettings);
+        $data["elements"][6]["form"][0]["value"] = $this->getSelectedFkeyNo($FkeysSettings);
         $data["elements"][6]["form"][6]["visible"] = !$recvOnly;
         $data["elements"][6]["form"][7]["visible"] = !$recvOnly;
         $data["elements"][6]["form"][8]["visible"] = $targetIsStatusVariable;
@@ -320,11 +320,69 @@ class SnomDeskphone extends IPSModuleStrict
         return json_encode($data["elements"][6]["form"]);
     }
 
-    public function getFkeysOptions(): array
+    public function getFkeysFormOptions(array $FkeysSettings): array
+    {
+        // add to options only fkeys that are not already in the list
+        $fkeys = [];
+        $selected = -2;
+
+        foreach ($FkeysSettings as $key => $value) {
+            if (str_contains($key, 'selected')) {
+                $selected = $value;
+            }
+            if (str_contains($key, 'array')) {
+                foreach ($value as $fkey_settings) {
+                    array_push($fkeys, $fkey_settings["FkeyNo"]);
+                }
+            }
+        }
+
+        $phoneModel = $this->GetValue("PhoneModel");
+        $fkeysRange = PhoneProperties::getFkeysRange($phoneModel);
+        $options = [];
+
+        //onEdit
+        if ($selected != -1) {
+            $selected += 1;
+            $option = ["caption" => "P$selected" , "value" => $selected];
+            array_push($options, $option);
+        }
+
+        foreach ($fkeysRange as $fkeyNo) {
+            if (!in_array($fkeyNo, $fkeys)) {
+                $option = ["caption" => "P$fkeyNo" , "value" => $fkeyNo];
+                array_push($options, $option);
+            }
+        }
+
+        return $options;
+    }
+
+    public function getSelectedFkeyNo(array $FkeysSettings): int
+    {
+        $selected = -2;
+        foreach ($FkeysSettings as $key => $value) {
+            if (str_contains($key, 'selected')) {
+                $selected_index = $value;
+            }
+            if (str_contains($key, 'array')) {
+                foreach ($value as $index => $fkey_settings) {
+                    if ($index === $selected_index) {
+                        $selected = $fkey_settings["FkeyNo"];
+                    }
+                }
+            }
+        }
+
+        return $selected;
+    }
+
+    public function getFkeysColumnsOptions(): array
     {
         $phoneModel = $this->GetValue("PhoneModel");
         $fkeysRange = PhoneProperties::getFkeysRange($phoneModel);
         $options = [];
+
         foreach ($fkeysRange as $fkeyNo) {
             $option = ["caption" => "P$fkeyNo" , "value" => $fkeyNo];
             array_push($options, $option);
