@@ -64,9 +64,10 @@
                     "name": "FkeyNo",
                     "width": "100px",
                     "align": "center",
-                    "add": 0,
+                    "add": 1,
                     "edit": {
-                        "type": "NumberSpinner"
+                        "type": "Select",
+                        "options": []
                     }
                 },
                 {
@@ -189,10 +190,10 @@
             "values": [],
             "form": [
                 {
-                    "type": "NumberSpinner",
+                    "type": "Select",
                     "name": "FkeyNo",
                     "caption": "Function key",
-                    "minimum": 1
+                    "options": []
                 },
                 {
                     "type": "ValidationTextBox",

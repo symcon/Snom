@@ -268,6 +268,7 @@ class SnomDeskphone extends IPSModuleStrict
             $data["elements"][6]["visible"] = false;
         }
 
+        $data["elements"][6]["columns"][0]["edit"]["options"] = $this->getFkeysOptions();
         $data["elements"][6]["form"] = "return json_decode(SNMD_UpdateForm(\$id, \$FkeysSettings['RecieveOnly'] ?? false, \$FkeysSettings['TargetIsStatus'] ?? true), true);";
 
         return json_encode($data);
@@ -310,14 +311,26 @@ class SnomDeskphone extends IPSModuleStrict
 
     public function UpdateForm(bool $recvOnly, bool $targetIsStatusVariable): string
     {
-        $phoneModel = $this->GetValue("PhoneModel");
         $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
-        $data["elements"][6]["form"][0]["maximum"] = PhoneProperties::FKEYS_NO[$phoneModel];
+        $data["elements"][6]["form"][0]["options"] = $this->getFkeysOptions();
         $data["elements"][6]["form"][6]["visible"] = !$recvOnly;
         $data["elements"][6]["form"][7]["visible"] = !$recvOnly;
         $data["elements"][6]["form"][8]["visible"] = $targetIsStatusVariable;
 
         return json_encode($data["elements"][6]["form"]);
+    }
+
+    public function getFkeysOptions(): array
+    {
+        $phoneModel = $this->GetValue("PhoneModel");
+        $fkeysRange = PhoneProperties::getFkeysRange($phoneModel);
+        $options = [];
+        foreach ($fkeysRange as $fkeyNo) {
+            $option = ["caption" => "P$fkeyNo" , "value" => $fkeyNo];
+            array_push($options, $option);
+        }
+
+        return $options;
     }
 
     // has_expanstion_module()
