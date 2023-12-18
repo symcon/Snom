@@ -313,6 +313,7 @@ class SnomDeskphone extends IPSModuleStrict
         $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
         $data["elements"][6]["form"][0]["options"] = $this->getFkeysFormOptions($FkeysSettings);
         $data["elements"][6]["form"][0]["value"] = $this->getSelectedFkeyNo($FkeysSettings);
+
         $data["elements"][6]["form"][6]["visible"] = !$recvOnly;
         $data["elements"][6]["form"][7]["visible"] = !$recvOnly;
         $data["elements"][6]["form"][8]["visible"] = $StatusVariable;
@@ -322,37 +323,54 @@ class SnomDeskphone extends IPSModuleStrict
 
     public function getFkeysFormOptions(array $FkeysSettings): array
     {
-        // add to options only fkeys that are not already in the list
-        $fkeys = [];
+        $current_fkeys = $this->getCurrentFkeys($FkeysSettings);
+        $options = $this->getCurrentFkeyOptionOnEdit($FkeysSettings, $current_fkeys);
+        $phoneModel = $this->GetValue("PhoneModel");
+        $fkeysRange = PhoneProperties::getFkeysRange($phoneModel);
+
+        foreach ($fkeysRange as $fkeyNo) {
+            if (!in_array($fkeyNo, $current_fkeys)) {
+                $option = ["caption" => "P$fkeyNo" , "value" => $fkeyNo];
+                array_push($options, $option);
+            }
+        }
+
+        return $options;
+    }
+
+    public function getCurrentFkeys($FkeysSettings): array
+    {
+        $current_fkeys = [];
+
+        foreach ($FkeysSettings as $key => $value) {
+            if (str_contains($key, 'array')) {
+                foreach ($value as $fkey_settings) {
+                    array_push($current_fkeys, $fkey_settings["FkeyNo"]);
+                }
+            }
+        }
+
+        return $current_fkeys;
+    }
+
+    public function getCurrentFkeyOptionOnEdit($FkeysSettings, $current_fkeys): array 
+    {
         $selected = -2;
 
         foreach ($FkeysSettings as $key => $value) {
             if (str_contains($key, 'selected')) {
                 $selected = $value;
             }
-            if (str_contains($key, 'array')) {
-                foreach ($value as $fkey_settings) {
-                    array_push($fkeys, $fkey_settings["FkeyNo"]);
-                }
-            }
         }
 
-        $phoneModel = $this->GetValue("PhoneModel");
-        $fkeysRange = PhoneProperties::getFkeysRange($phoneModel);
         $options = [];
 
-        //onEdit
-        if ($selected != -1) {
-            $selected += 1;
-            $option = ["caption" => "P$selected" , "value" => $selected];
+        if ($selected === -2) {
+            echo "Invalid selected row $selected";
+        } elseif ($selected != -1) {
+            $fkeyOnEdit = $current_fkeys[$selected];
+            $option = ["caption" => "P$fkeyOnEdit" , "value" => $fkeyOnEdit];
             array_push($options, $option);
-        }
-
-        foreach ($fkeysRange as $fkeyNo) {
-            if (!in_array($fkeyNo, $fkeys)) {
-                $option = ["caption" => "P$fkeyNo" , "value" => $fkeyNo];
-                array_push($options, $option);
-            }
         }
 
         return $options;
@@ -369,6 +387,8 @@ class SnomDeskphone extends IPSModuleStrict
                 foreach ($value as $index => $fkey_settings) {
                     if ($index === $selected_index) {
                         $selected = $fkey_settings["FkeyNo"];
+                    } else {
+                        $selected = $selected_index;
                     }
                 }
             }
