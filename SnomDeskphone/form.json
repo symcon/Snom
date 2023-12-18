@@ -66,7 +66,8 @@
                     "align": "center",
                     "add": 0,
                     "edit": {
-                        "type": "NumberSpinner"
+                        "type": "Select",
+                        "options": []
                     }
                 },
                 {
@@ -189,10 +190,10 @@
             "values": [],
             "form": [
                 {
-                    "type": "NumberSpinner",
+                    "type": "Select",
                     "name": "FkeyNo",
                     "caption": "Function key",
-                    "minimum": 1
+                    "options": []
                 },
                 {
                     "type": "ValidationTextBox",
@@ -287,22 +288,14 @@
                 }
             ],
             "onEdit": [
-                "if (!SNMD_fkeysAreUnique($id, (array)$FkeysSettings)) {",
-                "echo 'Fkey already exists in current list';",
-                "} else {",
                 "echo 'Are you sure?\n",
                 "Applying the changes, will override the edited function(s) key(s) settings in your phone.\n",
-                "For seeing the current fkey settings, press the button \"See current function keys settings\"';",
-                "}"
+                "For seeing the current fkey settings, press the button \"See current function keys settings\"';"
             ],
             "onAdd": [
-                "if (!SNMD_fkeysAreUnique($id, (array)$FkeysSettings)) {",
-                "echo 'Fkey already exists in current list';",
-                "} else {",
                 "echo 'Are you sure?\n",
                 "Applying the changes, will override the edited function(s) key(s) settings in your phone.\n",
-                "For seeing the current fkey settings, press the button \"See current function keys settings\"';",
-                "}"
+                "For seeing the current fkey settings, press the button \"See current function keys settings\"';"
             ]
         }
     ]
