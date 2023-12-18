@@ -249,7 +249,13 @@ class SnomDeskphone extends IPSModuleStrict
             $data["elements"][5]["enabled"] = false;
             $data["elements"][6]["visible"] = false;
         } elseif ($device_info['is snom phone']) {
-            if ($this->instanceIpExists()) {
+            $isFullMacAddress = strlen($device_info["mac address"]) === 17;
+            if (!$isFullMacAddress) {
+                $data["elements"][1]["items"][2]["caption"] = "IP $phone_ip is not a Snom D7xx or needs credentials";
+                $data["elements"][1]["items"][2]["visible"] = true;
+                $data["elements"][5]["enabled"] = false;
+                $data["elements"][6]["visible"] = false;
+            } elseif ($this->instanceIpExists()) {
                 $data["elements"][1]["items"][2]["caption"] = "Instance with IP $phone_ip already exists";
                 $data["elements"][1]["items"][2]["visible"] = true;
                 $data["elements"][5]["enabled"] = false;
@@ -288,16 +294,25 @@ class SnomDeskphone extends IPSModuleStrict
         }
 
         if (str_contains($output_mac, '00:04:13:')) {
-            $phone_settings_xml = simplexml_load_file("http://$phone_ip/settings.xml");
-            $phone_model = (string) $phone_settings_xml->{'phone-settings'}->phone_type[0];
-            $this->SetValue('PhoneModel', $phone_model);
-            $this->SetValue('PhoneMac', $output_mac);
+            $phone_settings_xml = @simplexml_load_file("http://$phone_ip/settings.xml");
 
-            return array(
-                "is snom phone" => true,
-                "mac address" => $output_mac,
-                "phone model" => $phone_model,
-            );
+            if ($phone_settings_xml) {
+                $phone_model = (string) $phone_settings_xml->{'phone-settings'}->phone_type[0];
+                $this->SetValue('PhoneModel', $phone_model);
+                $this->SetValue('PhoneMac', $output_mac);
+
+                return array(
+                    "is snom phone" => true,
+                    "mac address" => $output_mac,
+                    "phone model" => $phone_model,
+                );
+            } else {
+                return array(
+                    "is snom phone" => true,
+                    "mac address" => '00:04:13:',
+                    "phone model" => '',
+                );
+            }
         } else {
             return array(
                 "is snom phone" => false,
