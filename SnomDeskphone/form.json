@@ -167,8 +167,8 @@
                     }
                 },
                 {
-                    "caption": "Use action target for status LED",
-                    "name": "TargetIsStatus",
+                    "caption": "Use other variable for status LED",
+                    "name": "StatusVariable",
                     "width": "100px",
                     "visible": false,
                     "add": false,
@@ -276,9 +276,9 @@
                 },
                 {
                     "type": "CheckBox",
-                    "name": "TargetIsStatus",
+                    "name": "StatusVariable",
                     "caption": "Use other variable for status LED",
-                    "onChange": "SNMD_SetVariablesIds($id, $ActionValue, $TargetIsStatus);"
+                    "onChange": "SNMD_SetVariablesIds($id, $ActionValue, $StatusVariable);"
                 },
                 {
                     "type": "SelectVariable",
