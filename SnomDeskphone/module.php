@@ -11,6 +11,8 @@ class SnomDeskphone extends IPSModuleStrict
         $this->RegisterVariableString("PhoneMac", "MAC address");
         $this->RegisterHook("snom/" . $this->InstanceID);
         $this->RegisterPropertyString("PhoneIP", "");
+        $this->RegisterPropertyString("Username", "");
+        $this->RegisterPropertyString("Password", "");
         $this->RegisterPropertyString('LocalIP', Sys_GetNetworkInfo()[0]['IP']);
         $this->RegisterPropertyString("FkeysSettings", "[]");
     }
@@ -74,7 +76,7 @@ class SnomDeskphone extends IPSModuleStrict
                 "&color=" . $data["color"]
             );
             $RenderRemoteUrl = sprintf("http://%s/minibrowser.htm?url=%s", $this->ReadPropertyString("PhoneIP"), $hookParameters);
-            file_get_contents($RenderRemoteUrl);
+            $this->httpGetRequest($RenderRemoteUrl);
         }
     }
 
@@ -103,7 +105,6 @@ class SnomDeskphone extends IPSModuleStrict
     }
     private function GetIPPhoneTextItem(string $text, string $ledValue, int $ledNo, string $color, int $timeout = 1): string
     {
-        // header("Content-Type: text/xml");
         $xml = new DOMDocument('1.0', 'UTF-8');
         $xml->formatOutput = true;
         $xmlRoot = $xml->appendChild($xml->createElement("SnomIPPhoneText"));
@@ -203,8 +204,7 @@ class SnomDeskphone extends IPSModuleStrict
             $phoneIp = $this->ReadPropertyString("PhoneIP");
             $baseUrl = sprintf("http://%s/dummy.htm?", $phoneIp);
             $url = sprintf("%s%s", $baseUrl, $urlQuery);
-
-            file_get_contents($url);
+            $this->httpGetRequest($url);
         }
     }
 
@@ -250,25 +250,41 @@ class SnomDeskphone extends IPSModuleStrict
             $data["elements"][6]["visible"] = false;
         } elseif ($device_info['is snom phone']) {
             $isFullMacAddress = strlen($device_info["mac address"]) === 17;
+            $message = $this->getHttpResponseMessage();
+
             if (!$isFullMacAddress) {
-                $data["elements"][1]["items"][2]["caption"] = "IP $phone_ip is not a Snom D7xx or needs credentials";
-                $data["elements"][1]["items"][2]["visible"] = true;
-                $data["elements"][5]["enabled"] = false;
-                $data["elements"][6]["visible"] = false;
+                if ($message === "401") {
+                    $data["elements"][1]["items"][2]["visible"] = true;
+                    $data["elements"][1]["items"][3]["visible"] = true;
+                    $data["elements"][5]["enabled"] = false;
+                    $data["elements"][6]["visible"] = false;
+                } elseif ($message === "Login failed") {
+                    $data["elements"][1]["items"][2]["visible"] = true;
+                    $data["elements"][1]["items"][3]["visible"] = true;
+                    $data["elements"][1]["items"][4]["caption"] = $message;
+                    $data["elements"][1]["items"][4]["visible"] = true;
+                    $data["elements"][5]["enabled"] = false;
+                    $data["elements"][6]["visible"] = false;
+                } else {
+                    $data["elements"][1]["items"][4]["caption"] = $message;
+                    $data["elements"][1]["items"][4]["visible"] = true;
+                    $data["elements"][5]["enabled"] = false;
+                    $data["elements"][6]["visible"] = false;
+                }
             } elseif ($this->instanceIpExists()) {
-                $data["elements"][1]["items"][2]["caption"] = "Instance with IP $phone_ip already exists";
-                $data["elements"][1]["items"][2]["visible"] = true;
+                $data["elements"][1]["items"][4]["caption"] = "Instance with IP $phone_ip already exists";
+                $data["elements"][1]["items"][4]["visible"] = true;
                 $data["elements"][5]["enabled"] = false;
                 $data["elements"][6]["visible"] = false;
             } else {
                 $this->SetSummary($phone_ip);
-                $data["elements"][1]["items"][2]["visible"] = false;
+                $data["elements"][1]["items"][4]["visible"] = false;
                 $data["elements"][5]["enabled"] = true;
                 $data["elements"][6]["visible"] = true;
                 $this->SetFkeySettings();
             }
         } else {
-            $data["elements"][1]["items"][2]["visible"] = true;
+            $data["elements"][1]["items"][4]["visible"] = true;
             $data["elements"][5]["enabled"] = false;
             $data["elements"][6]["visible"] = false;
         }
@@ -294,7 +310,9 @@ class SnomDeskphone extends IPSModuleStrict
         }
 
         if (str_contains($output_mac, '00:04:13:')) {
-            $phone_settings_xml = @simplexml_load_file("http://$phone_ip/settings.xml");
+            $url = "http://$phone_ip/settings.xml";
+            $response = $this->httpGetRequest($url, false);
+            $phone_settings_xml = @simplexml_load_string($response);
 
             if ($phone_settings_xml) {
                 $phone_model = (string) $phone_settings_xml->{'phone-settings'}->phone_type[0];
@@ -320,7 +338,75 @@ class SnomDeskphone extends IPSModuleStrict
                 "phone model" => '',
             );
         }
+    }
 
+    public function httpGetRequest(string $url, bool $headerOutput = true): bool|string
+    {
+        $handler = curl_init();
+        curl_setopt($handler, CURLOPT_URL, $url);
+        curl_setopt($handler, CURLOPT_HEADER, $headerOutput);
+        curl_setopt($handler, CURLOPT_RETURNTRANSFER, true);
+
+        $username = $this->ReadPropertyString("Username");
+        $password = $this->ReadPropertyString("Password");
+
+        //TODO check if only username or only password
+        if ($username and $password) {
+            curl_setopt($handler, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST | CURLAUTH_BASIC);
+            curl_setopt($handler, CURLOPT_USERPWD, $username . ":" . $password);
+            $this->SendDebug("INFO", print_r("Phone WUI needs authentication", true), 0);
+            $this->SendDebug("INFO", print_r("Credentials: $username $password", true), 0);
+        }
+
+        $response = curl_exec($handler);
+        curl_close($handler);
+
+        return $response;
+    }
+
+    public function getHttpResponseMessage(): string
+    {
+        $handler = curl_init($this->ReadPropertyString("PhoneIP"));
+        $username = $this->ReadPropertyString("Username");
+        $password = $this->ReadPropertyString("Password");
+
+        if ($username and $password) {
+            curl_setopt($handler, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST | CURLAUTH_BASIC);
+            curl_setopt($handler, CURLOPT_USERPWD, $username . ":" . $password);
+            $this->SendDebug("INFO", print_r("Phone WUI needs authentication", true), 0);
+        }
+
+        curl_setopt($handler, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($handler, CURLOPT_HEADER, 1);
+        $response = curl_exec($handler);
+
+        if (!curl_errno($handler)) {
+            switch ($http_code = curl_getinfo($handler, CURLINFO_HTTP_CODE)) {
+                case 200:
+                    $isSnomD8xx = str_contains($response, "<title>Phone Manager</title>");
+                    $loginFailed = str_contains($response, "Login failed!");
+                    if ($isSnomD8xx) {
+                        $message = "Snom D8xx not supported. HTTP $http_code";
+                    } elseif ($loginFailed) {
+                        $message = "Login failed";
+                    } else {
+                        $message = "$http_code $response";
+                    }
+                    break;
+                case 303:
+                    $message = "Snom M900 not supported. HTTP $http_code";
+                    break;
+                case 401:
+                    $message = "$http_code";
+                    break;
+                default:
+                    $message = "$http_code";
+            }
+        }
+
+        curl_close($handler);
+
+        return $message;
     }
 
     public function UpdateForm(array $FkeysSettings, bool $recvOnly, bool $StatusVariable): string
@@ -345,7 +431,7 @@ class SnomDeskphone extends IPSModuleStrict
 
         foreach ($fkeysRange as $fkeyNo) {
             if (!in_array($fkeyNo, $current_fkeys)) {
-                $option = ["caption" => "P$fkeyNo" , "value" => $fkeyNo];
+                $option = ["caption" => "P$fkeyNo", "value" => $fkeyNo];
                 array_push($options, $option);
             }
         }
@@ -368,7 +454,7 @@ class SnomDeskphone extends IPSModuleStrict
         return $current_fkeys;
     }
 
-    public function getCurrentFkeyOptionOnEdit($FkeysSettings, $current_fkeys): array 
+    public function getCurrentFkeyOptionOnEdit($FkeysSettings, $current_fkeys): array
     {
         $selected = -2;
 
@@ -384,7 +470,7 @@ class SnomDeskphone extends IPSModuleStrict
             echo "Invalid selected row $selected";
         } elseif ($selected != -1) {
             $fkeyOnEdit = $current_fkeys[$selected];
-            $option = ["caption" => "P$fkeyOnEdit" , "value" => $fkeyOnEdit];
+            $option = ["caption" => "P$fkeyOnEdit", "value" => $fkeyOnEdit];
             array_push($options, $option);
         }
 
@@ -419,7 +505,7 @@ class SnomDeskphone extends IPSModuleStrict
         $options = [];
 
         foreach ($fkeysRange as $fkeyNo) {
-            $option = ["caption" => "P$fkeyNo" , "value" => $fkeyNo];
+            $option = ["caption" => "P$fkeyNo", "value" => $fkeyNo];
             array_push($options, $option);
         }
 
