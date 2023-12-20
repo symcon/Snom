@@ -83,11 +83,11 @@ class SnomDeskphone extends IPSModuleStrict
             curl_setopt($handler, CURLOPT_RETURNTRANSFER, true);
 
             if ($this->ReadPropertyString("Username") and $this->ReadPropertyString("Password")) {
-                curl_setopt($handler, CURLOPT_HTTPAUTH,  CURLAUTH_DIGEST|CURLAUTH_BASIC);
+                curl_setopt($handler, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST | CURLAUTH_BASIC);
                 curl_setopt($handler, CURLOPT_USERPWD, $this->ReadPropertyString("Username") . ":" . $this->ReadPropertyString("Password"));
                 $this->SendDebug("settings", print_r("needs auth", true), 0);
             }
-            
+
             curl_exec($handler);
             curl_close($handler);
             #
@@ -227,11 +227,11 @@ class SnomDeskphone extends IPSModuleStrict
             curl_setopt($handler, CURLOPT_RETURNTRANSFER, true);
 
             if ($this->ReadPropertyString("Username") and $this->ReadPropertyString("Password")) {
-                curl_setopt($handler, CURLOPT_HTTPAUTH,  CURLAUTH_DIGEST|CURLAUTH_BASIC);
+                curl_setopt($handler, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST | CURLAUTH_BASIC);
                 curl_setopt($handler, CURLOPT_USERPWD, $this->ReadPropertyString("Username") . ":" . $this->ReadPropertyString("Password"));
                 $this->SendDebug("settings", print_r("needs auth", true), 0);
             }
-            
+
             curl_exec($handler);
             curl_close($handler);
             #
@@ -272,7 +272,6 @@ class SnomDeskphone extends IPSModuleStrict
             $device_info = $this->getDeviceInformation();
             $this->SendDebug("settings", print_r($device_info, true), 0);
         }
-
 
         $data["elements"][2]["value"] = $device_info['mac address'];
         $data["elements"][3]["value"] = $device_info['phone model'];
@@ -341,7 +340,7 @@ class SnomDeskphone extends IPSModuleStrict
             curl_setopt($handler, CURLOPT_RETURNTRANSFER, true);
 
             if ($this->ReadPropertyString("Username") and $this->ReadPropertyString("Password")) {
-                curl_setopt($handler, CURLOPT_HTTPAUTH,  CURLAUTH_DIGEST|CURLAUTH_BASIC);
+                curl_setopt($handler, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST | CURLAUTH_BASIC);
                 curl_setopt($handler, CURLOPT_USERPWD, $this->ReadPropertyString("Username") . ":" . $this->ReadPropertyString("Password"));
                 $this->SendDebug("settings", print_r("needs auth", true), 0);
             }
@@ -381,17 +380,16 @@ class SnomDeskphone extends IPSModuleStrict
     public function getHttpResponseMessage(): string
     {
         $handler = curl_init($this->ReadPropertyString("PhoneIP"));
-        // $this->SendDebug("url", print_r($url, true), 0);
-        // if uname and passwd not empty
+
         if ($this->ReadPropertyString("Username") and $this->ReadPropertyString("Password")) {
-            curl_setopt($handler, CURLOPT_HTTPAUTH,  CURLAUTH_DIGEST|CURLAUTH_BASIC);
+            curl_setopt($handler, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST | CURLAUTH_BASIC);
             curl_setopt($handler, CURLOPT_USERPWD, $this->ReadPropertyString("Username") . ":" . $this->ReadPropertyString("Password"));
         }
 
         curl_setopt($handler, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($handler, CURLOPT_HEADER, 1);
         $response = curl_exec($handler);
-        
+
         if (!curl_errno($handler)) {
             switch ($http_code = curl_getinfo($handler, CURLINFO_HTTP_CODE)) {
                 case 200:
@@ -440,7 +438,7 @@ class SnomDeskphone extends IPSModuleStrict
 
         foreach ($fkeysRange as $fkeyNo) {
             if (!in_array($fkeyNo, $current_fkeys)) {
-                $option = ["caption" => "P$fkeyNo" , "value" => $fkeyNo];
+                $option = ["caption" => "P$fkeyNo", "value" => $fkeyNo];
                 array_push($options, $option);
             }
         }
@@ -463,7 +461,7 @@ class SnomDeskphone extends IPSModuleStrict
         return $current_fkeys;
     }
 
-    public function getCurrentFkeyOptionOnEdit($FkeysSettings, $current_fkeys): array 
+    public function getCurrentFkeyOptionOnEdit($FkeysSettings, $current_fkeys): array
     {
         $selected = -2;
 
@@ -479,7 +477,7 @@ class SnomDeskphone extends IPSModuleStrict
             echo "Invalid selected row $selected";
         } elseif ($selected != -1) {
             $fkeyOnEdit = $current_fkeys[$selected];
-            $option = ["caption" => "P$fkeyOnEdit" , "value" => $fkeyOnEdit];
+            $option = ["caption" => "P$fkeyOnEdit", "value" => $fkeyOnEdit];
             array_push($options, $option);
         }
 
@@ -514,7 +512,7 @@ class SnomDeskphone extends IPSModuleStrict
         $options = [];
 
         foreach ($fkeysRange as $fkeyNo) {
-            $option = ["caption" => "P$fkeyNo" , "value" => $fkeyNo];
+            $option = ["caption" => "P$fkeyNo", "value" => $fkeyNo];
             array_push($options, $option);
         }
 
