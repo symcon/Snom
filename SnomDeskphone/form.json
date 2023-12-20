@@ -20,12 +20,6 @@
                     "onClick": "SNMD_PingPhone($id, $PhoneIP);"
                 },
                 {
-                    "type": "Label",
-                    "caption": "No Snom phone with this IP address",
-                    "name": "NotSnomPhone",
-                    "visible": false
-                },
-                {
                     "type": "ValidationTextBox",
                     "caption": "Phone WUI username",
                     "name": "Username",
@@ -35,6 +29,12 @@
                     "type": "PasswordTextBox",
                     "caption": "Phone WUI password",
                     "name": "Password",
+                    "visible": false
+                },
+                {
+                    "type": "Label",
+                    "caption": "No Snom phone with this IP address",
+                    "name": "NotSnomPhone",
                     "visible": false
                 }
             ]

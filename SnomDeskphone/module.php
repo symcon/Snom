@@ -254,30 +254,37 @@ class SnomDeskphone extends IPSModuleStrict
 
             if (!$isFullMacAddress) {
                 if ($message === "401") {
+                    $data["elements"][1]["items"][2]["visible"] = true;
                     $data["elements"][1]["items"][3]["visible"] = true;
+                    $data["elements"][5]["enabled"] = false;
+                    $data["elements"][6]["visible"] = false;
+                } elseif ($message === "Login failed") {
+                    $data["elements"][1]["items"][2]["visible"] = true;
+                    $data["elements"][1]["items"][3]["visible"] = true;
+                    $data["elements"][1]["items"][4]["caption"] = $message;
                     $data["elements"][1]["items"][4]["visible"] = true;
                     $data["elements"][5]["enabled"] = false;
                     $data["elements"][6]["visible"] = false;
                 } else {
-                    $data["elements"][1]["items"][2]["caption"] = $message;
-                    $data["elements"][1]["items"][2]["visible"] = true;
+                    $data["elements"][1]["items"][4]["caption"] = $message;
+                    $data["elements"][1]["items"][4]["visible"] = true;
                     $data["elements"][5]["enabled"] = false;
                     $data["elements"][6]["visible"] = false;
                 }
             } elseif ($this->instanceIpExists()) {
-                $data["elements"][1]["items"][2]["caption"] = "Instance with IP $phone_ip already exists";
-                $data["elements"][1]["items"][2]["visible"] = true;
+                $data["elements"][1]["items"][4]["caption"] = "Instance with IP $phone_ip already exists";
+                $data["elements"][1]["items"][4]["visible"] = true;
                 $data["elements"][5]["enabled"] = false;
                 $data["elements"][6]["visible"] = false;
             } else {
                 $this->SetSummary($phone_ip);
-                $data["elements"][1]["items"][2]["visible"] = false;
+                $data["elements"][1]["items"][4]["visible"] = false;
                 $data["elements"][5]["enabled"] = true;
                 $data["elements"][6]["visible"] = true;
                 $this->SetFkeySettings();
             }
         } else {
-            $data["elements"][1]["items"][2]["visible"] = true;
+            $data["elements"][1]["items"][4]["visible"] = true;
             $data["elements"][5]["enabled"] = false;
             $data["elements"][6]["visible"] = false;
         }
@@ -378,10 +385,13 @@ class SnomDeskphone extends IPSModuleStrict
             switch ($http_code = curl_getinfo($handler, CURLINFO_HTTP_CODE)) {
                 case 200:
                     $isSnomD8xx = str_contains($response, "<title>Phone Manager</title>");
+                    $loginFailed = str_contains($response, "Login failed!");
                     if ($isSnomD8xx) {
                         $message = "Snom D8xx not supported. HTTP $http_code";
+                    } elseif ($loginFailed) {
+                        $message = "Login failed";
                     } else {
-                        $message = "$http_code";
+                        $message = "$http_code $response";
                     }
                     break;
                 case 303:
