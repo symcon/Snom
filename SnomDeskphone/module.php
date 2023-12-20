@@ -348,6 +348,7 @@ class SnomDeskphone extends IPSModuleStrict
             curl_setopt($handler, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST | CURLAUTH_BASIC);
             curl_setopt($handler, CURLOPT_USERPWD, $username . ":" . $password);
             $this->SendDebug("INFO", print_r("Phone WUI needs authentication", true), 0);
+            $this->SendDebug("INFO", print_r("Credentials: $username $password", true), 0);
         }
 
         $response = curl_exec($handler);
