@@ -298,7 +298,7 @@ class SnomDeskphone extends IPSModuleStrict
 
         // symbox 7.0 november 2023
         exec('arp ' . $phone_ip . ' | awk \'{print $4}\'', $output, $exec_status);
-        $output_mac = $output[0];
+        $output_mac = $output[0] ?? "";
 
         if (!str_contains($output_mac, ':')) {
             // raspberry os
