@@ -76,7 +76,21 @@ class SnomDeskphone extends IPSModuleStrict
                 "&color=" . $data["color"]
             );
             $RenderRemoteUrl = sprintf("http://%s/minibrowser.htm?url=%s", $this->ReadPropertyString("PhoneIP"), $hookParameters);
-            file_get_contents($RenderRemoteUrl);
+            #
+            $handler = curl_init();
+            curl_setopt($handler, CURLOPT_URL, $RenderRemoteUrl);
+            curl_setopt($handler, CURLOPT_HEADER, true);
+            curl_setopt($handler, CURLOPT_RETURNTRANSFER, true);
+
+            if ($this->ReadPropertyString("Username") and $this->ReadPropertyString("Password")) {
+                curl_setopt($handler, CURLOPT_HTTPAUTH,  CURLAUTH_DIGEST|CURLAUTH_BASIC);
+                curl_setopt($handler, CURLOPT_USERPWD, $this->ReadPropertyString("Username") . ":" . $this->ReadPropertyString("Password"));
+                $this->SendDebug("settings", print_r("needs auth", true), 0);
+            }
+            
+            curl_exec($handler);
+            curl_close($handler);
+            #
         }
     }
 
@@ -206,7 +220,21 @@ class SnomDeskphone extends IPSModuleStrict
             $baseUrl = sprintf("http://%s/dummy.htm?", $phoneIp);
             $url = sprintf("%s%s", $baseUrl, $urlQuery);
 
-            file_get_contents($url);
+            #
+            $handler = curl_init();
+            curl_setopt($handler, CURLOPT_URL, $url);
+            curl_setopt($handler, CURLOPT_HEADER, true);
+            curl_setopt($handler, CURLOPT_RETURNTRANSFER, true);
+
+            if ($this->ReadPropertyString("Username") and $this->ReadPropertyString("Password")) {
+                curl_setopt($handler, CURLOPT_HTTPAUTH,  CURLAUTH_DIGEST|CURLAUTH_BASIC);
+                curl_setopt($handler, CURLOPT_USERPWD, $this->ReadPropertyString("Username") . ":" . $this->ReadPropertyString("Password"));
+                $this->SendDebug("settings", print_r("needs auth", true), 0);
+            }
+            
+            curl_exec($handler);
+            curl_close($handler);
+            #
         }
     }
 
@@ -242,7 +270,9 @@ class SnomDeskphone extends IPSModuleStrict
 
         if ($phone_ip and Sys_Ping($phone_ip, 2000)) {
             $device_info = $this->getDeviceInformation();
+            $this->SendDebug("settings", print_r($device_info, true), 0);
         }
+
 
         $data["elements"][2]["value"] = $device_info['mac address'];
         $data["elements"][3]["value"] = $device_info['phone model'];
@@ -304,13 +334,22 @@ class SnomDeskphone extends IPSModuleStrict
         }
 
         if (str_contains($output_mac, '00:04:13:')) {
+            #
+            $handler = curl_init();
             $url = "http://$phone_ip/settings.xml";
-            $uname = $this->ReadPropertyString("Username");
-            $passwd = $this->ReadPropertyString("Password");
-            if ($uname and $passwd) {
-                $url = "http://$uname:$passwd@$phone_ip/settings.xml";
+            curl_setopt($handler, CURLOPT_URL, $url);
+            curl_setopt($handler, CURLOPT_RETURNTRANSFER, true);
+
+            if ($this->ReadPropertyString("Username") and $this->ReadPropertyString("Password")) {
+                curl_setopt($handler, CURLOPT_HTTPAUTH,  CURLAUTH_DIGEST|CURLAUTH_BASIC);
+                curl_setopt($handler, CURLOPT_USERPWD, $this->ReadPropertyString("Username") . ":" . $this->ReadPropertyString("Password"));
+                $this->SendDebug("settings", print_r("needs auth", true), 0);
             }
-            $phone_settings_xml = @simplexml_load_file($url);
+
+            $response = curl_exec($handler);
+            $phone_settings_xml = @simplexml_load_string($response);
+            curl_close($handler);
+            #
 
             if ($phone_settings_xml) {
                 $phone_model = (string) $phone_settings_xml->{'phone-settings'}->phone_type[0];
@@ -342,6 +381,7 @@ class SnomDeskphone extends IPSModuleStrict
     public function getHttpResponseMessage(): string
     {
         $handler = curl_init($this->ReadPropertyString("PhoneIP"));
+        // $this->SendDebug("url", print_r($url, true), 0);
         // if uname and passwd not empty
         if ($this->ReadPropertyString("Username") and $this->ReadPropertyString("Password")) {
             curl_setopt($handler, CURLOPT_HTTPAUTH,  CURLAUTH_DIGEST|CURLAUTH_BASIC);
