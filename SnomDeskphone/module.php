@@ -370,7 +370,6 @@ class SnomDeskphone extends IPSModuleStrict
         $username = $this->ReadPropertyString("Username");
         $password = $this->ReadPropertyString("Password");
 
-        //TODO check if only username or only password
         if ($username and $password) {
             curl_setopt($handler, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST | CURLAUTH_BASIC);
             curl_setopt($handler, CURLOPT_USERPWD, $username . ":" . $password);
