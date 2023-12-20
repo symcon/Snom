@@ -24,6 +24,18 @@
                     "caption": "No Snom phone with this IP address",
                     "name": "NotSnomPhone",
                     "visible": false
+                },
+                {
+                    "type": "ValidationTextBox",
+                    "caption": "Phone WUI username",
+                    "name": "Username",
+                    "visible": false
+                },
+                {
+                    "type": "PasswordTextBox",
+                    "caption": "Phone WUI password",
+                    "name": "Password",
+                    "visible": false
                 }
             ]
         },

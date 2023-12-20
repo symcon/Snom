@@ -11,6 +11,8 @@ class SnomDeskphone extends IPSModuleStrict
         $this->RegisterVariableString("PhoneMac", "MAC address");
         $this->RegisterHook("snom/" . $this->InstanceID);
         $this->RegisterPropertyString("PhoneIP", "");
+        $this->RegisterPropertyString("Username", "");
+        $this->RegisterPropertyString("Password", "");
         $this->RegisterPropertyString('LocalIP', Sys_GetNetworkInfo()[0]['IP']);
         $this->RegisterPropertyString("FkeysSettings", "[]");
     }
@@ -250,11 +252,19 @@ class SnomDeskphone extends IPSModuleStrict
             $data["elements"][6]["visible"] = false;
         } elseif ($device_info['is snom phone']) {
             $isFullMacAddress = strlen($device_info["mac address"]) === 17;
+            $message = $this->getHttpResponseMessage();
             if (!$isFullMacAddress) {
-                $data["elements"][1]["items"][2]["caption"] = "IP $phone_ip is not a Snom D7xx or needs credentials";
-                $data["elements"][1]["items"][2]["visible"] = true;
-                $data["elements"][5]["enabled"] = false;
-                $data["elements"][6]["visible"] = false;
+                if ($message === "401") {
+                    $data["elements"][1]["items"][3]["visible"] = true;
+                    $data["elements"][1]["items"][4]["visible"] = true;
+                    $data["elements"][5]["enabled"] = false;
+                    $data["elements"][6]["visible"] = false;
+                } else {
+                    $data["elements"][1]["items"][2]["caption"] = $message;
+                    $data["elements"][1]["items"][2]["visible"] = true;
+                    $data["elements"][5]["enabled"] = false;
+                    $data["elements"][6]["visible"] = false;
+                }
             } elseif ($this->instanceIpExists()) {
                 $data["elements"][1]["items"][2]["caption"] = "Instance with IP $phone_ip already exists";
                 $data["elements"][1]["items"][2]["visible"] = true;
@@ -294,7 +304,13 @@ class SnomDeskphone extends IPSModuleStrict
         }
 
         if (str_contains($output_mac, '00:04:13:')) {
-            $phone_settings_xml = @simplexml_load_file("http://$phone_ip/settings.xml");
+            $url = "http://$phone_ip/settings.xml";
+            $uname = $this->ReadPropertyString("Username");
+            $passwd = $this->ReadPropertyString("Password");
+            if ($uname and $passwd) {
+                $url = "http://$uname:$passwd@$phone_ip/settings.xml";
+            }
+            $phone_settings_xml = @simplexml_load_file($url);
 
             if ($phone_settings_xml) {
                 $phone_model = (string) $phone_settings_xml->{'phone-settings'}->phone_type[0];
@@ -321,6 +337,45 @@ class SnomDeskphone extends IPSModuleStrict
             );
         }
 
+    }
+
+    public function getHttpResponseMessage(): string
+    {
+        $handler = curl_init($this->ReadPropertyString("PhoneIP"));
+        // if uname and passwd not empty
+        if ($this->ReadPropertyString("Username") and $this->ReadPropertyString("Password")) {
+            curl_setopt($handler, CURLOPT_HTTPAUTH,  CURLAUTH_DIGEST|CURLAUTH_BASIC);
+            curl_setopt($handler, CURLOPT_USERPWD, $this->ReadPropertyString("Username") . ":" . $this->ReadPropertyString("Password"));
+        }
+
+        curl_setopt($handler, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($handler, CURLOPT_HEADER, 1);
+        $response = curl_exec($handler);
+        
+        if (!curl_errno($handler)) {
+            switch ($http_code = curl_getinfo($handler, CURLINFO_HTTP_CODE)) {
+                case 200:
+                    $isSnomD8xx = str_contains($response, "<title>Phone Manager</title>");
+                    if ($isSnomD8xx) {
+                        $message = "Snom D8xx not supported. HTTP $http_code";
+                    } else {
+                        $message = "$http_code";
+                    }
+                    break;
+                case 303:
+                    $message = "Snom M900 not supported. HTTP $http_code";
+                    break;
+                case 401:
+                    $message = "$http_code";
+                    break;
+                default:
+                    $message = "$http_code";
+            }
+        }
+
+        curl_close($handler);
+
+        return $message;
     }
 
     public function UpdateForm(array $FkeysSettings, bool $recvOnly, bool $StatusVariable): string
