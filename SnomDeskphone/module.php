@@ -76,21 +76,7 @@ class SnomDeskphone extends IPSModuleStrict
                 "&color=" . $data["color"]
             );
             $RenderRemoteUrl = sprintf("http://%s/minibrowser.htm?url=%s", $this->ReadPropertyString("PhoneIP"), $hookParameters);
-            #
-            $handler = curl_init();
-            curl_setopt($handler, CURLOPT_URL, $RenderRemoteUrl);
-            curl_setopt($handler, CURLOPT_HEADER, true);
-            curl_setopt($handler, CURLOPT_RETURNTRANSFER, true);
-
-            if ($this->ReadPropertyString("Username") and $this->ReadPropertyString("Password")) {
-                curl_setopt($handler, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST | CURLAUTH_BASIC);
-                curl_setopt($handler, CURLOPT_USERPWD, $this->ReadPropertyString("Username") . ":" . $this->ReadPropertyString("Password"));
-                $this->SendDebug("settings", print_r("needs auth", true), 0);
-            }
-
-            curl_exec($handler);
-            curl_close($handler);
-            #
+            $this->httpGetRequest($RenderRemoteUrl);
         }
     }
 
@@ -119,7 +105,6 @@ class SnomDeskphone extends IPSModuleStrict
     }
     private function GetIPPhoneTextItem(string $text, string $ledValue, int $ledNo, string $color, int $timeout = 1): string
     {
-        // header("Content-Type: text/xml");
         $xml = new DOMDocument('1.0', 'UTF-8');
         $xml->formatOutput = true;
         $xmlRoot = $xml->appendChild($xml->createElement("SnomIPPhoneText"));
@@ -219,22 +204,7 @@ class SnomDeskphone extends IPSModuleStrict
             $phoneIp = $this->ReadPropertyString("PhoneIP");
             $baseUrl = sprintf("http://%s/dummy.htm?", $phoneIp);
             $url = sprintf("%s%s", $baseUrl, $urlQuery);
-
-            #
-            $handler = curl_init();
-            curl_setopt($handler, CURLOPT_URL, $url);
-            curl_setopt($handler, CURLOPT_HEADER, true);
-            curl_setopt($handler, CURLOPT_RETURNTRANSFER, true);
-
-            if ($this->ReadPropertyString("Username") and $this->ReadPropertyString("Password")) {
-                curl_setopt($handler, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST | CURLAUTH_BASIC);
-                curl_setopt($handler, CURLOPT_USERPWD, $this->ReadPropertyString("Username") . ":" . $this->ReadPropertyString("Password"));
-                $this->SendDebug("settings", print_r("needs auth", true), 0);
-            }
-
-            curl_exec($handler);
-            curl_close($handler);
-            #
+            $this->httpGetRequest($url);
         }
     }
 
@@ -270,7 +240,6 @@ class SnomDeskphone extends IPSModuleStrict
 
         if ($phone_ip and Sys_Ping($phone_ip, 2000)) {
             $device_info = $this->getDeviceInformation();
-            $this->SendDebug("settings", print_r($device_info, true), 0);
         }
 
         $data["elements"][2]["value"] = $device_info['mac address'];
@@ -282,6 +251,7 @@ class SnomDeskphone extends IPSModuleStrict
         } elseif ($device_info['is snom phone']) {
             $isFullMacAddress = strlen($device_info["mac address"]) === 17;
             $message = $this->getHttpResponseMessage();
+
             if (!$isFullMacAddress) {
                 if ($message === "401") {
                     $data["elements"][1]["items"][3]["visible"] = true;
@@ -333,22 +303,9 @@ class SnomDeskphone extends IPSModuleStrict
         }
 
         if (str_contains($output_mac, '00:04:13:')) {
-            #
-            $handler = curl_init();
             $url = "http://$phone_ip/settings.xml";
-            curl_setopt($handler, CURLOPT_URL, $url);
-            curl_setopt($handler, CURLOPT_RETURNTRANSFER, true);
-
-            if ($this->ReadPropertyString("Username") and $this->ReadPropertyString("Password")) {
-                curl_setopt($handler, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST | CURLAUTH_BASIC);
-                curl_setopt($handler, CURLOPT_USERPWD, $this->ReadPropertyString("Username") . ":" . $this->ReadPropertyString("Password"));
-                $this->SendDebug("settings", print_r("needs auth", true), 0);
-            }
-
-            $response = curl_exec($handler);
+            $response = $this->httpGetRequest($url, false);
             $phone_settings_xml = @simplexml_load_string($response);
-            curl_close($handler);
-            #
 
             if ($phone_settings_xml) {
                 $phone_model = (string) $phone_settings_xml->{'phone-settings'}->phone_type[0];
@@ -374,16 +331,42 @@ class SnomDeskphone extends IPSModuleStrict
                 "phone model" => '',
             );
         }
+    }
 
+    public function httpGetRequest(string $url, bool $headerOutput = true): bool|string
+    {
+        $handler = curl_init();
+        curl_setopt($handler, CURLOPT_URL, $url);
+        curl_setopt($handler, CURLOPT_HEADER, $headerOutput);
+        curl_setopt($handler, CURLOPT_RETURNTRANSFER, true);
+
+        $username = $this->ReadPropertyString("Username");
+        $password = $this->ReadPropertyString("Password");
+
+        //TODO check if only username or only password
+        if ($username and $password) {
+            curl_setopt($handler, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST | CURLAUTH_BASIC);
+            curl_setopt($handler, CURLOPT_USERPWD, $username . ":" . $password);
+            $this->SendDebug("INFO", print_r("Phone WUI needs authentication", true), 0);
+        }
+
+        $response = curl_exec($handler);
+        curl_close($handler);
+
+        return $response;
     }
 
     public function getHttpResponseMessage(): string
     {
         $handler = curl_init($this->ReadPropertyString("PhoneIP"));
+        $username = $this->ReadPropertyString("Username");
+        $password = $this->ReadPropertyString("Password");
 
-        if ($this->ReadPropertyString("Username") and $this->ReadPropertyString("Password")) {
+        //TODO check if only username or only password
+        if ($username and $password) {
             curl_setopt($handler, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST | CURLAUTH_BASIC);
-            curl_setopt($handler, CURLOPT_USERPWD, $this->ReadPropertyString("Username") . ":" . $this->ReadPropertyString("Password"));
+            curl_setopt($handler, CURLOPT_USERPWD, $username . ":" . $password);
+            $this->SendDebug("INFO", print_r("Phone WUI needs authentication", true), 0);
         }
 
         curl_setopt($handler, CURLOPT_RETURNTRANSFER, 1);
