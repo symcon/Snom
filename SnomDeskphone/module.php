@@ -141,9 +141,6 @@ class SnomDeskphone extends IPSModuleStrict
         IPS_RunAction($action['actionID'], $parameters);
     }
 
-    // Usage of public functions (prefix defined in module.json):
-    // SNMD_PingPhone();
-
     public function PingPhone(string $phone_ip): void
     {
         if (Sys_Ping($phone_ip, 4000)) {
