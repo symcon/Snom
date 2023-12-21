@@ -1,20 +1,15 @@
 # Snom (Deskphone) Symcon module
 ## Description
-Integrates [Snom deskphones](https://www.snom.com/en/products/desk-phones/) in the [Symcon](https://www.symcon.de/en/) automation ecosystem.
+This module is part of the [Snom Symcon library](https://gitlab.com/simon.golpe/snom_symcon/-/blob/main/README.md).  
+After configurating an instance of this module, the user of the Snom deskphone can control and visualize end devices of an automation system integrated in the SymconOS.  
+Pressing a function key of the Deskphone the user can, for example, control the lights, doors or blinds of a KNX system.  
+The LEDS of the function keys can be used for visualizing the status of the different parts of a facility, for example, a LED on the phone turns red if an alarm is triggered.  
 
-That means, that different building automation systems (e.g. [KNX](https://www.knx.org/knx-en/for-your-home/benefits/end-customers/), [Modbus](https://modbus.org/about_us.php), [Shelly](https://www.shelly.com/en)), applications (e.g. Spotify) or even your Tesla car can be controlled or monitored from your IP phone.
-
-## Requirements
-The [SymconOS](https://www.symcon.de/en/downloads/) must run in one of this devices:
-- [Symbox](https://www.symcon.de/en/shop/symbox/)
-- Raspberry pi
-
-## <span style="color:red">Warnings <span>
-- <span style="color:red">The module works only with HTTP.</span>  
-If the PBX where the phone is registered or the user changes the phone server settings to allow only HTTPS, the module will not work
-
-## Usage
-tbd.
-
-Maintainer: Simón Golpe Varela
+## Configuration
+1. Navigate to the [management console](https://www.symcon.de/en/service/documentation/components/management-console/) of the IP-Symcon server
+2. 
+   
+```
+Maintainer: Simón Golpe Varela  
 Support: simon.golpe@snom.com
+```
