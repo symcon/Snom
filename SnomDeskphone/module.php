@@ -141,9 +141,6 @@ class SnomDeskphone extends IPSModuleStrict
         IPS_RunAction($action['actionID'], $parameters);
     }
 
-    // Usage of public functions (prefix defined in module.json):
-    // SNMD_PingPhone();
-
     public function PingPhone(string $phone_ip): void
     {
         if (Sys_Ping($phone_ip, 4000)) {
@@ -298,18 +295,9 @@ class SnomDeskphone extends IPSModuleStrict
     public function getDeviceInformation(): array
     {
         $phone_ip = $this->ReadPropertyString("PhoneIP");
+        $mac_address = $this->getMacAddress();
 
-        // symbox 7.0 november 2023
-        exec('arp ' . $phone_ip . ' | awk \'{print $4}\'', $output, $exec_status);
-        $output_mac = $output[0];
-
-        if (!str_contains($output_mac, ':')) {
-            // raspberry os
-            exec('arp ' . $phone_ip . ' | awk \'{print $3}\'', $output_raspberrypi, $exec_status);
-            $output_mac = $output_raspberrypi[1];
-        }
-
-        if (str_contains($output_mac, '00:04:13:')) {
+        if (str_contains($mac_address, '00:04:13:')) {
             $url = "http://$phone_ip/settings.xml";
             $response = $this->httpGetRequest($url, false);
             $phone_settings_xml = @simplexml_load_string($response);
@@ -317,11 +305,11 @@ class SnomDeskphone extends IPSModuleStrict
             if ($phone_settings_xml) {
                 $phone_model = (string) $phone_settings_xml->{'phone-settings'}->phone_type[0];
                 $this->SetValue('PhoneModel', $phone_model);
-                $this->SetValue('PhoneMac', $output_mac);
+                $this->SetValue('PhoneMac', $mac_address);
 
                 return array(
                     "is snom phone" => true,
-                    "mac address" => $output_mac,
+                    "mac address" => $mac_address,
                     "phone model" => $phone_model,
                 );
             } else {
@@ -338,6 +326,32 @@ class SnomDeskphone extends IPSModuleStrict
                 "phone model" => '',
             );
         }
+    }
+
+    public function getMacAddress(): string 
+    {
+        $mac_address = "none";
+        $phone_ip = $this->ReadPropertyString("PhoneIP");
+        exec('uname', $isLinux, $exec_status);
+
+        if ($isLinux) {
+            // symbox 7.0 november 2023
+            exec('arp ' . $phone_ip . ' | awk \'{print $4}\'', $output, $exec_status);
+            $mac_address = $output[0];
+
+            if (!str_contains($mac_address, ':')) {
+                // raspberry os
+                exec('arp ' . $phone_ip . ' | awk \'{print $3}\'', $output_raspberrypi, $exec_status);
+                $mac_address = $output_raspberrypi[1];
+            }
+        } else {
+            // windows
+            exec('arp -a ' . $phone_ip, $output, $exec_status);
+            $output_array = explode(' ', $output[3]);
+            $mac_address = str_replace("-", ":", $output_array[11]);
+        }
+
+        return $mac_address;
     }
 
     public function httpGetRequest(string $url, bool $headerOutput = true): bool|string
@@ -379,6 +393,7 @@ class SnomDeskphone extends IPSModuleStrict
         curl_setopt($handler, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($handler, CURLOPT_HEADER, 1);
         $response = curl_exec($handler);
+        $message = "Curl handle error";
 
         if (!curl_errno($handler)) {
             switch ($http_code = curl_getinfo($handler, CURLINFO_HTTP_CODE)) {
