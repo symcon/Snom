@@ -297,21 +297,7 @@ class SnomDeskphone extends IPSModuleStrict
         $phone_ip = $this->ReadPropertyString("PhoneIP");
         $mac_address = $this->getMacAddress();
 
-<<<<<<< Updated upstream
-        // symbox 7.0 november 2023
-        exec('arp ' . $phone_ip . ' | awk \'{print $4}\'', $output, $exec_status);
-        $output_mac = $output[0] ?? "";
-
-        if (!str_contains($output_mac, ':')) {
-            // raspberry os
-            exec('arp ' . $phone_ip . ' | awk \'{print $3}\'', $output_raspberrypi, $exec_status);
-            $output_mac = $output_raspberrypi[1];
-        }
-
-        if (str_contains($output_mac, '00:04:13:')) {
-=======
         if (str_contains($mac_address, '00:04:13:')) {
->>>>>>> Stashed changes
             $url = "http://$phone_ip/settings.xml";
             $response = $this->httpGetRequest($url, false);
             $phone_settings_xml = @simplexml_load_string($response);
