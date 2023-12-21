@@ -295,7 +295,9 @@ class SnomDeskphone extends IPSModuleStrict
     public function getDeviceInformation(): array
     {
         $phone_ip = $this->ReadPropertyString("PhoneIP");
+        $mac_address = $this->getMacAddress();
 
+<<<<<<< Updated upstream
         // symbox 7.0 november 2023
         exec('arp ' . $phone_ip . ' | awk \'{print $4}\'', $output, $exec_status);
         $output_mac = $output[0] ?? "";
@@ -307,6 +309,9 @@ class SnomDeskphone extends IPSModuleStrict
         }
 
         if (str_contains($output_mac, '00:04:13:')) {
+=======
+        if (str_contains($mac_address, '00:04:13:')) {
+>>>>>>> Stashed changes
             $url = "http://$phone_ip/settings.xml";
             $response = $this->httpGetRequest($url, false);
             $phone_settings_xml = @simplexml_load_string($response);
@@ -314,11 +319,11 @@ class SnomDeskphone extends IPSModuleStrict
             if ($phone_settings_xml) {
                 $phone_model = (string) $phone_settings_xml->{'phone-settings'}->phone_type[0];
                 $this->SetValue('PhoneModel', $phone_model);
-                $this->SetValue('PhoneMac', $output_mac);
+                $this->SetValue('PhoneMac', $mac_address);
 
                 return array(
                     "is snom phone" => true,
-                    "mac address" => $output_mac,
+                    "mac address" => $mac_address,
                     "phone model" => $phone_model,
                 );
             } else {
@@ -335,6 +340,32 @@ class SnomDeskphone extends IPSModuleStrict
                 "phone model" => '',
             );
         }
+    }
+
+    public function getMacAddress(): string 
+    {
+        $mac_address = "none";
+        $phone_ip = $this->ReadPropertyString("PhoneIP");
+        exec('uname', $isLinux, $exec_status);
+
+        if ($isLinux) {
+            // symbox 7.0 november 2023
+            exec('arp ' . $phone_ip . ' | awk \'{print $4}\'', $output, $exec_status);
+            $mac_address = $output[0];
+
+            if (!str_contains($output_mac, ':')) {
+                // raspberry os
+                exec('arp ' . $phone_ip . ' | awk \'{print $3}\'', $output_raspberrypi, $exec_status);
+                $mac_address = $output_raspberrypi[1];
+            }
+        } else {
+            // windows
+            exec('arp -a ' . $phone_ip, $output, $exec_status);
+            $output_array = explode(' ', $output[3]);
+            $mac_address = str_replace("-", ":", $output_array[11]);
+        }
+
+        return $mac_address;
     }
 
     public function httpGetRequest(string $url, bool $headerOutput = true): bool|string
