@@ -11,7 +11,7 @@ The [SymconOS](https://www.symcon.de/en/downloads/) must run in one of this devi
 
 ## <span style="color:red">Warnings <span>
 - <span style="color:red">The module works only with HTTP.</span>  
-If the PBX where the phone is registered or the user changes the phone server settings to only HTTPS, the module will not work
+If the PBX where the phone is registered or the user changes the phone server settings to allow only HTTPS, the module will not work
 
 ## Usage
 tbd.
