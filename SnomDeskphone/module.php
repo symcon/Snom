@@ -393,6 +393,7 @@ class SnomDeskphone extends IPSModuleStrict
         curl_setopt($handler, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($handler, CURLOPT_HEADER, 1);
         $response = curl_exec($handler);
+        $message = "Curl handle error";
 
         if (!curl_errno($handler)) {
             switch ($http_code = curl_getinfo($handler, CURLINFO_HTTP_CODE)) {
