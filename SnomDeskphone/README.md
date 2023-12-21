@@ -16,3 +16,5 @@ If the PBX where the phone is registered or the user changes the phone server se
 ## Usage
 tbd.
 
+Maintainer: Simón Golpe Varela
+Support: simon.golpe@snom.com
