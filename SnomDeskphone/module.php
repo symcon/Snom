@@ -339,7 +339,7 @@ class SnomDeskphone extends IPSModuleStrict
             exec('arp ' . $phone_ip . ' | awk \'{print $4}\'', $output, $exec_status);
             $mac_address = $output[0];
 
-            if (!str_contains($output_mac, ':')) {
+            if (!str_contains($mac_address, ':')) {
                 // raspberry os
                 exec('arp ' . $phone_ip . ' | awk \'{print $3}\'', $output_raspberrypi, $exec_status);
                 $mac_address = $output_raspberrypi[1];
