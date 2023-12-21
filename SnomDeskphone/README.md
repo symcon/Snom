@@ -9,6 +9,10 @@ The [SymconOS](https://www.symcon.de/en/downloads/) must run in one of this devi
 - [Symbox](https://www.symcon.de/en/shop/symbox/)
 - Raspberry pi
 
+## Phone provisioning requirements
+- <span style="color:red">The module works only with HTTP.</span>  
+If the PBX where the phone is registered changes the phone server settings to only HTTPS, the module will not work
+
 ## Usage
 tbd.
 
