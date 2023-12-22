@@ -18,10 +18,6 @@ The [SymconOS](https://www.symcon.de/en/downloads/) must run in one of this devi
 - Supported Snom devices: [Snom D335](https://www.snom.com/de/produkte/tischtelefone/d3xx/snom-d335/), [Snom D385](https://www.snom.com/de/produkte/tischtelefone/d3xx/snom-d385/), [Snom D735](https://www.snom.com/de/produkte/tischtelefone/d7xx/snom-d735/), [Snom D785](https://www.snom.com/de/produkte/tischtelefone/d7xx/snom-d785/)
 - Only boolean variables supported (on/off)
 
-## <span style="color:red">Warnings <span>
-- <span style="color:red">The modules of this library work only with HTTP.</span>  
-If the PBX where the phone is registered or the user changes the phone server settings to allow only HTTPS, the module will not work
-
 ## Library modules
 - [Snom (Deskphone)](https://gitlab.com/simon.golpe/snom_symcon/-/blob/main/SnomDeskphone/README.md)  
 
