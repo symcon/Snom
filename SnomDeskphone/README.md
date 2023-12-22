@@ -1,4 +1,8 @@
 # Snom (Deskphone) Symcon module
+```
+Warning: The modules of this library work only with HTTP. 
+If the PBX where the phone is registered or the user changes the phone server settings to allow only HTTPS, the module will not work
+```
 ## Description
 This module is part of the [Snom Symcon library](https://gitlab.com/simon.golpe/snom_symcon/-/blob/main/README.md).  
 After configurating an instance of this module, the user of the Snom deskphone can control and visualize end devices of an automation system integrated in the SymconOS.  

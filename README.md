@@ -1,5 +1,8 @@
 # Snom Symcon library
-
+```
+Warning: The modules of this library work only with HTTP. 
+If the PBX where the phone is registered or the user changes the phone server settings to allow only HTTPS, the module will not work
+```
 ## Description
 Librarary for integrating [Snom IP phones](https://www.snom.com/en/products/) in the [Symcon](https://www.symcon.de/en/product/) building automation ecosystem.  
 
