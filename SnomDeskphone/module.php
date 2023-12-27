@@ -302,7 +302,7 @@ class SnomDeskphone extends IPSModuleStrict
             $response = $this->httpGetRequest($url, false);
             $phone_settings_xml = @simplexml_load_string($response);
 
-            if ($phone_settings_xml) {
+            if ($phone_settings_xml and !str_contains($response, "404")) {
                 $phone_model = (string) $phone_settings_xml->{'phone-settings'}->phone_type[0];
                 $this->SetValue('PhoneModel', $phone_model);
                 $this->SetValue('PhoneMac', $mac_address);
@@ -364,7 +364,6 @@ class SnomDeskphone extends IPSModuleStrict
         $username = $this->ReadPropertyString("Username");
         $password = $this->ReadPropertyString("Password");
 
-        //TODO check if only username or only password
         if ($username and $password) {
             curl_setopt($handler, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST | CURLAUTH_BASIC);
             curl_setopt($handler, CURLOPT_USERPWD, $username . ":" . $password);
