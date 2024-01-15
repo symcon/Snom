@@ -6,6 +6,21 @@
             "name": "InstanceLabel"
         },
         {
+            "type": "Select",
+            "name": "Protocol",
+            "caption": "Protocol",
+            "options": [
+                {
+                    "caption": "HTTP",
+                    "value": "http"
+                },
+                {
+                    "caption": "HTTPS",
+                    "value": "https"
+                }
+            ]
+        },
+        {
             "type": "RowLayout",
             "items": [
                 {
