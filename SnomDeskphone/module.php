@@ -237,9 +237,6 @@ class SnomDeskphone extends IPSModuleStrict
         $phone_ip = $this->ReadPropertyString("PhoneIP");
 
         if ($phone_ip and Sys_Ping($phone_ip, 2000)) {
-            // exec("echo quit | openssl s_client -showcerts -servername   $phone_ip -connect $phone_ip:443", $output, $exec_status);
-            // echo var_dump($output);
-            // $this->SendDebug("INFO", print_r(var_dump($output), true), 0);
             $device_info = $this->getDeviceInformation();
         }
 
@@ -305,13 +302,13 @@ class SnomDeskphone extends IPSModuleStrict
 
     public function getDeviceInformation(): array
     {
-        $phone_ip = $this->ReadPropertyString("PhoneIP");
-        $protocol = $this->ReadPropertyString("Protocol");
         $mac_address = $this->getMacAddress();
 
         if (str_contains($mac_address, '00:04:13:')) {
-            $url = "$protocol://$phone_ip/settings.xml";
-            $response = $this->httpGetRequest($url, false);
+            $message = $this->getHttpResponseMessage();
+            $this->SendDebug("message", print_r($message, true), 0);
+            $response = $this->httpGetRequest(false);
+            $this->SendDebug("response", print_r($response, true), 0);
             $phone_settings_xml = @simplexml_load_string($response);
 
             if ($phone_settings_xml and !str_contains($response, "404")) {
@@ -366,15 +363,24 @@ class SnomDeskphone extends IPSModuleStrict
         return $mac_address;
     }
 
-    public function httpGetRequest(string $url, bool $headerOutput = true): bool|string
+    public function httpGetRequest(bool $headerOutput = true): bool|string
     {
+        $phone_ip = $this->ReadPropertyString("PhoneIP");
+        $protocol = $this->ReadPropertyString("Protocol");
+        $url = "$protocol://$phone_ip/settings.xml";
+        $this->SendDebug("url", print_r($url, true), 0);
+
         $handler = curl_init();
-        curl_setopt($handler, CURLOPT_SSL_VERIFYHOST, 2); 
-        curl_setopt($handler, CURLOPT_SSL_VERIFYPEER, true);
-        curl_setopt($handler, CURLOPT_CAINFO,  getcwd().'/certs.pem');
         curl_setopt($handler, CURLOPT_URL, $url);
+        curl_setopt($handler, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS | CURLPROTO_HTTP);
         curl_setopt($handler, CURLOPT_HEADER, $headerOutput);
         curl_setopt($handler, CURLOPT_RETURNTRANSFER, true);
+
+        if ($protocol === "HTTPS") {
+            curl_setopt($handler, CURLOPT_SSL_VERIFYHOST, 0); 
+            curl_setopt($handler, CURLOPT_SSL_VERIFYPEER, false);
+            // curl_setopt($handler, CURLOPT_CAINFO,  getcwd().'/certs.pem');
+        }
 
         $username = $this->ReadPropertyString("Username");
         $password = $this->ReadPropertyString("Password");
@@ -397,7 +403,13 @@ class SnomDeskphone extends IPSModuleStrict
         $protocol = $this->ReadPropertyString("Protocol");
         $phone_ip = $this->ReadPropertyString("PhoneIP");
         $url = "$protocol://$phone_ip";
-        $handler = curl_init($url);
+
+        $handler = curl_init();
+        curl_setopt($handler, CURLOPT_URL, $url);
+        curl_setopt($handler, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS | CURLPROTO_HTTP);
+        curl_setopt($handler, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($handler, CURLOPT_HEADER, 1);
+
         $username = $this->ReadPropertyString("Username");
         $password = $this->ReadPropertyString("Password");
 
@@ -406,12 +418,12 @@ class SnomDeskphone extends IPSModuleStrict
             curl_setopt($handler, CURLOPT_USERPWD, $username . ":" . $password);
             $this->SendDebug("INFO", print_r("Phone WUI needs authentication", true), 0);
         }
+        if ($protocol === "https") {
+            curl_setopt($handler, CURLOPT_SSL_VERIFYHOST, 0); 
+            curl_setopt($handler, CURLOPT_SSL_VERIFYPEER, false);
+            // curl_setopt($handler, CURLOPT_CAINFO,  getcwd().'/certs.pem');
+        }
 
-        curl_setopt($handler, CURLOPT_SSL_VERIFYHOST, 2); 
-        curl_setopt($handler, CURLOPT_SSL_VERIFYPEER, true);
-        curl_setopt($handler, CURLOPT_CAINFO,  getcwd().'/certs.pem');
-        curl_setopt($handler, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($handler, CURLOPT_HEADER, 1);
         $response = curl_exec($handler);
         $message = "Curl handle error";
         $curl_errno = curl_errno($handler);
