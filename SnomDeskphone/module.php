@@ -66,6 +66,8 @@ class SnomDeskphone extends IPSModuleStrict
 
     protected function UpdateFkeys(array $fkeysToUpdate, int $SenderID, array $Data): void
     {
+        $this->SendDebug("fkeys update", print_r("Updating fkeys...", true), 0);
+        $protocol = $this->ReadPropertyString("Protocol");
         $instanceHook = sprintf("http://%s:3777/hook/snom/%d/", $this->ReadPropertyString("LocalIP"), $this->InstanceID);
 
         foreach ($fkeysToUpdate as $data) {
@@ -76,8 +78,10 @@ class SnomDeskphone extends IPSModuleStrict
                 "&ledNo=" . $data["ledNo"] .
                 "&color=" . $data["color"]
             );
-            $RenderRemoteUrl = sprintf("http://%s/minibrowser.htm?url=%s", $this->ReadPropertyString("PhoneIP"), $hookParameters);
+            $RenderRemoteUrl = sprintf("$protocol://%s/minibrowser.htm?url=%s", $this->ReadPropertyString("PhoneIP"), $hookParameters);
+            $this->SendDebug("http", print_r("sending $RenderRemoteUrl", true), 0);
             $this->httpGetRequest($RenderRemoteUrl);
+            $this->SendDebug("http", print_r("sent $RenderRemoteUrl", true), 0);
         }
     }
 
@@ -86,11 +90,13 @@ class SnomDeskphone extends IPSModuleStrict
      */
     protected function ProcessHookData(): void
     {
+        $this->SendDebug("HOOK", print_r("Processing hook data...", true), 0);
         if (filter_var($_GET["xml"], FILTER_VALIDATE_BOOLEAN)) {
             $this->UpdatePhonesStatusLed($_GET);
         } else {
             $this->ExecuteAction($_GET["value"]);
         }
+        $this->SendDebug("HOOK", print_r("Hook data processed", true), 0);
     }
 
     private function UpdatePhonesStatusLed(array $requestParameters): void
@@ -174,6 +180,7 @@ class SnomDeskphone extends IPSModuleStrict
     public function SetFkeySettings(): void
     {
         $fkeysSettings = json_decode($this->ReadPropertyString("FkeysSettings"), true);
+        $protocol = $this->ReadPropertyString("Protocol");
 
         foreach ($fkeysSettings as $fkeySettings) {
             $fKeyIndex = ((int) $fkeySettings["FkeyNo"]) - 1;
@@ -200,7 +207,7 @@ class SnomDeskphone extends IPSModuleStrict
             }
 
             $phoneIp = $this->ReadPropertyString("PhoneIP");
-            $baseUrl = sprintf("http://%s/dummy.htm?", $phoneIp);
+            $baseUrl = sprintf("$protocol://%s/dummy.htm?", $phoneIp);
             $url = sprintf("%s%s", $baseUrl, $urlQuery);
             $this->httpGetRequest($url);
         }
@@ -248,7 +255,10 @@ class SnomDeskphone extends IPSModuleStrict
             $data["elements"][7]["visible"] = false;
         } elseif ($device_info['is snom phone']) {
             $isFullMacAddress = strlen($device_info["mac address"]) === 17;
-            $message = $this->getHttpResponseMessage();
+            $phone_ip = $this->ReadPropertyString("PhoneIP");
+            $protocol = $this->ReadPropertyString("Protocol");
+            $url = "$protocol://$phone_ip";
+            $message = $this->httpGetRequest($url, return_message: true);
 
             if (!$isFullMacAddress) {
                 if ($message === "401") {
@@ -305,10 +315,10 @@ class SnomDeskphone extends IPSModuleStrict
         $mac_address = $this->getMacAddress();
 
         if (str_contains($mac_address, '00:04:13:')) {
-            $message = $this->getHttpResponseMessage();
-            $this->SendDebug("message", print_r($message, true), 0);
-            $response = $this->httpGetRequest(false);
-            $this->SendDebug("response", print_r($response, true), 0);
+            $phone_ip = $this->ReadPropertyString("PhoneIP");
+            $protocol = $this->ReadPropertyString("Protocol");
+            $url = "$protocol://$phone_ip/settings.xml";
+            $response = $this->httpGetRequest($url, headerOutput: false);
             $phone_settings_xml = @simplexml_load_string($response);
 
             if ($phone_settings_xml and !str_contains($response, "404")) {
@@ -363,11 +373,11 @@ class SnomDeskphone extends IPSModuleStrict
         return $mac_address;
     }
 
-    public function httpGetRequest(bool $headerOutput = true): bool|string
+    public function httpGetRequest(string $url, bool $return_message = false, bool $headerOutput = true): bool|string
     {
-        $phone_ip = $this->ReadPropertyString("PhoneIP");
+        $this->SendDebug("davor", print_r($url, true), 0);
+
         $protocol = $this->ReadPropertyString("Protocol");
-        $url = "$protocol://$phone_ip/settings.xml";
         $this->SendDebug("url", print_r($url, true), 0);
 
         $handler = curl_init();
@@ -375,88 +385,67 @@ class SnomDeskphone extends IPSModuleStrict
         curl_setopt($handler, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS | CURLPROTO_HTTP);
         curl_setopt($handler, CURLOPT_HEADER, $headerOutput);
         curl_setopt($handler, CURLOPT_RETURNTRANSFER, true);
-
-        if ($protocol === "HTTPS") {
-            curl_setopt($handler, CURLOPT_SSL_VERIFYHOST, 0); 
-            curl_setopt($handler, CURLOPT_SSL_VERIFYPEER, false);
-            // curl_setopt($handler, CURLOPT_CAINFO,  getcwd().'/certs.pem');
-        }
+        curl_setopt($handler, CURLOPT_HTTPHEADER, [
+            'Connection: keep-alive'
+        ]);
+        // curl_setopt($handler, CURLOPT_FORBID_REUSE, true);
 
         $username = $this->ReadPropertyString("Username");
         $password = $this->ReadPropertyString("Password");
 
         if ($username and $password) {
             curl_setopt($handler, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST | CURLAUTH_BASIC);
-            curl_setopt($handler, CURLOPT_USERPWD, $username . ":" . $password);
+            curl_setopt($handler, CURLOPT_USERNAME, $username);
+            curl_setopt($handler, CURLOPT_PASSWORD, $password);
             $this->SendDebug("INFO", print_r("Phone WUI needs authentication", true), 0);
             $this->SendDebug("INFO", print_r("Credentials: $username $password", true), 0);
         }
 
-        $response = curl_exec($handler);
-        curl_close($handler);
-
-        return $response;
-    }
-
-    public function getHttpResponseMessage(): string
-    {
-        $protocol = $this->ReadPropertyString("Protocol");
-        $phone_ip = $this->ReadPropertyString("PhoneIP");
-        $url = "$protocol://$phone_ip";
-
-        $handler = curl_init();
-        curl_setopt($handler, CURLOPT_URL, $url);
-        curl_setopt($handler, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS | CURLPROTO_HTTP);
-        curl_setopt($handler, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($handler, CURLOPT_HEADER, 1);
-
-        $username = $this->ReadPropertyString("Username");
-        $password = $this->ReadPropertyString("Password");
-
-        if ($username and $password) {
-            curl_setopt($handler, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST | CURLAUTH_BASIC);
-            curl_setopt($handler, CURLOPT_USERPWD, $username . ":" . $password);
-            $this->SendDebug("INFO", print_r("Phone WUI needs authentication", true), 0);
-        }
         if ($protocol === "https") {
             curl_setopt($handler, CURLOPT_SSL_VERIFYHOST, 0); 
             curl_setopt($handler, CURLOPT_SSL_VERIFYPEER, false);
-            // curl_setopt($handler, CURLOPT_CAINFO,  getcwd().'/certs.pem');
         }
 
         $response = curl_exec($handler);
-        $message = "Curl handle error";
-        $curl_errno = curl_errno($handler);
+        $this->SendDebug("danach", print_r($url, true), 0);
 
-        if (!$curl_errno) {
-            switch ($http_code = curl_getinfo($handler, CURLINFO_HTTP_CODE)) {
-                case 200:
-                    $isSnomD8xx = str_contains($response, "<title>Phone Manager</title>");
-                    $loginFailed = str_contains($response, "Login failed!");
-                    if ($isSnomD8xx) {
-                        $message = "Snom D8xx not supported. HTTP $http_code";
-                    } elseif ($loginFailed) {
-                        $message = "Login failed";
-                    } else {
-                        $message = "$http_code $response";
-                    }
-                    break;
-                case 303:
-                    $message = "Snom M900 not supported. HTTP $http_code";
-                    break;
-                case 401:
-                    $message = "$http_code";
-                    break;
-                default:
-                    $message = "$http_code";
+        if ($return_message) {
+            $curl_errno = curl_errno($handler);
+            $message = "Curl handle error";
+    
+            if (!$curl_errno) {
+                switch ($http_code = curl_getinfo($handler, CURLINFO_HTTP_CODE)) {
+                    case 200:
+                        $isSnomD8xx = str_contains($response, "<title>Phone Manager</title>");
+                        $loginFailed = str_contains($response, "Login failed!");
+                        if ($isSnomD8xx) {
+                            $message = "Snom D8xx not supported. HTTP $http_code";
+                        } elseif ($loginFailed) {
+                            $message = "Login failed";
+                        } else {
+                            $message = "$http_code $response";
+                        }
+                        break;
+                    case 303:
+                        $message = "Snom M900 not supported. HTTP $http_code";
+                        break;
+                    case 401:
+                        $message = "$http_code";
+                        break;
+                    default:
+                        $message = "$http_code";
+                }
+            } else {
+                $message =  "Curl error " . curl_errno($handler) . " " . curl_error($handler) . " HTTP " . curl_getinfo($handler, CURLINFO_HTTP_CODE);
             }
-        } else {
-            $message =  "Curl error " . curl_errno($handler) . " " . curl_error($handler);
-        }
 
+            curl_close($handler);
+
+            return $message;
+        }
         curl_close($handler);
 
-        return $message;
+        return $response;
     }
 
     public function UpdateForm(array $FkeysSettings, bool $recvOnly, bool $StatusVariable): string
