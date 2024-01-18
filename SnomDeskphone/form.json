@@ -31,7 +31,7 @@
                 },
                 {
                     "type": "Button",
-                    "caption": "Ping",
+                    "caption": "Reachable?",
                     "onClick": "SNMD_PingPhone($id, $PhoneIP);"
                 },
                 {

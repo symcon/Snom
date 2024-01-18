@@ -429,7 +429,13 @@ class SnomDeskphone extends IPSModuleStrict
                         $message = "$http_code";
                 }
             } else {
-                $message = "Curl error " . curl_errno($handler) . " " . curl_error($handler) . " HTTP " . curl_getinfo($handler, CURLINFO_HTTP_CODE);
+                switch (curl_errno($handler)) {
+                    case 7:
+                        $message = "Accepts your Snom phone HTTP or HTTPS?\n" . curl_error($handler);
+                        break;
+                    default:
+                        $message = curl_error($handler) . "\n(Curl error " . curl_errno($handler) . " " .  " HTTP: " . curl_getinfo($handler, CURLINFO_HTTP_CODE) . ")";
+                }
             }
 
             curl_close($handler);
