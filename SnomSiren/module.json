@@ -1,0 +1,15 @@
+{
+	"id": "{B6C76CF8-12ED-D6D2-3781-08D3FC609C6D}",
+	"name": "SnomSiren",
+	"type": 3,
+	"vendor": "",
+	"aliases": 
+	[
+		"Snom (Siren)"
+	],
+	"url": "https://www.snom.com/",
+	"parentRequirements": [],
+	"childRequirements": [],
+	"implemented": [],
+	"prefix": "SNOM"
+}
