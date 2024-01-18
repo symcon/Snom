@@ -5,10 +5,12 @@ Librarary for integrating [Snom IP phones](https://www.snom.com/en/products/) in
 Different building automation systems (e.g. [KNX](https://www.knx.org/knx-en/for-your-home/benefits/end-customers/), [Modbus](https://modbus.org/about_us.php), [Shelly](https://www.shelly.com/en)), applications (e.g. Spotify) or even your Tesla car can be controlled or monitored from your Snom IP phone.
 
 ## Requirements
-The [SymconOS](https://www.symcon.de/en/downloads/) must run in one of this devices:
-- [Symbox](https://www.symcon.de/en/shop/symbox/)
-- Linux machine (Debian based)
-- Windows machine
+[IP-Symcon](https://www.symcon.de/en/downloads/) must run on one of this devices:
+- [SymBox](https://www.symcon.de/en/shop/symbox/)
+- Linux (Debian based)
+- Docker
+- MacOS
+- Windows
 
 ## Limitations
 - Supported Snom devices: [Snom D335](https://www.snom.com/de/produkte/tischtelefone/d3xx/snom-d335/), [Snom D385](https://www.snom.com/de/produkte/tischtelefone/d3xx/snom-d385/), [Snom D735](https://www.snom.com/de/produkte/tischtelefone/d7xx/snom-d735/), [Snom D785](https://www.snom.com/de/produkte/tischtelefone/d7xx/snom-d785/)
