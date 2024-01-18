@@ -386,7 +386,7 @@ class SnomDeskphone extends IPSModuleStrict
         curl_setopt($handler, CURLOPT_HEADER, $headerOutput);
         curl_setopt($handler, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($handler, CURLOPT_HTTPHEADER, [
-            'Connection: keep-alive'
+            'Connection: Close'
         ]);
         // curl_setopt($handler, CURLOPT_FORBID_REUSE, true);
 
