@@ -307,7 +307,7 @@ class SnomDeskphone extends IPSModuleStrict
     {
         $mac_address = $this->getMacAddress();
 
-        if (str_contains($mac_address, '00:04:13:')) {
+        if (str_contains($mac_address, '00:04:13:') or str_contains($mac_address, '0:4:13:')) { // for MacOS '0:4:13:'
             $phone_ip = $this->ReadPropertyString("PhoneIP");
             $protocol = $this->ReadPropertyString("Protocol");
             $url = "$protocol://$phone_ip/settings.xml";
