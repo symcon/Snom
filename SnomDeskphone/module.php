@@ -247,7 +247,7 @@ class SnomDeskphone extends IPSModuleStrict
             $data["elements"][6]["enabled"] = false;
             $data["elements"][7]["visible"] = false;
         } elseif ($device_info['is snom phone']) {
-            $isFullMacAddress = strlen($device_info["mac address"]) === 17;
+            $isFullMacAddress = substr_count($device_info["mac address"], ':')  === 5;
             $phone_ip = $this->ReadPropertyString("PhoneIP");
             $protocol = $this->ReadPropertyString("Protocol");
             $url = "$protocol://$phone_ip";
