@@ -2,7 +2,9 @@
     "translations": {
         "de": { 
             "Configure Snom IP phone": "Snom IP Phone Konfiguration",
+            "Protocol": "Protokoll",
             "IP address": "IP Addresse",
+            "Reachable?": "Erreichbar?",
             "MAC address": "MAC Addresse",
             "Phone model": "Telefon Typ",
             "Local IP address": "Lokale IP Adresse",
@@ -26,7 +28,9 @@
         },
         "de_DE": { 
             "Configure Snom IP phone": "Snom IP Phone Konfiguration",
+            "Protocol": "Protokoll",
             "IP address": "IP Addresse",
+            "Reachable?": "Erreichbar?",
             "MAC address": "MAC Addresse",
             "Phone model": "Telefon Typ",
             "Local IP address": "Lokale IP Addresse",
