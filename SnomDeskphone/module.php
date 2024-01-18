@@ -18,11 +18,6 @@ class SnomDeskphone extends IPSModuleStrict
         $this->RegisterPropertyString("FkeysSettings", "[]");
     }
 
-    // public function ApplyChanges(): void
-    // {
-    //     parent::ApplyChanges();
-    // }
-
     public function instanceIpExists(): bool
     {
         $phone_ip = $this->ReadPropertyString('PhoneIP');
@@ -79,14 +74,12 @@ class SnomDeskphone extends IPSModuleStrict
                 "&color=" . $data["color"]
             );
             $RenderRemoteUrl = sprintf("$protocol://%s/minibrowser.htm?url=%s", $this->ReadPropertyString("PhoneIP"), $hookParameters);
-            $this->SendDebug("http", print_r("sending $RenderRemoteUrl", true), 0);
             $this->httpGetRequest($RenderRemoteUrl);
-            $this->SendDebug("http", print_r("sent $RenderRemoteUrl", true), 0);
         }
     }
 
     /**
-     * This function will be called by the hook control. Visibility should be protected!
+     * Visibility of functions called by the hook control should be protected!
      */
     protected function ProcessHookData(): void
     {
@@ -99,7 +92,7 @@ class SnomDeskphone extends IPSModuleStrict
         $this->SendDebug("HOOK", print_r("Hook data processed", true), 0);
     }
 
-    private function UpdatePhonesStatusLed(array $requestParameters): void
+    protected function UpdatePhonesStatusLed(array $requestParameters): void
     {
         $ledValue = ($requestParameters["color"] === "none") ? "Off" : "On";
         $variableId = $requestParameters["variableId"];
@@ -107,10 +100,10 @@ class SnomDeskphone extends IPSModuleStrict
         $text = $variableId . " = " . $value;
         header("Content-Type: text/xml");
         $xml = $this->GetIPPhoneTextItem($text, $ledValue, $requestParameters["ledNo"], $requestParameters["color"]);
-        $this->SendDebug("STATUS LED", print_r($xml, true), 0);
+        $this->SendDebug("SNOM MB", print_r($xml, true), 0);
         echo $xml;
     }
-    private function GetIPPhoneTextItem(string $text, string $ledValue, int $ledNo, string $color, int $timeout = 1): string
+    protected function GetIPPhoneTextItem(string $text, string $ledValue, int $ledNo, string $color, int $timeout = 1): string
     {
         $xml = new DOMDocument('1.0', 'UTF-8');
         $xml->formatOutput = true;
@@ -141,7 +134,7 @@ class SnomDeskphone extends IPSModuleStrict
         return $xml->saveXML();
     }
 
-    private function ExecuteAction(string $action): void
+    protected function ExecuteAction(string $action): void
     {
         $action = json_decode($action, true);
         $parameters = $action['parameters'];
@@ -287,12 +280,12 @@ class SnomDeskphone extends IPSModuleStrict
             } else {
                 $this->SetSummary($phone_ip);
                 $needs_credentials = $this->ReadPropertyString("Username") and $this->ReadPropertyString("Password");
-            
+
                 if ($needs_credentials) {
                     $data["elements"][2]["items"][2]["visible"] = true;
                     $data["elements"][2]["items"][3]["visible"] = true;
                 }
-                
+
                 $data["elements"][2]["items"][4]["visible"] = false;
                 $data["elements"][5]["enabled"] = true;
                 $data["elements"][6]["visible"] = true;
@@ -347,7 +340,7 @@ class SnomDeskphone extends IPSModuleStrict
         }
     }
 
-    public function getMacAddress(): string 
+    public function getMacAddress(): string
     {
         $mac_address = "none";
         $phone_ip = $this->ReadPropertyString("PhoneIP");
@@ -375,8 +368,6 @@ class SnomDeskphone extends IPSModuleStrict
 
     public function httpGetRequest(string $url, bool $return_message = false, bool $headerOutput = true): bool|string
     {
-        $this->SendDebug("davor", print_r($url, true), 0);
-
         $protocol = $this->ReadPropertyString("Protocol");
         $this->SendDebug("url", print_r($url, true), 0);
 
@@ -386,7 +377,7 @@ class SnomDeskphone extends IPSModuleStrict
         curl_setopt($handler, CURLOPT_HEADER, $headerOutput);
         curl_setopt($handler, CURLOPT_RETURNTRANSFER, true);
 
-        // minibrowser.htm will delay 8 seconds if we send this header
+        // Workaround: minibrowser.htm will delay 8 seconds if we send this header
         // but we need this header for all other requests. Otherwise,
         // we will get curl error code 52 -> no relpy
         if (!str_contains($url, "minibrowser.htm")) {
@@ -402,22 +393,19 @@ class SnomDeskphone extends IPSModuleStrict
             curl_setopt($handler, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST | CURLAUTH_BASIC);
             curl_setopt($handler, CURLOPT_USERNAME, $username);
             curl_setopt($handler, CURLOPT_PASSWORD, $password);
-            $this->SendDebug("INFO", print_r("Phone WUI needs authentication", true), 0);
-            $this->SendDebug("INFO", print_r("Credentials: $username $password", true), 0);
         }
 
         if ($protocol === "https") {
-            curl_setopt($handler, CURLOPT_SSL_VERIFYHOST, 0); 
+            curl_setopt($handler, CURLOPT_SSL_VERIFYHOST, 0);
             curl_setopt($handler, CURLOPT_SSL_VERIFYPEER, false);
         }
 
         $response = curl_exec($handler);
-        $this->SendDebug("danach", print_r($url, true), 0);
 
         if ($return_message) {
             $curl_errno = curl_errno($handler);
             $message = "Curl handle error";
-    
+
             if (!$curl_errno) {
                 switch ($http_code = curl_getinfo($handler, CURLINFO_HTTP_CODE)) {
                     case 200:
@@ -441,7 +429,7 @@ class SnomDeskphone extends IPSModuleStrict
                         $message = "$http_code";
                 }
             } else {
-                $message =  "Curl error " . curl_errno($handler) . " " . curl_error($handler) . " HTTP " . curl_getinfo($handler, CURLINFO_HTTP_CODE);
+                $message = "Curl error " . curl_errno($handler) . " " . curl_error($handler) . " HTTP " . curl_getinfo($handler, CURLINFO_HTTP_CODE);
             }
 
             curl_close($handler);
@@ -556,5 +544,5 @@ class SnomDeskphone extends IPSModuleStrict
         return $options;
     }
 
-    // has_expanstion_module()
+    // TODO:has_expanstion_module()
 }
