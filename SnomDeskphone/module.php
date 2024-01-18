@@ -385,10 +385,15 @@ class SnomDeskphone extends IPSModuleStrict
         curl_setopt($handler, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS | CURLPROTO_HTTP);
         curl_setopt($handler, CURLOPT_HEADER, $headerOutput);
         curl_setopt($handler, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($handler, CURLOPT_HTTPHEADER, [
-            'Connection: Close'
-        ]);
-        // curl_setopt($handler, CURLOPT_FORBID_REUSE, true);
+
+        // minibrowser.htm will delay 8 seconds if we send this header
+        // but we need this header for all other requests. Otherwise,
+        // we will get curl error code 52 -> no relpy
+        if (!str_contains($url, "minibrowser.htm")) {
+            curl_setopt($handler, CURLOPT_HTTPHEADER, [
+                'Connection: keep-alive',
+            ]);
+        }
 
         $username = $this->ReadPropertyString("Username");
         $password = $this->ReadPropertyString("Password");
