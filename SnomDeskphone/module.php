@@ -275,6 +275,13 @@ class SnomDeskphone extends IPSModuleStrict
                 $data["elements"][6]["visible"] = false;
             } else {
                 $this->SetSummary($phone_ip);
+                $needs_credentials = $this->ReadPropertyString("Username") and $this->ReadPropertyString("Password");
+            
+                if ($needs_credentials) {
+                    $data["elements"][1]["items"][2]["visible"] = true;
+                    $data["elements"][1]["items"][3]["visible"] = true;
+                }
+                
                 $data["elements"][1]["items"][4]["visible"] = false;
                 $data["elements"][5]["enabled"] = true;
                 $data["elements"][6]["visible"] = true;
