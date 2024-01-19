@@ -1,6 +1,6 @@
 # Snom Symcon library
 ## Description
-Librarary for integrating [Snom IP phones](https://www.snom.com/en/products/) in the [Symcon](https://www.symcon.de/en/product/) building automation ecosystem.  
+Librarary for integrating [Snom IP phones](https://www.snom.com/en/products/) in the [Symcon](https://www.symcon.de/en/product/) building automation ecosystem.
 
 Different building automation systems (e.g. [KNX](https://www.knx.org/knx-en/for-your-home/benefits/end-customers/), [Modbus](https://modbus.org/about_us.php), [Shelly](https://www.shelly.com/en)), applications (e.g. Spotify) or even your Tesla car can be controlled or monitored from your Snom IP phone.
 
@@ -17,10 +17,10 @@ Different building automation systems (e.g. [KNX](https://www.knx.org/knx-en/for
 - Only boolean variables supported (on/off)
 
 ## Library modules
-- [Snom (Deskphone)](https://github.com/symcon/Snom/tree/main/SnomDeskphone)  
+- [Snom (Deskphone)](https://github.com/symcon/Snom/tree/main/SnomDeskphone)
 
 ```
-Maintainer: Simón Golpe Varela  
+Maintainer: Simón Golpe Varela
 Support: simon.golpe@snom.com
-Last update: December 2023
+Last update: January 2024
 ```

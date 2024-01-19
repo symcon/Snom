@@ -1,39 +1,64 @@
 <?php
 
 /**
- * Utilities for Snom XML minibrowser https://service.snom.com/display/wiki/XML+Definitions
+ * Utilities for Snom XML minibrowser https://service.snom.com/display/wiki/XML+Minibrowser
  */
 class SnomXmlMinibrowser
 {
+    /**
+     * Returns an XML with an SnomIPPhonetext lement as content https://service.snom.com/display/wiki/SnomIPPhoneText
+     */
+
+    // main tags
+    const SNOM_IP_PHONE_TEXT = "SnomIPPhoneText";
+
+    // main subtags
+    const LED = "LED";
+    const FETCH = "fetch";
+    const TEXT = "Text";
+
+    // main attributes
+    const NUMBER = "number";
+    const COLOR = "color";
+    const MIL = "mil";
+
     public static function getSnomIPPhoneTextElement(array $xmlAttributes, int $timeout = 1): string
     {
-        $ledValue = ($xmlAttributes["color"] === "none") ? "Off" : "On";
-
         $xml = new DOMDocument('1.0', 'UTF-8');
         $xml->formatOutput = true;
-        $xmlRoot = $xml->appendChild($xml->createElement("SnomIPPhoneText"));
+
+        // snomIpPhoneText tag
+        $ipPhoneTextElement = $xml->createElement(self::SNOM_IP_PHONE_TEXT);
+        $xmlRoot = $xml->appendChild($ipPhoneTextElement);
 
         //text tag
         $textToDisplay = $xmlAttributes["variableId"] . " = " . $xmlAttributes["value"];
-        $xmlRoot->appendChild($xml->createElement('Text', $textToDisplay));
+        $textElement = $xml->createElement(self::TEXT, $textToDisplay);
+        $xmlRoot->appendChild($textElement);
+
 
         //led tag
-        $led = $xml->createElement('LED', $ledValue);
-        $ledNumber = $xml->createAttribute('number');
+        $ledValue = ($xmlAttributes["color"] === "none") ? "Off" : "On";
+        $ledElement = $xml->createElement(self::LED, $ledValue);
+
+        $ledNumber = $xml->createAttribute(self::NUMBER);
         $ledNumber->value = $xmlAttributes["ledNo"];
-        $led->appendChild($ledNumber);
-        $ledColor = $xml->createAttribute('color');
+        $ledElement->appendChild($ledNumber);
+
+        $ledColor = $xml->createAttribute(self::COLOR);
         $ledColor->value = $xmlAttributes["color"];
-        $led->appendChild($ledColor);
-        $xmlRoot->appendChild($led);
+        $ledElement->appendChild($ledColor);
+
+        $xmlRoot->appendChild($ledElement);
 
         //fetch tag
-        $fetch = $xml->createElement('fetch', 'snom://mb_exit');
-        $fetchTimeout = $xml->createAttribute('mil');
-        $timeout = 1;
+        $fetchElement = $xml->createElement(self::FETCH, 'snom://mb_exit');
+
+        $fetchTimeout = $xml->createAttribute(self::MIL);
         $fetchTimeout->value = $timeout;
-        $fetch->appendChild($fetchTimeout);
-        $xmlRoot->appendChild($fetch);
+        $fetchElement->appendChild($fetchTimeout);
+
+        $xmlRoot->appendChild($fetchElement);
 
         $xml->format_output = TRUE;
 
