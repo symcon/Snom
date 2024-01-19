@@ -166,7 +166,7 @@
                 },
                 {
                     "caption": "Functionality",
-                    "name": "RecieveOnly",
+                    "name": "UpdateLEDonly",
                     "width": "100px",
                     "visible": false,
                     "add": false,
@@ -276,7 +276,7 @@
                 },
                 {
                     "type": "Select",
-                    "name": "RecieveOnly",
+                    "name": "UpdateLEDonly",
                     "caption": "Functionality",
                     "options": [
                         {
@@ -288,7 +288,7 @@
                             "value": false
                         }
                     ],
-                    "onChange": "SNMD_setFkeyFunctionality($id, $RecieveOnly);"
+                    "onChange": "SNMD_setFkeyFunctionality($id, $UpdateLEDonly);"
                 },
                 {
                     "type": "SelectVariable",
