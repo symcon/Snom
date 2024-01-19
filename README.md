@@ -15,7 +15,7 @@ The [SymconOS](https://www.symcon.de/en/downloads/) must run in one of this devi
 - Only boolean variables supported (on/off)
 
 ## Library modules
-- [Snom (Deskphone)](https://gitlab.com/simon.golpe/snom_symcon/-/blob/main/SnomDeskphone/README.md)  
+- [Snom (Deskphone)](https://github.com/symcon/Snom/tree/main/SnomDeskphone)  
 
 ```
 Maintainer: Simón Golpe Varela  
