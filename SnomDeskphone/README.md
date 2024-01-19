@@ -21,7 +21,7 @@ Give it a meaningful name, e.g., "Snom (Deskphone) D785 office" and click "OK"
 ```
 Warning: For the configuration process, the phone must be connected in the same network as IP-Symcon
 ```
-1. Type the IP address of the phone to be configured and press the button "Ping" to check if the phone is reachable
+1. Type the IP address of the phone to be configured and press the button "Reachable?" to check if the phone is reachable
 2. Apply the changes
 3. If the phone web user interface is protected with credentials, you will be asked for typing them in.  
 After doing it, apply the changes again
