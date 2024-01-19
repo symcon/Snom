@@ -1,6 +1,7 @@
 <?php
 
 require_once("phoneProperties.php");
+require_once("minibrowser.php");
 
 class SnomDeskphone extends IPSModuleStrict
 {
@@ -37,11 +38,15 @@ class SnomDeskphone extends IPSModuleStrict
     public function MessageSink(int $TimeStamp, int $SenderID, int $Message, array $Data): void
     {
         $fkeysSettings = json_decode($this->ReadPropertyString("FkeysSettings"), true);
-        $fkeysToUpdate = $this->GetFkeysToUpdate($fkeysSettings, $SenderID, $Data);
-        $this->UpdateFkeys($fkeysToUpdate, $SenderID, $Data);
+        $fkeysToUpdate = $this->getFkeysToUpdate($fkeysSettings, $SenderID, $Data);
+        $urls = $this->getUrls($fkeysToUpdate, $SenderID, $Data);
+
+        foreach ($urls as $url) {
+            $this->httpGetRequest($url);
+        }
     }
 
-    protected function GetFkeysToUpdate(array $fkeysSettings, int $SenderID, array $SenderData): array
+    protected function getFkeysToUpdate(array $fkeysSettings, int $SenderID, array $SenderData): array
     {
         $fkeysToUpdate = array();
 
@@ -59,23 +64,27 @@ class SnomDeskphone extends IPSModuleStrict
         return $fkeysToUpdate;
     }
 
-    protected function UpdateFkeys(array $fkeysToUpdate, int $SenderID, array $Data): void
+
+    // build minibrowser url
+    protected function getUrls(array $fkeysToUpdate, int $SenderID, array $Data): array
     {
-        $this->SendDebug("fkeys update", print_r("Updating fkeys...", true), 0);
         $protocol = $this->ReadPropertyString("Protocol");
         $instanceHook = sprintf("http://%s:3777/hook/snom/%d/", $this->ReadPropertyString("LocalIP"), $this->InstanceID);
+        $urls = array();
 
         foreach ($fkeysToUpdate as $data) {
             $hookParameters = urlencode(
                 $instanceHook .
-                "?xml=true&variableId=" . $SenderID .
+                "?xml=true&variableId=" . $SenderID . // TODO: rename xml parameter to something meaningful
                 "&value=" . (int) $Data[0] .
                 "&ledNo=" . $data["ledNo"] .
                 "&color=" . $data["color"]
             );
-            $RenderRemoteUrl = sprintf("$protocol://%s/minibrowser.htm?url=%s", $this->ReadPropertyString("PhoneIP"), $hookParameters);
-            $this->httpGetRequest($RenderRemoteUrl);
+            $url = sprintf("$protocol://%s/minibrowser.htm?url=%s", $this->ReadPropertyString("PhoneIP"), $hookParameters);
+            array_push($urls, $url);
         }
+
+        return $urls;
     }
 
     /**
@@ -83,62 +92,14 @@ class SnomDeskphone extends IPSModuleStrict
      */
     protected function ProcessHookData(): void
     {
-        $this->SendDebug("HOOK", print_r("Processing hook data...", true), 0);
         if (filter_var($_GET["xml"], FILTER_VALIDATE_BOOLEAN)) {
-            $this->UpdatePhonesStatusLed($_GET);
+            $snomIPPhoneTextElement = SnomXmlMinibrowser::getSnomIPPhoneTextElement($_GET);
+            $this->SendDebug("SNOM XML", print_r($snomIPPhoneTextElement, true), 0);
+            SnomXmlMinibrowser::executeXml($snomIPPhoneTextElement);
         } else {
-            $this->ExecuteAction($_GET["value"]);
+            $action = json_decode($_GET["value"], true);
+            IPS_RunAction($action['actionID'], $action['parameters']);
         }
-        $this->SendDebug("HOOK", print_r("Hook data processed", true), 0);
-    }
-
-    protected function UpdatePhonesStatusLed(array $requestParameters): void
-    {
-        $ledValue = ($requestParameters["color"] === "none") ? "Off" : "On";
-        $variableId = $requestParameters["variableId"];
-        $value = $requestParameters["value"];
-        $text = $variableId . " = " . $value;
-        header("Content-Type: text/xml");
-        $xml = $this->GetIPPhoneTextItem($text, $ledValue, $requestParameters["ledNo"], $requestParameters["color"]);
-        $this->SendDebug("SNOM MB", print_r($xml, true), 0);
-        echo $xml;
-    }
-    protected function GetIPPhoneTextItem(string $text, string $ledValue, int $ledNo, string $color, int $timeout = 1): string
-    {
-        $xml = new DOMDocument('1.0', 'UTF-8');
-        $xml->formatOutput = true;
-        $xmlRoot = $xml->appendChild($xml->createElement("SnomIPPhoneText"));
-
-        //text tag
-        $xmlRoot->appendChild($xml->createElement('Text', $text));
-
-        //led tag
-        $led = $xml->createElement('LED', $ledValue);
-        $ledNumber = $xml->createAttribute('number');
-        $ledNumber->value = $ledNo;
-        $led->appendChild($ledNumber);
-        $ledColor = $xml->createAttribute('color');
-        $ledColor->value = $color;
-        $led->appendChild($ledColor);
-        $xmlRoot->appendChild($led);
-
-        //fetch tag
-        $fetch = $xml->createElement('fetch', 'snom://mb_exit');
-        $fetchTimeout = $xml->createAttribute('mil');
-        $fetchTimeout->value = $timeout;
-        $fetch->appendChild($fetchTimeout);
-        $xmlRoot->appendChild($fetch);
-
-        $xml->format_output = TRUE;
-
-        return $xml->saveXML();
-    }
-
-    protected function ExecuteAction(string $action): void
-    {
-        $action = json_decode($action, true);
-        $parameters = $action['parameters'];
-        IPS_RunAction($action['actionID'], $parameters);
     }
 
     public function PingPhone(string $phone_ip): void
@@ -184,7 +145,7 @@ class SnomDeskphone extends IPSModuleStrict
                 $this->RegisterMessage($fkeySettings["ActionVariableId"], VM_UPDATE);
             }
 
-            // Move this if/else to a separated method
+            // TODO: Move this if/else to a separated method
             if ($fkeySettings["UpdateLEDonly"]) {
                 $fkeyValue = urlencode("none");
             } else {
@@ -202,7 +163,7 @@ class SnomDeskphone extends IPSModuleStrict
             $phoneIp = $this->ReadPropertyString("PhoneIP");
             $baseUrl = sprintf("$protocol://%s/dummy.htm?", $phoneIp);
             $url = sprintf("%s%s", $baseUrl, $urlQuery);
-            $this->httpGetRequest($url);
+            $this->httpGetRequest($url); // TODO: execute the urls outside of this method (SRP)
         }
     }
 
