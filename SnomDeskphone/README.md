@@ -1,12 +1,17 @@
 # Snom (Deskphone) Symcon module
 ## Description
+
 This module is part of the [Snom Symcon library](https://github.com/symcon/Snom/tree/main).  
-After configurating an instance of this module, the user of the Snom deskphone can control and visualize end devices of an automation system integrated in the SymconOS.  
+After configurating an instance of this module, the user of the Snom deskphone can control and visualize end devices of an automation system integrated in IP-Symcon.  
+
 Pressing a function key of the Deskphone the user can, for example, control the lights, doors or blinds of a KNX system.  
 The LEDS of the function keys can be used for visualizing the status of the different parts of a facility, for example, an LED on the phone turns red if an alarm is triggered.  
 
+## Installing through the Module Store
+Before being able to use the Snom module, it needs to be installed through the [Module Store](https://www.symcon.de/en/service/documentation/components/management-console/module-store/). The module can be found by searching for "Snom".
+
 ## Creating a Snom Deskphone instance
-1. Navigate to the [management console](https://www.symcon.de/en/service/documentation/components/management-console/) of the IP-Symcon server
+1. Navigate to the [Management Console](https://www.symcon.de/en/service/documentation/components/management-console/) of the IP-Symcon server
 2. Open the ["Object tree"](https://www.symcon.de/en/service/documentation/components/management-console/object-tree/)  
 3. Right click on the folder (Category) where you want to create the phone instance and click on "Add object" -> "Instance"
 4. Search for "snom" and select the instance "Snom (Deskphone)".  
@@ -14,9 +19,9 @@ Give it a meaningful name, e.g., "Snom (Deskphone) D785 office" and click "OK"
 
 ## Instance configuration
 ```
-Warning: For the configuration process, the phone must be connected in the same network as the SymconOS device
+Warning: For the configuration process, the phone must be connected in the same network as IP-Symcon
 ```
-1. Type the  IP address of the phone to be configured and press the button "Ping" to check if the phone is reachable
+1. Type the IP address of the phone to be configured and press the button "Reachable?" to check if the phone is reachable
 2. Apply the changes
 3. If the phone web user interface is protected with credentials, you will be asked for typing them in.  
 After doing it, apply the changes again
