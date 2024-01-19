@@ -30,9 +30,9 @@ After doing it, apply the changes again
 Warning: After adding function keys in the instance and applying the changes, the current settings for the edited function key(s) will be overwritten in the phone.  
 For checking the current settings before, click on the button "See current function keys settings"
 ```
-4. Click on "Add" for configuring a new function key  
+4. Click on "Add" for configuring a new function key.  
 A form with following elements will pop up:
->> - _Function key_: Function key to setup (P1...PXX)  
+>> - _Function key_: Function key to setup (P1...PXX)
 >> - _Label_: Text that will be displayed next to the selected function key
 >> - _Color for status on_: Color of the LED when the assigned status variable is turned to on
 >> - _Color for status off_: Color of the LED when the assigned status variable is turned to off
@@ -44,7 +44,6 @@ Each single function key can be configured for one of this two modi:
 >> - _Action_: Action to be triggered on the target variable (e.g. toggle)
 >> - _Use other variable for status LED_: If the status variable (LED color) must be different than the target variable (often in systems like KNX) turn this switch to on
 >> - _Status variable_: The color of the LED will change depending on the value of this variable
-    
 5. After filling in the form, press "OK"
 6. Add further function keys if needed
 7. Apply the changes (current settings for edited function keys will be on the phone overwritten)
@@ -53,7 +52,7 @@ Each single function key can be configured for one of this two modi:
 
 
 ```
-Maintainer: Simón Golpe Varela  
+Maintainer: Simón Golpe Varela
 Support: simon.golpe@snom.com
-Last update: December 2023
+Last update: January 2024
 ```
