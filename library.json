@@ -4,7 +4,7 @@
 	"name": "Snom",
 	"url": "https://www.snom.com/en/",
 	"compatibility": {
-		"version": 7.0
+		"version": "7.0"
 	},
 	"version": "1.0",
 	"build": 0,
