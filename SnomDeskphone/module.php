@@ -93,9 +93,9 @@ class SnomDeskphone extends IPSModuleStrict
     protected function ProcessHookData(): void
     {
         if (filter_var($_GET["xml"], FILTER_VALIDATE_BOOLEAN)) {
-            $snomIPPhoneTextElement = SnomXmlMinibrowser::getSnomIPPhoneTextElement($_GET);
-            $this->SendDebug("SNOM XML", print_r($snomIPPhoneTextElement, true), 0);
-            SnomXmlMinibrowser::executeXml($snomIPPhoneTextElement);
+            $xml = new SnomXmlMinibrowser($_GET);
+            $this->SendDebug("SNOM MINIBROWSER", print_r($xml->minibrowser, true), 0);
+            $xml->executeMinibrowser();
         } else {
             $action = json_decode($_GET["value"], true);
             IPS_RunAction($action['actionID'], $action['parameters']);
