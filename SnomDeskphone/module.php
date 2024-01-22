@@ -511,5 +511,12 @@ class SnomDeskphone extends IPSModuleStrict
         return $options;
     }
 
+    public function expansionModuleConnected(): bool
+    {
+        $expansionModuleConnected = false;
+
+        return $expansionModuleConnected;
+    }
+
     // TODO:has_expanstion_module()
 }
