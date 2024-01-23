@@ -1,6 +1,6 @@
 <?php
 
-class PhoneProperties
+class DeviceProperties
 {
     const FKEYS_NO = array(
         "" => 1,
@@ -10,6 +10,7 @@ class PhoneProperties
         "snomD785" => 24,
         "snomD862" => 32,
         "snomD865" => 40,
+        "snomD7C" => 48,
     );
 
     const HAS_SMART_LABEL = array(
@@ -19,6 +20,7 @@ class PhoneProperties
         "snomD785" => true,
         "snomD862" => false,
         "snomD865" => false,
+        "snomD7C" => false,
     );
 
     const FKEY_LED_OFFSET = array(
@@ -30,9 +32,19 @@ class PhoneProperties
         "snomD865" => 5,
     );
 
-    public static function getFkeysRange(string $phoneType): array
+    public static function getFkeysRange(string $phoneType, string $connectedExpansionModule): array
     {
-        return range(1, self::FKEYS_NO[$phoneType]);
+        $expansionFkeyRange = [];
+
+        if ($connectedExpansionModule) {
+            $start = self::FKEYS_NO[$phoneType] + 1;
+            $end = self::FKEYS_NO[$phoneType] + self::FKEYS_NO[$connectedExpansionModule];
+            $expansionFkeyRange = range($start, $end);
+        }
+
+        $phoneFkeyRange = range(1, self::FKEYS_NO[$phoneType]);
+
+        return array_merge($phoneFkeyRange, $expansionFkeyRange);
     }
 
     public static function hasSmartLabel(string $phoneType): bool

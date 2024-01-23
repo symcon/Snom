@@ -90,7 +90,7 @@
                 {
                     "caption": "Function key",
                     "name": "FkeyNo",
-                    "width": "100px",
+                    "width": "200px",
                     "align": "center",
                     "add": 0,
                     "edit": {
