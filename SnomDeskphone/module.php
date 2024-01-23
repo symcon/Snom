@@ -432,15 +432,7 @@ class SnomDeskphone extends IPSModuleStrict
 
         foreach ($fkeysRange as $fkeyNo) {
             if (!in_array($fkeyNo, $current_fkeys)) {
-                $phoneFkeysNo = DeviceProperties::FKEYS_NO[$phoneModel];
-                $caption = "P$fkeyNo (phone)";
-
-                if ($fkeyNo > $phoneFkeysNo) {
-                    $caption = strval($fkeyNo - $phoneFkeysNo) . " (expansion module)";
-                }
-
-                $option = ["caption" => $caption, "value" => $fkeyNo];
-
+                $option = $this->getSelectOption($fkeyNo);
                 array_push($options, $option);
             }
         }
@@ -478,18 +470,7 @@ class SnomDeskphone extends IPSModuleStrict
         if ($selected === -2) {
             echo "Invalid selected row $selected";
         } elseif ($selected != -1) {
-            $phoneModel = $this->GetValue("PhoneModel");
-            $fkeyOnEdit = $current_fkeys[$selected];
-
-            $phoneFkeysNo = DeviceProperties::FKEYS_NO[$phoneModel];
-            $caption = "P$fkeyOnEdit (phone)";
-
-            if ($fkeyOnEdit > $phoneFkeysNo) {
-                $caption = strval($fkeyOnEdit - $phoneFkeysNo) . " (expansion module)";
-            }
-
-            $option = ["caption" => $caption, "value" => $fkeyOnEdit];
-
+            $option = $this->getSelectOption($current_fkeys[$selected]);
             array_push($options, $option);
         }
 
@@ -525,19 +506,24 @@ class SnomDeskphone extends IPSModuleStrict
         $options = [];
 
         foreach ($fkeysRange as $fkeyNo) {
-            $phoneFkeysNo = DeviceProperties::FKEYS_NO[$phoneModel];
-            $caption = "P$fkeyNo (phone)";
-
-            if ($fkeyNo > $phoneFkeysNo) {
-                $caption = strval($fkeyNo - $phoneFkeysNo) . " (expansion module)";
-            }
-
-            $option = ["caption" => $caption, "value" => $fkeyNo];
-
+            $option = $this->getSelectOption($fkeyNo);
             array_push($options, $option);
         }
 
         return $options;
+    }
+
+    public function getSelectOption(int $fkeyNo): array
+    {
+        $phoneModel = $this->GetValue("PhoneModel");
+        $phoneFkeysNo = DeviceProperties::FKEYS_NO[$phoneModel];
+        $caption = "P$fkeyNo (phone)";
+
+        if ($fkeyNo > $phoneFkeysNo) {
+            $caption = strval($fkeyNo - $phoneFkeysNo) . " (expansion module)";
+        }
+
+        return ["caption" => $caption, "value" => $fkeyNo];
     }
 
     public function connectedExpansionModule(): string

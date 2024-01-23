@@ -13,7 +13,7 @@ Different building automation systems (e.g. [KNX](https://www.knx.org/knx-en/for
 - Windows
 
 ## Limitations
-- Supported Snom devices: [Snom D335](https://www.snom.com/de/produkte/tischtelefone/d3xx/snom-d335/), [Snom D385](https://www.snom.com/de/produkte/tischtelefone/d3xx/snom-d385/), [Snom D735](https://www.snom.com/de/produkte/tischtelefone/d7xx/snom-d735/), [Snom D785](https://www.snom.com/de/produkte/tischtelefone/d7xx/snom-d785/)
+- Supported Snom devices: [Snom D335](https://www.snom.com/de/produkte/tischtelefone/d3xx/snom-d335/), [Snom D385](https://www.snom.com/de/produkte/tischtelefone/d3xx/snom-d385/), [Snom D735](https://www.snom.com/de/produkte/tischtelefone/d7xx/snom-d735/), [Snom D785](https://www.snom.com/de/produkte/tischtelefone/d7xx/snom-d785/), [Snom D7C](https://www.snom.com/en/products/desk-phones/d7xx/snom-d7c/)
 - Only boolean variables supported (on/off)
 
 ## Library modules
