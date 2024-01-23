@@ -536,8 +536,6 @@ class SnomDeskphone extends IPSModuleStrict
 
         if (str_contains($phoneInfo, "D7C")) {
             $connectedExpansionModule = "snomD7C";
-        } else {
-            echo "$phoneIp has no D7C connected: $url";
         }
 
         return $connectedExpansionModule;
