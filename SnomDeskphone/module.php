@@ -502,7 +502,8 @@ class SnomDeskphone extends IPSModuleStrict
     {
         $phoneModel = $this->GetValue("PhoneModel");
         $expansionModule = $this->connectedExpansionModule();
-        $fkeysRange = DeviceProperties::getFkeysRange($phoneModel, $expansionModule);
+        // $fkeysRange = DeviceProperties::getFkeysRange($phoneModel, $expansionModule);
+        $fkeysRange = range(1, 176);
         $options = [];
 
         foreach ($fkeysRange as $fkeyNo) {
