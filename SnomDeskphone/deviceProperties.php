@@ -42,10 +42,7 @@ class DeviceProperties
         $expansionFkeyRange = [];
 
         if ($connectedExpansionModule) {
-            if ($phoneType === "snomD335") {
-                $start = self::FKEYS_NO[$phoneType] + 101;
-                $end = self::FKEYS_NO[$phoneType] + 100 + self::FKEYS_NO[$connectedExpansionModule];
-            } elseif ($phoneType === "snomD385") {
+            if ($phoneType === "snomD385") {
                 $start = self::FKEYS_NO[$phoneType] + 127;
                 $end = self::FKEYS_NO[$phoneType] + 126 + self::FKEYS_NO[$connectedExpansionModule];
             } else {

@@ -520,9 +520,7 @@ class SnomDeskphone extends IPSModuleStrict
         $caption = "P$fkeyNo (phone)";
 
         if ($fkeyNo > $phoneFkeysNo) {
-            if ($phoneModel === "snomD335") {
-                $caption = strval($fkeyNo - $phoneFkeysNo - 100) . " (expansion module)";
-            } elseif ($phoneModel === "snomD385") {
+            if ($phoneModel === "snomD385") {
                 $caption = strval($fkeyNo - $phoneFkeysNo - 126) . " (expansion module)";
             } else {
                 $caption = strval($fkeyNo - $phoneFkeysNo) . " (expansion module)";
