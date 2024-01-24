@@ -520,7 +520,13 @@ class SnomDeskphone extends IPSModuleStrict
         $caption = "P$fkeyNo (phone)";
 
         if ($fkeyNo > $phoneFkeysNo) {
-            $caption = strval($fkeyNo - $phoneFkeysNo) . " (expansion module)";
+            if ($phoneModel === "snomD335") {
+                $caption = strval($fkeyNo - $phoneFkeysNo - 100) . " (expansion module)";
+            } elseif ($phoneModel === "snomD385") {
+                $caption = strval($fkeyNo - $phoneFkeysNo - 126) . " (expansion module)";
+            } else {
+                $caption = strval($fkeyNo - $phoneFkeysNo) . " (expansion module)";
+            }
         }
 
         return ["caption" => $caption, "value" => $fkeyNo];
@@ -533,9 +539,13 @@ class SnomDeskphone extends IPSModuleStrict
         $protocol = $this->ReadPropertyString("Protocol");
         $url = "$protocol://$phoneIp/info.htm";
         $phoneInfo = $this->httpGetRequest($url);
+        $expansionModules = DeviceProperties::EXPANSION_MODULES;
 
-        if (str_contains($phoneInfo, "D7C")) {
-            $connectedExpansionModule = "snomD7C";
+        foreach ($expansionModules as $expansionModel) {
+            if (str_contains($phoneInfo, "$expansionModel ")) {
+                $connectedExpansionModule = "snom$expansionModel";
+                break;
+            }
         }
 
         return $connectedExpansionModule;
