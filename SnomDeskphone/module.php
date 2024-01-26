@@ -1,6 +1,6 @@
 <?php
 
-require_once("phoneProperties.php");
+require_once("deviceProperties.php");
 require_once("minibrowser.php");
 
 class SnomDeskphone extends IPSModuleStrict
@@ -54,8 +54,9 @@ class SnomDeskphone extends IPSModuleStrict
             if ($settings["StatusVariableId"] == $SenderID) {
                 $fkeyNo = (int) $settings["FkeyNo"] - 1;
                 $SenderValue = $SenderData[0] ? "On" : "Off";
+                $phoneModel = $this->GetValue("PhoneModel");
                 $fkeysToUpdate[$fkeyNo] = array(
-                    "ledNo" => PhoneProperties::getFkeyLedNo($this->GetValue("PhoneModel"), $fkeyNo),
+                    "ledNo" => DeviceProperties::getFkeyLedNo($phoneModel, $fkeyNo),
                     "color" => $settings["FkeyColor" . $SenderValue]
                 );
             }
@@ -156,7 +157,7 @@ class SnomDeskphone extends IPSModuleStrict
 
             $urlQuery = sprintf("settings=save&store_settings=save&fkey%d=%s&fkey_label%d=%s", $fKeyIndex, $fkeyValue, $fKeyIndex, urlencode($fkeySettings["FkeyLabel"]));
 
-            if (PhoneProperties::hasSmartLabel($this->GetValue("PhoneModel"))) {
+            if (DeviceProperties::hasSmartLabel($this->GetValue("PhoneModel"))) {
                 $urlQuery = sprintf("%s&fkey_short_label%d=%s", $urlQuery, $fKeyIndex, urlencode($fkeySettings["FkeyLabel"]));
             }
 
@@ -212,6 +213,7 @@ class SnomDeskphone extends IPSModuleStrict
             $phone_ip = $this->ReadPropertyString("PhoneIP");
             $protocol = $this->ReadPropertyString("Protocol");
             $url = "$protocol://$phone_ip";
+            // echo $device_info["mac address"];
             $message = $this->httpGetRequest($url, return_message: true);
 
             if (!$isFullMacAddress) {
@@ -275,7 +277,7 @@ class SnomDeskphone extends IPSModuleStrict
             $response = $this->httpGetRequest($url, headerOutput: false);
             $phone_settings_xml = @simplexml_load_string($response);
 
-            if ($phone_settings_xml and !str_contains($response, "404")) {
+            if ($phone_settings_xml) {
                 $phone_model = (string) $phone_settings_xml->{'phone-settings'}->phone_type[0];
                 $this->SetValue('PhoneModel', $phone_model);
                 $this->SetValue('PhoneMac', $mac_address);
@@ -426,11 +428,14 @@ class SnomDeskphone extends IPSModuleStrict
         $current_fkeys = $this->getCurrentFkeys($FkeysSettings);
         $options = $this->getCurrentFkeyOptionOnEdit($FkeysSettings, $current_fkeys);
         $phoneModel = $this->GetValue("PhoneModel");
-        $fkeysRange = PhoneProperties::getFkeysRange($phoneModel);
+        $expansionModule = $this->connectedExpansionModule();
+        $phoneFkeysRange = DeviceProperties::getFkeysRange($phoneModel);
+        $expansionFkeysRange = DeviceProperties::getExpansionFkeysRange($phoneModel, $expansionModule);
+        $fkeysRange = array_merge($phoneFkeysRange, $expansionFkeysRange);
 
         foreach ($fkeysRange as $fkeyNo) {
             if (!in_array($fkeyNo, $current_fkeys)) {
-                $option = ["caption" => "P$fkeyNo", "value" => $fkeyNo];
+                $option = $this->getSelectOption($fkeyNo, boolval($expansionModule));
                 array_push($options, $option);
             }
         }
@@ -468,8 +473,8 @@ class SnomDeskphone extends IPSModuleStrict
         if ($selected === -2) {
             echo "Invalid selected row $selected";
         } elseif ($selected != -1) {
-            $fkeyOnEdit = $current_fkeys[$selected];
-            $option = ["caption" => "P$fkeyOnEdit", "value" => $fkeyOnEdit];
+            $expansionModuleConnected = boolval($this->connectedExpansionModule());
+            $option = $this->getSelectOption($current_fkeys[$selected], $expansionModuleConnected);
             array_push($options, $option);
         }
 
@@ -500,16 +505,58 @@ class SnomDeskphone extends IPSModuleStrict
     public function getFkeysColumnsOptions(): array
     {
         $phoneModel = $this->GetValue("PhoneModel");
-        $fkeysRange = PhoneProperties::getFkeysRange($phoneModel);
+        $phoneFkeysRange = DeviceProperties::getFkeysRange($phoneModel);
+        $expansionFkeysRange = DeviceProperties::getMaxExpansionFkeysRange($phoneModel);
+        $fkeysRange = array_merge($phoneFkeysRange, $expansionFkeysRange);
+        $expansionModuleConnected = boolval($this->connectedExpansionModule());
         $options = [];
 
         foreach ($fkeysRange as $fkeyNo) {
-            $option = ["caption" => "P$fkeyNo", "value" => $fkeyNo];
+            $option = $this->getSelectOption($fkeyNo, $expansionModuleConnected);
             array_push($options, $option);
         }
 
         return $options;
     }
 
-    // TODO:has_expanstion_module()
+    public function getSelectOption(int $fkeyNo, bool $expansionModule = false): array
+    {
+        $phoneModel = $this->GetValue("PhoneModel");
+        $phoneFkeysNo = DeviceProperties::FKEYS_NO[$phoneModel];
+        $caption = "P$fkeyNo (phone)";
+
+        if ($fkeyNo > $phoneFkeysNo) {
+            if ($phoneModel === "snomD385") {
+                $caption = strval($fkeyNo - $phoneFkeysNo - 126);
+            } else {
+                $caption = strval($fkeyNo - $phoneFkeysNo);
+            }
+            if (!$expansionModule) {
+                $caption = $caption . " expansion not connected";    
+            } else {
+                $caption = $caption . " (expansion module)";  
+            }
+        }
+
+        return ["caption" => $caption, "value" => $fkeyNo];
+    }
+
+    public function connectedExpansionModule(): string
+    {
+        $connectedExpansionModule = "";
+        $phoneIp = $this->ReadPropertyString("PhoneIP");
+        $protocol = $this->ReadPropertyString("Protocol");
+        $url = "$protocol://$phoneIp/info.htm";
+        $phoneInfo = $this->httpGetRequest($url);
+        $expansionModules = DeviceProperties::EXPANSION_MODULES;
+
+        foreach ($expansionModules as $expansionModel) {
+            if (str_contains($phoneInfo, "$expansionModel ")) {
+                $connectedExpansionModule = "snom$expansionModel";
+                break;
+            }
+        }
+
+        return $connectedExpansionModule;
+    }
 }

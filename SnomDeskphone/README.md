@@ -32,7 +32,13 @@ For checking the current settings before, click on the button "See current funct
 ```
 4. Click on "Add" for configuring a new function key.  
 A form with following elements will pop up:
->> - _Function key_: Function key to setup (P1...PXX)
+>> - _Function key_: Function key to setup:  
+>>>>- P1...PXX for function keys of a deskphone  
+>>>>- 1...XX for function keys of a [expansion module](https://www.snom.com/en/products/desk-phones/d7xx/snom-d7c/)
+>>>>```
+>>>>Warning: Only one expansion module is supported.
+>>>>If several are connected, the settings of the one connected directly to the phone will be overwritten.
+>>>>```
 >> - _Label_: Text that will be displayed next to the selected function key
 >> - _Color for status on_: Color of the LED when the assigned status variable is turned to on
 >> - _Color for status off_: Color of the LED when the assigned status variable is turned to off
