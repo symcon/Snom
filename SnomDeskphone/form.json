@@ -325,6 +325,12 @@
                 "Applying the changes, will override the edited function(s) key(s) settings in your phone.\n",
                 "For seeing the current fkey settings, press the button \"See current function keys settings\"';"
             ]
+        },
+        {
+            "type": "Label",
+            "caption": "No expansion module connected",
+            "name": "ExpansionConnected",
+            "visible": false
         }
     ]
 }

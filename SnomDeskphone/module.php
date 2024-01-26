@@ -213,6 +213,7 @@ class SnomDeskphone extends IPSModuleStrict
             $phone_ip = $this->ReadPropertyString("PhoneIP");
             $protocol = $this->ReadPropertyString("Protocol");
             $url = "$protocol://$phone_ip";
+            // echo $device_info["mac address"];
             $message = $this->httpGetRequest($url, return_message: true);
 
             if (!$isFullMacAddress) {
@@ -276,7 +277,7 @@ class SnomDeskphone extends IPSModuleStrict
             $response = $this->httpGetRequest($url, headerOutput: false);
             $phone_settings_xml = @simplexml_load_string($response);
 
-            if ($phone_settings_xml and !str_contains($response, "404")) {
+            if ($phone_settings_xml) {
                 $phone_model = (string) $phone_settings_xml->{'phone-settings'}->phone_type[0];
                 $this->SetValue('PhoneModel', $phone_model);
                 $this->SetValue('PhoneMac', $mac_address);
@@ -428,11 +429,13 @@ class SnomDeskphone extends IPSModuleStrict
         $options = $this->getCurrentFkeyOptionOnEdit($FkeysSettings, $current_fkeys);
         $phoneModel = $this->GetValue("PhoneModel");
         $expansionModule = $this->connectedExpansionModule();
-        $fkeysRange = DeviceProperties::getFkeysRange($phoneModel, $expansionModule);
+        $phoneFkeysRange = DeviceProperties::getFkeysRange($phoneModel);
+        $expansionFkeysRange = DeviceProperties::getExpansionFkeysRange($phoneModel, $expansionModule);
+        $fkeysRange = array_merge($phoneFkeysRange, $expansionFkeysRange);
 
         foreach ($fkeysRange as $fkeyNo) {
             if (!in_array($fkeyNo, $current_fkeys)) {
-                $option = $this->getSelectOption($fkeyNo);
+                $option = $this->getSelectOption($fkeyNo, boolval($expansionModule));
                 array_push($options, $option);
             }
         }
@@ -470,7 +473,8 @@ class SnomDeskphone extends IPSModuleStrict
         if ($selected === -2) {
             echo "Invalid selected row $selected";
         } elseif ($selected != -1) {
-            $option = $this->getSelectOption($current_fkeys[$selected]);
+            $expansionModuleConnected = boolval($this->connectedExpansionModule());
+            $option = $this->getSelectOption($current_fkeys[$selected], $expansionModuleConnected);
             array_push($options, $option);
         }
 
@@ -501,20 +505,21 @@ class SnomDeskphone extends IPSModuleStrict
     public function getFkeysColumnsOptions(): array
     {
         $phoneModel = $this->GetValue("PhoneModel");
-        $expansionModule = $this->connectedExpansionModule();
-        // $fkeysRange = DeviceProperties::getFkeysRange($phoneModel, $expansionModule);
-        $fkeysRange = range(1, 176);
+        $phoneFkeysRange = DeviceProperties::getFkeysRange($phoneModel);
+        $expansionFkeysRange = DeviceProperties::getMaxExpansionFkeysRange($phoneModel);
+        $fkeysRange = array_merge($phoneFkeysRange, $expansionFkeysRange);
+        $expansionModuleConnected = boolval($this->connectedExpansionModule());
         $options = [];
 
         foreach ($fkeysRange as $fkeyNo) {
-            $option = $this->getSelectOption($fkeyNo);
+            $option = $this->getSelectOption($fkeyNo, $expansionModuleConnected);
             array_push($options, $option);
         }
 
         return $options;
     }
 
-    public function getSelectOption(int $fkeyNo): array
+    public function getSelectOption(int $fkeyNo, bool $expansionModule = false): array
     {
         $phoneModel = $this->GetValue("PhoneModel");
         $phoneFkeysNo = DeviceProperties::FKEYS_NO[$phoneModel];
@@ -522,9 +527,14 @@ class SnomDeskphone extends IPSModuleStrict
 
         if ($fkeyNo > $phoneFkeysNo) {
             if ($phoneModel === "snomD385") {
-                $caption = strval($fkeyNo - $phoneFkeysNo - 126) . " (expansion module)";
+                $caption = strval($fkeyNo - $phoneFkeysNo - 126);
             } else {
-                $caption = strval($fkeyNo - $phoneFkeysNo) . " (expansion module)";
+                $caption = strval($fkeyNo - $phoneFkeysNo);
+            }
+            if (!$expansionModule) {
+                $caption = $caption . " expansion not connected";    
+            } else {
+                $caption = $caption . " (expansion module)";  
             }
         }
 

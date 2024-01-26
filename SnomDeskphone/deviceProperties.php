@@ -3,6 +3,8 @@
 class DeviceProperties
 {
     const EXPANSION_MODULES = ["D7C", "D7", "D3"];
+    const MAX_EXPANSION_FKEYS = 144;
+    const D385_EXPANSION_OFFSET = 126;
     const FKEYS_NO = array(
         "" => 1,
         "snomD335" => 32,
@@ -37,24 +39,39 @@ class DeviceProperties
         "snomD865" => 5,
     );
 
-    public static function getFkeysRange(string $phoneType, string $connectedExpansionModule): array
+    public static function getFkeysRange(string $phoneType): array
     {
-        $expansionFkeyRange = [];
+        return range(1, self::FKEYS_NO[$phoneType]);
+    }
 
-        if ($connectedExpansionModule) {
-            if ($phoneType === "snomD385") {
-                $start = self::FKEYS_NO[$phoneType] + 127;
-                $end = self::FKEYS_NO[$phoneType] + 126 + self::FKEYS_NO[$connectedExpansionModule];
-            } else {
-                $start = self::FKEYS_NO[$phoneType] + 1;
-                $end = self::FKEYS_NO[$phoneType] + self::FKEYS_NO[$connectedExpansionModule];
-            }
-            $expansionFkeyRange = range($start, $end);
+    public static function getMaxExpansionFkeysRange(string $phoneType)
+    {
+        $start = self::FKEYS_NO[$phoneType] + 1;
+        $end = self::FKEYS_NO[$phoneType] + self::MAX_EXPANSION_FKEYS;
+
+        if ($phoneType === "snomD385") {
+            $start = $start + self::D385_EXPANSION_OFFSET;
+            $end = $end + self::D385_EXPANSION_OFFSET;
         }
 
-        $phoneFkeyRange = range(1, self::FKEYS_NO[$phoneType]);
+        return range($start, $end);  
+    }
 
-        return array_merge($phoneFkeyRange, $expansionFkeyRange);
+    public static function getExpansionFkeysRange(string $phoneType, string $connectedExpansionModule)
+    {
+        if ($connectedExpansionModule) {
+            $start = self::FKEYS_NO[$phoneType] + 1;
+            $end = self::FKEYS_NO[$phoneType] + self::FKEYS_NO[$connectedExpansionModule];
+
+            if ($phoneType === "snomD385") {
+                $start = $start + self::D385_EXPANSION_OFFSET;
+                $end = $end + self::D385_EXPANSION_OFFSET;
+            }
+
+            return range($start, $end);
+        }
+
+        return [];
     }
 
     public static function hasSmartLabel(string $phoneType): bool
