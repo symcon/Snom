@@ -27,7 +27,7 @@
 			$this->assertContains($deskphoneId, $existingInstances);
 		}
 
-		public function testBasic()
+		public function testInstanceWithGivenIpExists()
 		{
 			$deskphoneId = IPS_CreateInstance($this->snomDeskphoneModuleId);
 			IPS_SetProperty($deskphoneId, 'PhoneIP', '192.168.178.20');
