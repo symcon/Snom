@@ -103,13 +103,13 @@ class SnomDeskphone extends IPSModuleStrict
         }
     }
 
-    public function PingPhone(string $phone_ip): void
+    public function PingPhone(string $phone_ip): string
     {
         if (Sys_Ping($phone_ip, 4000)) {
-            echo "IP $phone_ip is reachable";
-        } else {
-            echo "IP $phone_ip is not reachable";
+            return "IP $phone_ip is reachable";
         }
+
+        return "IP $phone_ip is not reachable";
     }
 
     public function setFkeyFunctionality(bool $UpdateLEDonly): void
@@ -313,6 +313,7 @@ class SnomDeskphone extends IPSModuleStrict
             // symbox 7.0 november 2023
             exec('arp ' . $phone_ip . ' | awk \'{print $4}\'', $output, $exec_status);
             $mac_address = $output[0];
+            echo var_dump($output);
 
             if (!str_contains($mac_address, ':')) {
                 // raspberry os
