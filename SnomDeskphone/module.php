@@ -103,13 +103,13 @@ class SnomDeskphone extends IPSModuleStrict
         }
     }
 
-    public function PingPhone(string $phone_ip): void
+    public function PingPhone(string $phone_ip): string
     {
         if (Sys_Ping($phone_ip, 4000)) {
-            echo "IP $phone_ip is reachable";
-        } else {
-            echo "IP $phone_ip is not reachable";
+            return "IP $phone_ip is reachable";
         }
+
+        return "IP $phone_ip is not reachable";
     }
 
     public function setFkeyFunctionality(bool $UpdateLEDonly): void
@@ -213,7 +213,6 @@ class SnomDeskphone extends IPSModuleStrict
             $phone_ip = $this->ReadPropertyString("PhoneIP");
             $protocol = $this->ReadPropertyString("Protocol");
             $url = "$protocol://$phone_ip";
-            // echo $device_info["mac address"];
             $message = $this->httpGetRequest($url, return_message: true);
 
             if (!$isFullMacAddress) {
@@ -250,7 +249,6 @@ class SnomDeskphone extends IPSModuleStrict
                 }
 
                 $data["elements"][2]["items"][4]["visible"] = false;
-                $data["elements"][5]["enabled"] = true;
                 $data["elements"][6]["visible"] = true;
                 $this->SetFkeySettings();
             }
@@ -374,10 +372,15 @@ class SnomDeskphone extends IPSModuleStrict
                     case 200:
                         $isSnomD8xx = str_contains($response, "<title>Phone Manager</title>");
                         $loginFailed = str_contains($response, "Login failed!");
+
                         if ($isSnomD8xx) {
                             $message = "Snom D8xx not supported. HTTP $http_code";
                         } elseif ($loginFailed) {
-                            $message = "Login failed";
+                            if (str_contains($response, "unsuccessful login attempts")) {
+                                $message = "Unsuccessful login attempts.Wait...";
+                            } else {
+                                $message = "Login failed";
+                            }
                         } else {
                             $message = "$http_code $response";
                         }
@@ -410,11 +413,11 @@ class SnomDeskphone extends IPSModuleStrict
         return $response;
     }
 
-    public function UpdateForm(array $FkeysSettings, bool $recvOnly, bool $StatusVariable): string
+    public function UpdateForm(array $fkeysSettings, bool $recvOnly, bool $StatusVariable): string
     {
         $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
-        $data["elements"][7]["form"][0]["options"] = $this->getFkeysFormOptions($FkeysSettings);
-        $data["elements"][7]["form"][0]["value"] = $this->getSelectedFkeyNo($FkeysSettings);
+        $data["elements"][7]["form"][0]["options"] = $this->getFkeysFormOptions($fkeysSettings);
+        $data["elements"][7]["form"][0]["value"] = $this->getSelectedFkeyNo($fkeysSettings);
 
         $data["elements"][7]["form"][6]["visible"] = !$recvOnly;
         $data["elements"][7]["form"][7]["visible"] = !$recvOnly;

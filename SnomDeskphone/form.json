@@ -32,7 +32,7 @@
                 {
                     "type": "Button",
                     "caption": "Reachable?",
-                    "onClick": "SNMD_PingPhone($id, $PhoneIP);"
+                    "onClick": "echo SNMD_PingPhone($id, $PhoneIP);"
                 },
                 {
                     "type": "ValidationTextBox",
