@@ -249,7 +249,6 @@ class SnomDeskphone extends IPSModuleStrict
                 }
 
                 $data["elements"][2]["items"][4]["visible"] = false;
-                $data["elements"][5]["enabled"] = true;
                 $data["elements"][6]["visible"] = true;
                 $this->SetFkeySettings();
             }
