@@ -213,7 +213,6 @@ class SnomDeskphone extends IPSModuleStrict
             $phone_ip = $this->ReadPropertyString("PhoneIP");
             $protocol = $this->ReadPropertyString("Protocol");
             $url = "$protocol://$phone_ip";
-            // echo $device_info["mac address"];
             $message = $this->httpGetRequest($url, return_message: true);
 
             if (!$isFullMacAddress) {
@@ -313,7 +312,6 @@ class SnomDeskphone extends IPSModuleStrict
             // symbox 7.0 november 2023
             exec('arp ' . $phone_ip . ' | awk \'{print $4}\'', $output, $exec_status);
             $mac_address = $output[0];
-            echo var_dump($output);
 
             if (!str_contains($mac_address, ':')) {
                 // raspberry os
@@ -375,10 +373,15 @@ class SnomDeskphone extends IPSModuleStrict
                     case 200:
                         $isSnomD8xx = str_contains($response, "<title>Phone Manager</title>");
                         $loginFailed = str_contains($response, "Login failed!");
+
                         if ($isSnomD8xx) {
                             $message = "Snom D8xx not supported. HTTP $http_code";
                         } elseif ($loginFailed) {
-                            $message = "Login failed";
+                            if (str_contains($response, "unsuccessful login attempts")) {
+                                $message = "Unsuccessful login attempts.Wait...";
+                            } else {
+                                $message = "Login failed";
+                            }
                         } else {
                             $message = "$http_code $response";
                         }
@@ -411,11 +414,11 @@ class SnomDeskphone extends IPSModuleStrict
         return $response;
     }
 
-    public function UpdateForm(array $FkeysSettings, bool $recvOnly, bool $StatusVariable): string
+    public function UpdateForm(array $fkeysSettings, bool $recvOnly, bool $StatusVariable): string
     {
         $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
-        $data["elements"][7]["form"][0]["options"] = $this->getFkeysFormOptions($FkeysSettings);
-        $data["elements"][7]["form"][0]["value"] = $this->getSelectedFkeyNo($FkeysSettings);
+        $data["elements"][7]["form"][0]["options"] = $this->getFkeysFormOptions($fkeysSettings);
+        $data["elements"][7]["form"][0]["value"] = $this->getSelectedFkeyNo($fkeysSettings);
 
         $data["elements"][7]["form"][6]["visible"] = !$recvOnly;
         $data["elements"][7]["form"][7]["visible"] = !$recvOnly;
