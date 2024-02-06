@@ -191,16 +191,8 @@ class SnomDeskphone extends IPSModuleStrict
     public function GetConfigurationForm(): string
     {
         $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
-        $device_info = array(
-            "is snom phone" => false,
-            "mac address" => '00:04:13:',
-            "phone model" => '',
-        );
         $phone_ip = $this->ReadPropertyString("PhoneIP");
-
-        if ($phone_ip and Sys_Ping($phone_ip, 2000)) {
-            $device_info = $this->getDeviceInformation();
-        }
+        $device_info = $this->getDeviceInformation();
 
         $data["elements"][3]["value"] = $device_info['mac address'];
         $data["elements"][4]["value"] = $device_info['phone model'];
@@ -266,39 +258,36 @@ class SnomDeskphone extends IPSModuleStrict
 
     public function getDeviceInformation(): array
     {
-        $mac_address = $this->getMacAddress();
+        $phoneIp = $this->ReadPropertyString("PhoneIP");
+        $deviceInfo = array(
+            "is snom phone" => false,
+            "mac address" => '00:04:13:',
+            "phone model" => '',
+        );
 
-        if (str_contains($mac_address, '00:04:13:') or str_contains($mac_address, '0:4:13:')) { // for MacOS '0:4:13:'
-            $phone_ip = $this->ReadPropertyString("PhoneIP");
-            $protocol = $this->ReadPropertyString("Protocol");
-            $url = "$protocol://$phone_ip/settings.xml";
-            $response = $this->httpGetRequest($url, headerOutput: false);
-            $phone_settings_xml = @simplexml_load_string($response);
+        if ($phoneIp and Sys_Ping($phoneIp, 2000)) {
+            $macAddress = $this->getMacAddress();
 
-            if ($phone_settings_xml) {
-                $phone_model = (string) $phone_settings_xml->{'phone-settings'}->phone_type[0];
-                $this->SetValue('PhoneModel', $phone_model);
-                $this->SetValue('PhoneMac', $mac_address);
+            if (str_contains($macAddress, '00:04:13:') or str_contains($macAddress, '0:4:13:')) { // for MacOS '0:4:13:'
+                $phoneIp = $this->ReadPropertyString("PhoneIP");
+                $protocol = $this->ReadPropertyString("Protocol");
+                $url = "$protocol://$phoneIp/settings.xml";
+                $response = $this->httpGetRequest($url, return_message: true, headerOutput: false);
+                $phoneSettings = @simplexml_load_string($response);
 
-                return array(
-                    "is snom phone" => true,
-                    "mac address" => $mac_address,
-                    "phone model" => $phone_model,
-                );
-            } else {
-                return array(
-                    "is snom phone" => true,
-                    "mac address" => '00:04:13:',
-                    "phone model" => '',
-                );
+                if ($phoneSettings) {
+                    $phoneModel = (string) $phoneSettings->{'phone-settings'}->phone_type[0];
+                    $this->SetValue('PhoneModel', $phoneModel);
+                    $this->SetValue('PhoneMac', $macAddress);
+                    $deviceInfo["is snom phone"] = true;
+                    $deviceInfo["mac address"] = $macAddress;
+                    $deviceInfo["phone model"] = $phoneModel;
+                } else {
+                    $deviceInfo["is snom phone"] = true;
+                }
             }
-        } else {
-            return array(
-                "is snom phone" => false,
-                "mac address" => '00:04:13:',
-                "phone model" => '',
-            );
         }
+        return $deviceInfo;
     }
 
     public function getMacAddress(): string
@@ -382,7 +371,7 @@ class SnomDeskphone extends IPSModuleStrict
                                 $message = "Login failed";
                             }
                         } else {
-                            $message = "$http_code $response";
+                            $message = "";
                         }
                         break;
                     case 303:
@@ -406,7 +395,10 @@ class SnomDeskphone extends IPSModuleStrict
 
             curl_close($handler);
 
-            return $message;
+            if ($message) {
+                return $message;
+            }
+            return $response;
         }
         curl_close($handler);
 
