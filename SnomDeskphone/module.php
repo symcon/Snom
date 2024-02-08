@@ -37,12 +37,16 @@ class SnomDeskphone extends IPSModuleStrict
 
     public function MessageSink(int $TimeStamp, int $SenderID, int $Message, array $Data): void
     {
-        $fkeysSettings = json_decode($this->ReadPropertyString("FkeysSettings"), true);
-        $fkeysToUpdate = $this->getFkeysToUpdate($fkeysSettings, $SenderID, $Data);
-        $urls = $this->getUrls($fkeysToUpdate, $SenderID, $Data);
+        $valueChanged = $Data[1];
 
-        foreach ($urls as $url) {
-            $this->httpGetRequest($url);
+        if ($valueChanged) {
+            $fkeysSettings = json_decode($this->ReadPropertyString("FkeysSettings"), true);
+            $fkeysToUpdate = $this->getFkeysToUpdate($fkeysSettings, $SenderID, $Data);
+            $urls = $this->getUrls($fkeysToUpdate, $SenderID, $Data);
+
+            foreach ($urls as $url) {
+                $this->httpGetRequest($url);
+            }
         }
     }
 
