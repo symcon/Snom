@@ -3,6 +3,10 @@
 require_once("deviceProperties.php");
 require_once("minibrowser.php");
 
+const DISPLAY_STATUS = 1;
+const UPDATE_LED = 2;
+const UPDATE_LED_AND_ACTION = 3;
+
 class SnomDeskphone extends IPSModuleStrict
 {
     public function Create(): void
@@ -42,10 +46,10 @@ class SnomDeskphone extends IPSModuleStrict
 		if ($valueChanged) {	
 			$fkeysSettings = json_decode($this->ReadPropertyString("FkeysSettings"), true);
 			$fkeysToUpdate = $this->getFkeysToUpdate($fkeysSettings, $SenderID, $Data);
-			$urls = $this->getUrls($fkeysToUpdate, $SenderID, $Data);
+			$minibrowserUrls = $this->getMinibrowserUrls($fkeysToUpdate, $SenderID, $Data);
 			
-			foreach ($urls as $url) {
-				$this->httpGetRequest($url);
+			foreach ($minibrowserUrls as $minibrowserUrl) {
+				$this->httpGetRequest($minibrowserUrl);
 			}
 		}
     }
@@ -70,26 +74,26 @@ class SnomDeskphone extends IPSModuleStrict
     }
 
 
-    // build minibrowser url
-    protected function getUrls(array $fkeysToUpdate, int $SenderID, array $Data): array
+    protected function getMinibrowserUrls(array $fkeysToUpdate, int $SenderID, array $Data): array
     {
         $protocol = $this->ReadPropertyString("Protocol");
         $instanceHook = sprintf("http://%s:3777/hook/snom/%d/", $this->ReadPropertyString("LocalIP"), $this->InstanceID);
-        $urls = array();
+        $minibrowserUrls = array();
 
         foreach ($fkeysToUpdate as $data) {
             $hookParameters = urlencode(
                 $instanceHook .
-                "?xml=true&variableId=" . $SenderID . // TODO: rename xml parameter to something meaningful
-                "&value=" . (int) $Data[0] .
+                "?xml=true&variableId=" . $SenderID .
+                "&value=" . GetValueFormatted($SenderID) .
                 "&ledNo=" . $data["ledNo"] .
-                "&color=" . $data["color"]
+                "&color=" . $data["color"] .
+                "&timeout=1"
             );
-            $url = sprintf("$protocol://%s/minibrowser.htm?url=%s", $this->ReadPropertyString("PhoneIP"), $hookParameters);
-            array_push($urls, $url);
+            $minibrowserUrl = sprintf("$protocol://%s/minibrowser.htm?url=%s", $this->ReadPropertyString("PhoneIP"), $hookParameters);
+            array_push($minibrowserUrls, $minibrowserUrl);
         }
 
-        return $urls;
+        return $minibrowserUrls;
     }
 
     /**
@@ -98,6 +102,15 @@ class SnomDeskphone extends IPSModuleStrict
     protected function ProcessHookData(): void
     {
         if (filter_var($_GET["xml"], FILTER_VALIDATE_BOOLEAN)) {
+            $variableId = $_GET["variableId"];
+
+            if ($_GET["value"] === "read") {
+                $_GET["value"] = GetValueFormatted($variableId);
+            }
+
+            $_GET["variable"] = IPS_GetName($variableId);
+            $parentId = IPS_GetParent($_GET["variableId"]);
+            $_GET["variable parent"] = IPS_GetName($parentId);
             $xml = new SnomXmlMinibrowser($_GET);
             $this->SendDebug("SNOM MINIBROWSER", print_r($xml->minibrowser, true), 0);
             $xml->executeMinibrowser();
@@ -168,26 +181,8 @@ class SnomDeskphone extends IPSModuleStrict
                 $this->RegisterMessage($fkeySettings["ActionVariableId"], VM_UPDATE);
             }
 
-            // TODO: Move this if/else to a separated method
-            switch ($fkeySettings["Functionality"]) {
-                case 1:
-                    $instanceHook = sprintf("http://%s:3777/hook/snom/%d/", $this->ReadPropertyString("LocalIP"), $this->InstanceID);
-                    $hookParameters = "?xml=true&variableId=" . $fkeySettings["StatusVariableId"] . "&value=" . strval(GetValue($fkeySettings["StatusVariableId"]));
-                    $fkeyValue = urlencode("url " . $instanceHook . $hookParameters);
-                    break;
-                case 2:
-                    $fkeyValue = urlencode("none");
-                    break;
-                case 3:
-                    $instanceHook = sprintf("http://%s:3777/hook/snom/%d/", $this->ReadPropertyString("LocalIP"), $this->InstanceID);
-                    $hookParameters = "?xml=false&variableId=" . $fkeySettings["ActionVariableId"] . "&value=" . $fkeySettings["ActionValue"];
-                    $fkeyValue = urlencode("url " . $instanceHook . $hookParameters);
-                    break;
-                default:
-
-            }
-
-            $urlQuery = sprintf("settings=save&store_settings=save&fkey%d=%s&fkey_label%d=%s", $fKeyIndex, $fkeyValue, $fKeyIndex, urlencode($fkeySettings["FkeyLabel"]));
+            $actionUrl = $this->getFkeyActionUrl($fkeySettings);
+            $urlQuery = sprintf("settings=save&store_settings=save&fkey%d=%s&fkey_label%d=%s", $fKeyIndex, $actionUrl, $fKeyIndex, urlencode($fkeySettings["FkeyLabel"]));
 
             if (DeviceProperties::hasSmartLabel($this->GetValue("PhoneModel"))) {
                 $urlQuery = sprintf("%s&fkey_short_label%d=%s", $urlQuery, $fKeyIndex, urlencode($fkeySettings["FkeyLabel"]));
@@ -197,6 +192,28 @@ class SnomDeskphone extends IPSModuleStrict
             $baseUrl = sprintf("$protocol://%s/dummy.htm?", $phoneIp);
             $url = sprintf("%s%s", $baseUrl, $urlQuery);
             $this->httpGetRequest($url); // TODO: execute the urls outside of this method (SRP)
+        }
+    }
+
+    public function getFkeyActionUrl(array $fkeySettings): string
+    {
+        $instanceHook = sprintf("http://%s:3777/hook/snom/%d/", $this->ReadPropertyString("LocalIP"), $this->InstanceID);
+
+        switch ($fkeySettings["Functionality"]) {
+            case DISPLAY_STATUS:
+                $timeout = 5000;
+                $variableIdToDisplay = $fkeySettings["StatusVariableId"];
+                $hookParameters = "?xml=true&variableId=$variableIdToDisplay&value=read&timeout=$timeout";
+                return urlencode("url $instanceHook$hookParameters");
+            case UPDATE_LED:
+                return urlencode("none");
+            case UPDATE_LED_AND_ACTION:
+                $variableIdToWrite = $fkeySettings["ActionVariableId"];
+                $valueToWrite = $fkeySettings["ActionValue"];
+                $hookParameters = "?xml=false&variableId=$variableIdToWrite&value=$valueToWrite";
+                return urlencode("url $instanceHook$hookParameters");
+            default:
+                return urlencode("none");
         }
     }
 

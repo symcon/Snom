@@ -4,6 +4,7 @@
 const SNOM_IP_PHONE_TEXT = "SnomIPPhoneText";
 
 // main subtags
+const TITLE = "Title";
 const LED = "LED";
 const FETCH = "fetch";
 const TEXT = "Text";
@@ -24,13 +25,11 @@ class SnomXmlMinibrowser
     protected DOMDocument $xmlDocument;
     protected array $parameters;
     public string $minibrowser;
-    public int $timeout;
 
     function __construct(array $xmlParameters, $mainTag = SNOM_IP_PHONE_TEXT)
     {
         $this->mainTag = $mainTag;
         $this->parameters = $xmlParameters;
-        $this->timeout = 1;
         $this->xmlDocument = $this->getXmlDocument();
         $this->minibrowser = $this->getMinibrowserPage();
     }
@@ -49,8 +48,13 @@ class SnomXmlMinibrowser
     public function getMinibrowserPage(): string
     {
         $xmlRoot = $this->getRootElement();
+        $this->appendMinibrowserTag($xmlRoot, TITLE);
         $this->appendMinibrowserTag($xmlRoot, TEXT);
-        // $this->appendMinibrowserTag($xmlRoot, LED);
+
+        if ($this->parameters["ledNo"]) {
+            $this->appendMinibrowserTag($xmlRoot, LED);
+        }
+
         $this->appendMinibrowserTag($xmlRoot, FETCH);
 
         return $this->xmlDocument->saveXML();
@@ -70,8 +74,12 @@ class SnomXmlMinibrowser
         $minibrowserTag = new DOMNode;
 
         switch ($tag) {
+            case TITLE:
+                $title = $this->parameters["variable parent"];
+                $minibrowserTag = $this->xmlDocument->createElement($tag, $title);
+                break;
             case TEXT:
-                $textToDisplay = $this->parameters["variableId"] . " = " . $this->parameters["value"];
+                $textToDisplay = $this->parameters["variable"] . ": " . $this->parameters["value"];
                 $minibrowserTag = $this->xmlDocument->createElement($tag, $textToDisplay);
                 break;
             case LED:
@@ -106,7 +114,7 @@ class SnomXmlMinibrowser
                 break;
             case MIL:
                 $tagAttribute = $this->xmlDocument->createAttribute($attribute);
-                $tagAttribute->value = $this->timeout;
+                $tagAttribute->value = $this->parameters["timeout"];
                 break;
             default:
                 echo "Not valid Snom attribute $attribute";
