@@ -132,26 +132,31 @@ class SnomDeskphone extends IPSModuleStrict
     public function setFkeyFunctionality(int $functionality): void
     {
         switch ($functionality) {
-            case 1:
+            case DISPLAY_STATUS:
+                $this->UpdateFormField("FkeyColorOn", "visible", false);
+                $this->UpdateFormField("FkeyColorOff", "visible", false);
                 $this->UpdateFormField("ActionValue", "visible", false);
                 $this->UpdateFormField("StatusVariable", "visible", false);
                 $this->UpdateFormField("StatusVariable", "value", true);
                 $this->UpdateFormField("StatusVariableId", "visible", true);
                 break;
-            case 2:
+            case UPDATE_LED:
                 $this->UpdateFormField("ActionValue", "visible", false);
                 $this->UpdateFormField("StatusVariable", "visible", false);
                 $this->UpdateFormField("StatusVariable", "value", true);
                 $this->UpdateFormField("StatusVariableId", "visible", true);
                 break;
-            case 3;
+            case UPDATE_LED_AND_ACTION;
                 $this->UpdateFormField("ActionValue", "visible", true);
                 $this->UpdateFormField("StatusVariable", "visible", true);
                 $this->UpdateFormField("StatusVariable", "value", false);
                 $this->UpdateFormField("StatusVariableId", "visible", false);
                 break;
             default:
-                
+                $this->UpdateFormField("ActionValue", "visible", true);
+                $this->UpdateFormField("StatusVariable", "visible", true);
+                $this->UpdateFormField("StatusVariable", "value", false);
+                $this->UpdateFormField("StatusVariableId", "visible", false);
         }
     }
 
@@ -467,9 +472,10 @@ class SnomDeskphone extends IPSModuleStrict
         $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
         $data["elements"][7]["form"][0]["options"] = $this->getFkeysFormOptions($fkeysSettings);
         $data["elements"][7]["form"][0]["value"] = $this->getSelectedFkeyNo($fkeysSettings);
-
-        $data["elements"][7]["form"][6]["visible"] = $functionality === 3 ? true : false;
-        $data["elements"][7]["form"][7]["visible"] = $functionality === 3 ? true : false;
+        $data["elements"][7]["form"][2]["visible"] = !($functionality === DISPLAY_STATUS);
+        $data["elements"][7]["form"][3]["visible"] = !($functionality === DISPLAY_STATUS);
+        $data["elements"][7]["form"][6]["visible"] = $functionality === UPDATE_LED_AND_ACTION ? true : false;
+        $data["elements"][7]["form"][7]["visible"] = $functionality === UPDATE_LED_AND_ACTION ? true : false;
         $data["elements"][7]["form"][8]["visible"] = $StatusVariable;
 
         return json_encode($data["elements"][7]["form"]);
