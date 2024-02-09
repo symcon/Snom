@@ -166,10 +166,10 @@
                 },
                 {
                     "caption": "Functionality",
-                    "name": "UpdateLEDonly",
+                    "name": "Functionality",
                     "width": "100px",
                     "visible": false,
-                    "add": false,
+                    "add": 3,
                     "edit": {
                         "type": "Select"
                     }
@@ -276,19 +276,23 @@
                 },
                 {
                     "type": "Select",
-                    "name": "UpdateLEDonly",
+                    "name": "Functionality",
                     "caption": "Functionality",
                     "options": [
                         {
+                            "caption": "Display status",
+                            "value": 1
+                        },
+                        {
                             "caption": "Update status LED",
-                            "value": true
+                            "value": 2
                         },
                         {
                             "caption": "Update status LED and trigger action",
-                            "value": false
+                            "value": 3
                         }
                     ],
-                    "onChange": "SNMD_setFkeyFunctionality($id, $UpdateLEDonly);"
+                    "onChange": "SNMD_setFkeyFunctionality($id, $Functionality);"
                 },
                 {
                     "type": "SelectVariable",

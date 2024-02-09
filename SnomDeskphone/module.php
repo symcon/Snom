@@ -116,12 +116,30 @@ class SnomDeskphone extends IPSModuleStrict
         return "IP $phone_ip is not reachable";
     }
 
-    public function setFkeyFunctionality(bool $UpdateLEDonly): void
+    public function setFkeyFunctionality(int $functionality): void
     {
-        $this->UpdateFormField("ActionValue", "visible", !$UpdateLEDonly);
-        $this->UpdateFormField("StatusVariable", "visible", !$UpdateLEDonly);
-        $this->UpdateFormField("StatusVariable", "value", $UpdateLEDonly);
-        $this->UpdateFormField("StatusVariableId", "visible", $UpdateLEDonly);
+        switch ($functionality) {
+            case 1:
+                $this->UpdateFormField("ActionValue", "visible", false);
+                $this->UpdateFormField("StatusVariable", "visible", false);
+                $this->UpdateFormField("StatusVariable", "value", true);
+                $this->UpdateFormField("StatusVariableId", "visible", true);
+                break;
+            case 2:
+                $this->UpdateFormField("ActionValue", "visible", false);
+                $this->UpdateFormField("StatusVariable", "visible", false);
+                $this->UpdateFormField("StatusVariable", "value", true);
+                $this->UpdateFormField("StatusVariableId", "visible", true);
+                break;
+            case 3;
+                $this->UpdateFormField("ActionValue", "visible", true);
+                $this->UpdateFormField("StatusVariable", "visible", true);
+                $this->UpdateFormField("StatusVariable", "value", false);
+                $this->UpdateFormField("StatusVariableId", "visible", false);
+                break;
+            default:
+                
+        }
     }
 
     public function SetVariablesIds(string $actionValue, bool $StatusVariable): void
@@ -151,12 +169,22 @@ class SnomDeskphone extends IPSModuleStrict
             }
 
             // TODO: Move this if/else to a separated method
-            if ($fkeySettings["UpdateLEDonly"]) {
-                $fkeyValue = urlencode("none");
-            } else {
-                $instanceHook = sprintf("http://%s:3777/hook/snom/%d/", $this->ReadPropertyString("LocalIP"), $this->InstanceID);
-                $hookParameters = "?xml=false&variableId=" . $fkeySettings["ActionVariableId"] . "&value=" . $fkeySettings["ActionValue"];
-                $fkeyValue = urlencode("url " . $instanceHook . $hookParameters);
+            switch ($fkeySettings["Functionality"]) {
+                case 1:
+                    $instanceHook = sprintf("http://%s:3777/hook/snom/%d/", $this->ReadPropertyString("LocalIP"), $this->InstanceID);
+                    $hookParameters = "?xml=true&variableId=" . $fkeySettings["StatusVariableId"] . "&value=" . strval(GetValue($fkeySettings["StatusVariableId"]));
+                    $fkeyValue = urlencode("url " . $instanceHook . $hookParameters);
+                    break;
+                case 2:
+                    $fkeyValue = urlencode("none");
+                    break;
+                case 3:
+                    $instanceHook = sprintf("http://%s:3777/hook/snom/%d/", $this->ReadPropertyString("LocalIP"), $this->InstanceID);
+                    $hookParameters = "?xml=false&variableId=" . $fkeySettings["ActionVariableId"] . "&value=" . $fkeySettings["ActionValue"];
+                    $fkeyValue = urlencode("url " . $instanceHook . $hookParameters);
+                    break;
+                default:
+
             }
 
             $urlQuery = sprintf("settings=save&store_settings=save&fkey%d=%s&fkey_label%d=%s", $fKeyIndex, $fkeyValue, $fKeyIndex, urlencode($fkeySettings["FkeyLabel"]));
@@ -263,7 +291,7 @@ class SnomDeskphone extends IPSModuleStrict
         }
 
         $data["elements"][7]["columns"][0]["edit"]["options"] = $this->getFkeysColumnsOptions();
-        $data["elements"][7]["form"] = "return json_decode(SNMD_UpdateForm(\$id, (array) \$FkeysSettings, \$FkeysSettings['UpdateLEDonly'] ?? false, \$FkeysSettings['StatusVariable'] ?? true), true);";
+        $data["elements"][7]["form"] = "return json_decode(SNMD_UpdateForm(\$id, (array) \$FkeysSettings, \$FkeysSettings['Functionality'] ?? false, \$FkeysSettings['StatusVariable'] ?? true), true);";
 
         return json_encode($data);
     }
@@ -417,14 +445,14 @@ class SnomDeskphone extends IPSModuleStrict
         return $response;
     }
 
-    public function UpdateForm(array $fkeysSettings, bool $recvOnly, bool $StatusVariable): string
+    public function UpdateForm(array $fkeysSettings, int $functionality, bool $StatusVariable): string
     {
         $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
         $data["elements"][7]["form"][0]["options"] = $this->getFkeysFormOptions($fkeysSettings);
         $data["elements"][7]["form"][0]["value"] = $this->getSelectedFkeyNo($fkeysSettings);
 
-        $data["elements"][7]["form"][6]["visible"] = !$recvOnly;
-        $data["elements"][7]["form"][7]["visible"] = !$recvOnly;
+        $data["elements"][7]["form"][6]["visible"] = $functionality === 3 ? true : false;
+        $data["elements"][7]["form"][7]["visible"] = $functionality === 3 ? true : false;
         $data["elements"][7]["form"][8]["visible"] = $StatusVariable;
 
         return json_encode($data["elements"][7]["form"]);

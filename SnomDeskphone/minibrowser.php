@@ -50,7 +50,7 @@ class SnomXmlMinibrowser
     {
         $xmlRoot = $this->getRootElement();
         $this->appendMinibrowserTag($xmlRoot, TEXT);
-        $this->appendMinibrowserTag($xmlRoot, LED);
+        // $this->appendMinibrowserTag($xmlRoot, LED);
         $this->appendMinibrowserTag($xmlRoot, FETCH);
 
         return $this->xmlDocument->saveXML();
