@@ -168,10 +168,24 @@
                     "caption": "Functionality",
                     "name": "Functionality",
                     "width": "100px",
-                    "visible": false,
+                    "visible": true,
                     "add": 3,
                     "edit": {
-                        "type": "Select"
+                        "type": "Select",
+                        "options": [
+                            {
+                                "caption": "Display status",
+                                "value": 1
+                            },
+                            {
+                                "caption": "Update status LED",
+                                "value": 2
+                            },
+                            {
+                                "caption": "Trigger action and update status LED",
+                                "value": 3
+                            }
+                        ]
                     }
                 },
                 {
@@ -288,7 +302,7 @@
                             "value": 2
                         },
                         {
-                            "caption": "Update status LED and trigger action",
+                            "caption": "Trigger action and update status LED",
                             "value": 3
                         }
                     ],

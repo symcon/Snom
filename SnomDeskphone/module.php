@@ -5,7 +5,7 @@ require_once("minibrowser.php");
 
 const DISPLAY_STATUS = 1;
 const UPDATE_LED = 2;
-const UPDATE_LED_AND_ACTION = 3;
+const TRIGGER_ACTION_UPDATE_LED = 3;
 
 class SnomDeskphone extends IPSModuleStrict
 {
@@ -146,7 +146,7 @@ class SnomDeskphone extends IPSModuleStrict
                 $this->UpdateFormField("StatusVariable", "value", true);
                 $this->UpdateFormField("StatusVariableId", "visible", true);
                 break;
-            case UPDATE_LED_AND_ACTION;
+            case TRIGGER_ACTION_UPDATE_LED;
                 $this->UpdateFormField("ActionValue", "visible", true);
                 $this->UpdateFormField("StatusVariable", "visible", true);
                 $this->UpdateFormField("StatusVariable", "value", false);
@@ -222,7 +222,7 @@ class SnomDeskphone extends IPSModuleStrict
                 return urlencode("url $instanceHook$hookParameters");
             case UPDATE_LED:
                 return urlencode("none");
-            case UPDATE_LED_AND_ACTION:
+            case TRIGGER_ACTION_UPDATE_LED:
                 $variableIdToWrite = $fkeySettings["ActionVariableId"];
                 $valueToWrite = $fkeySettings["ActionValue"];
                 $hookParameters = "?xml=false&variableId=$variableIdToWrite&value=$valueToWrite";
@@ -483,8 +483,8 @@ class SnomDeskphone extends IPSModuleStrict
         $data["elements"][7]["form"][0]["value"] = $this->getSelectedFkeyNo($fkeysSettings);
         $data["elements"][7]["form"][2]["visible"] = !($functionality === DISPLAY_STATUS);
         $data["elements"][7]["form"][3]["visible"] = !($functionality === DISPLAY_STATUS);
-        $data["elements"][7]["form"][6]["visible"] = $functionality === UPDATE_LED_AND_ACTION ? true : false;
-        $data["elements"][7]["form"][7]["visible"] = $functionality === UPDATE_LED_AND_ACTION ? true : false;
+        $data["elements"][7]["form"][6]["visible"] = $functionality === TRIGGER_ACTION_UPDATE_LED ? true : false;
+        $data["elements"][7]["form"][7]["visible"] = $functionality === TRIGGER_ACTION_UPDATE_LED ? true : false;
         $data["elements"][7]["form"][8]["visible"] = $StatusVariable;
 
         return json_encode($data["elements"][7]["form"]);
