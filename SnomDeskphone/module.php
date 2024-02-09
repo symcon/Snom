@@ -172,10 +172,20 @@ class SnomDeskphone extends IPSModuleStrict
         $this->UpdateFormField("StatusVariableId", "visible", $StatusVariable);
     }
 
-    public function SetFkeySettings(): void
+    public function setFkeysSettings(): void 
+    {
+        $settingsUrls = $this->getFkeySettingsUrls();
+
+        foreach ($settingsUrls as $settingsUrl) {
+            $this->httpGetRequest($settingsUrl);
+        }
+    }
+
+    public function getFkeySettingsUrls(): array
     {
         $fkeysSettings = json_decode($this->ReadPropertyString("FkeysSettings"), true);
         $protocol = $this->ReadPropertyString("Protocol");
+        $settingsUrls = array();
 
         foreach ($fkeysSettings as $fkeySettings) {
             $fKeyIndex = ((int) $fkeySettings["FkeyNo"]) - 1;
@@ -187,17 +197,17 @@ class SnomDeskphone extends IPSModuleStrict
             }
 
             $actionUrl = $this->getFkeyActionUrl($fkeySettings);
-            $urlQuery = sprintf("settings=save&store_settings=save&fkey%d=%s&fkey_label%d=%s", $fKeyIndex, $actionUrl, $fKeyIndex, urlencode($fkeySettings["FkeyLabel"]));
+            $urlParameters = sprintf("settings=save&store_settings=save&fkey%d=%s&fkey_label%d=%s", $fKeyIndex, $actionUrl, $fKeyIndex, urlencode($fkeySettings["FkeyLabel"]));
 
             if (DeviceProperties::hasSmartLabel($this->GetValue("PhoneModel"))) {
-                $urlQuery = sprintf("%s&fkey_short_label%d=%s", $urlQuery, $fKeyIndex, urlencode($fkeySettings["FkeyLabel"]));
+                $urlParameters = sprintf("%s&fkey_short_label%d=%s", $urlParameters, $fKeyIndex, urlencode($fkeySettings["FkeyLabel"]));
             }
 
             $phoneIp = $this->ReadPropertyString("PhoneIP");
-            $baseUrl = sprintf("$protocol://%s/dummy.htm?", $phoneIp);
-            $url = sprintf("%s%s", $baseUrl, $urlQuery);
-            $this->httpGetRequest($url); // TODO: execute the urls outside of this method (SRP)
+            array_push($settingsUrls, "$protocol://$phoneIp/dummy.htm?$urlParameters");
         }
+
+        return $settingsUrls;
     }
 
     public function getFkeyActionUrl(array $fkeySettings): string
@@ -304,7 +314,6 @@ class SnomDeskphone extends IPSModuleStrict
 
                 $data["elements"][2]["items"][4]["visible"] = false;
                 $data["elements"][6]["visible"] = true;
-                $this->SetFkeySettings();
             }
         } else {
             $data["elements"][2]["items"][4]["visible"] = true;
