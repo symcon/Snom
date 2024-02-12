@@ -471,13 +471,13 @@
                     }
                 },
                 {
-                    "caption": "Action URL",
-                    "name": "actionUrl",
-                    "width": "150px",
+                    "caption": "Action",
+                    "name": "urlAction",
+                    "width": "100px",
                     "align": "center",
-                    "add": "",
+                    "add": 0,
                     "edit": {
-                        "type": "ValidationTextBox"
+                        "type": "SelectAction"
                     }
                 }
             ],
@@ -591,9 +591,9 @@
                     ]
                 },
                 {
-                    "type": "ValidationTextBox",
-                    "name": "actionUrl",
-                    "caption": "Action URL"
+                    "type": "SelectAction",
+                    "name": "urlAction",
+                    "caption": "Action"
                 }
             ],
             "onEdit": [
