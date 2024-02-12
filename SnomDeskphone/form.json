@@ -166,12 +166,26 @@
                 },
                 {
                     "caption": "Functionality",
-                    "name": "UpdateLEDonly",
+                    "name": "Functionality",
                     "width": "100px",
-                    "visible": false,
-                    "add": false,
+                    "visible": true,
+                    "add": 3,
                     "edit": {
-                        "type": "Select"
+                        "type": "Select",
+                        "options": [
+                            {
+                                "caption": "Display status",
+                                "value": 1
+                            },
+                            {
+                                "caption": "Update status LED",
+                                "value": 2
+                            },
+                            {
+                                "caption": "Trigger action and update status LED",
+                                "value": 3
+                            }
+                        ]
                     }
                 },
                 {
@@ -276,19 +290,23 @@
                 },
                 {
                     "type": "Select",
-                    "name": "UpdateLEDonly",
+                    "name": "Functionality",
                     "caption": "Functionality",
                     "options": [
                         {
-                            "caption": "Update status LED",
-                            "value": true
+                            "caption": "Display status",
+                            "value": 1
                         },
                         {
-                            "caption": "Update status LED and trigger action",
-                            "value": false
+                            "caption": "Update status LED",
+                            "value": 2
+                        },
+                        {
+                            "caption": "Trigger action and update status LED",
+                            "value": 3
                         }
                     ],
-                    "onChange": "SNMD_setFkeyFunctionality($id, $UpdateLEDonly);"
+                    "onChange": "SNMD_setFkeyFunctionality($id, $Functionality);"
                 },
                 {
                     "type": "SelectVariable",
@@ -318,12 +336,14 @@
             "onEdit": [
                 "echo 'Are you sure?\n",
                 "Applying the changes, will override the edited function(s) key(s) settings in your phone.\n",
-                "For seeing the current fkey settings, press the button \"See current function keys settings\"';"
+                "For seeing the current fkey settings, press the button \"See current function keys settings\"';",
+                "SNMD_setFkeysSettings($id);"
             ],
             "onAdd": [
                 "echo 'Are you sure?\n",
                 "Applying the changes, will override the edited function(s) key(s) settings in your phone.\n",
-                "For seeing the current fkey settings, press the button \"See current function keys settings\"';"
+                "For seeing the current fkey settings, press the button \"See current function keys settings\"';",
+                "SNMD_setFkeysSettings($id);"
             ]
         }
     ]

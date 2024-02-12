@@ -43,9 +43,10 @@ A form with following elements will pop up:
 >> - _Color for status on_: Color of the LED when the assigned status variable is turned to on
 >> - _Color for status off_: Color of the LED when the assigned status variable is turned to off
 >> - _Fuctionality_:  
-Each single function key can be configured for one of this two modi:
+Each single function key can be configured for one of this modi:
+>>>>- _Display status_: the value of the assigned variable will be displayed on the phone for 5 seconds when pressing the key
 >>>>- _Update status LED_: the LED color will update depending on the value of the assigned status variable (e.g. signilizing an alarm)
->>>>- _Update status LED and trigger action_: the LED color will update depending on the value of the assigned status variable and when pressing the key, an action will be triggered on the selected target variable (e.g. LED signilizes an alarm and pressing the key will quit the alarm)
+>>>>- _Trigger action and update status LED_: the LED color will update depending on the value of the assigned status variable and when pressing the key, an action will be triggered on the selected target variable (e.g. LED signilizes an alarm and pressing the key will quit the alarm)
 >> - _Target_: Target variable for the selected action
 >> - _Action_: Action to be triggered on the target variable (e.g. toggle)
 >> - _Use other variable for status LED_: If the status variable (LED color) must be different than the target variable (often in systems like KNX) turn this switch to on
