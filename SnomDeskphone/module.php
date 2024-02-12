@@ -26,6 +26,7 @@ class SnomDeskphone extends IPSModuleStrict
         $this->RegisterPropertyString("Password", "");
         $this->RegisterPropertyString('LocalIP', Sys_GetNetworkInfo()[0]['IP']);
         $this->RegisterPropertyString("FkeysSettings", "[]");
+        $this->RegisterPropertyString("ActionUrlSettings", "[]");
     }
 
     public function instanceIpExists(): bool

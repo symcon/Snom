@@ -343,6 +343,269 @@
                 "Applying the changes, will override the edited function(s) key(s) settings in your phone.\n",
                 "For seeing the current fkey settings, press the button \"See current function keys settings\"';"
             ]
+        },
+        {
+            "type": "Button",
+            "caption": "See current action URLs",
+            "name": "PhoneWuiActionUrls",
+            "link": true,
+            "onClick": "echo 'http://' . $PhoneIP . '/action.htm';"
+        },
+        {
+            "type": "List",
+            "caption": "Action URL settings",
+            "name": "ActionUrlSettings",
+            "add": true,
+            "delete": true,
+            "columns": [
+                {
+                    "caption": "Phone event",
+                    "name": "phoneEvent",
+                    "width": "200px",
+                    "align": "center",
+                    "add": 0,
+                    "edit": {
+                        "type": "Select",
+                        "options": [
+                            {
+                                "caption": "DND on",
+                                "value": 1
+                            },
+                            {
+                                "caption": "DND off",
+                                "value": 2
+                            },
+                            {
+                                "caption": "Call Forwarding on",
+                                "value": 3
+                            },
+                            {
+                                "caption": "Call Forwarding off",
+                                "value": 4
+                            },
+                            {
+                                "caption": "Incoming Call",
+                                "value": 5
+                            },
+                            {
+                                "caption": "Outgoing Call",
+                                "value": 6
+                            },
+                            {
+                                "caption": "Setup finished",
+                                "value": 7
+                            },
+                            {
+                                "caption": "Off-hook",
+                                "value": 8
+                            },
+                            {
+                                "caption": "On-hook",
+                                "value": 9
+                            },
+                            {
+                                "caption": "Missed Call",
+                                "value": 10
+                            },
+                            {
+                                "caption": "Registration failed",
+                                "value": 11
+                            },
+                            {
+                                "caption": "On Connected",
+                                "value": 12
+                            },
+                            {
+                                "caption": "On Disconnected",
+                                "value": 13
+                            },
+                            {
+                                "caption": "Log on",
+                                "value": 14
+                            },
+                            {
+                                "caption": "Log off",
+                                "value": 15
+                            },
+                            {
+                                "caption": "Hold call",
+                                "value": 16
+                            },
+                            {
+                                "caption": "Unhold Call",
+                                "value": 17
+                            },
+                            {
+                                "caption": "Transfer Call",
+                                "value": 18
+                            },
+                            {
+                                "caption": "Blind Transfer",
+                                "value": 19
+                            },
+                            {
+                                "caption": "Attended Transfer",
+                                "value": 20
+                            },
+                            {
+                                "caption": "Received SIP INVITE",
+                                "value": 21
+                            },
+                            {
+                                "caption": "Line Key Long Press",
+                                "value": 22
+                            },
+                            {
+                                "caption": "Check for Blacklisting",
+                                "value": 23
+                            },
+                            {
+                                "caption": "Received NOTIFY Subscription",
+                                "value": 24
+                            },
+                            {
+                                "caption": "Received CSTA Message Firetest",
+                                "value": 25
+                            }
+                        ]
+                    }
+                },
+                {
+                    "caption": "Action URL",
+                    "name": "actionUrl",
+                    "width": "150px",
+                    "align": "center",
+                    "add": "",
+                    "edit": {
+                        "type": "ValidationTextBox"
+                    }
+                }
+            ],
+            "values": [],
+            "form": [
+                {
+                    "type": "Select",
+                    "name": "phoneEvent",
+                    "caption": "Phone event",
+                    "options": [
+                        {
+                            "caption": "DND on",
+                            "value": 1
+                        },
+                        {
+                            "caption": "DND off",
+                            "value": 2
+                        },
+                        {
+                            "caption": "Call Forwarding on",
+                            "value": 3
+                        },
+                        {
+                            "caption": "Call Forwarding off",
+                            "value": 4
+                        },
+                        {
+                            "caption": "Incoming Call",
+                            "value": 5
+                        },
+                        {
+                            "caption": "Outgoing Call",
+                            "value": 6
+                        },
+                        {
+                            "caption": "Setup finished",
+                            "value": 7
+                        },
+                        {
+                            "caption": "Off-hook",
+                            "value": 8
+                        },
+                        {
+                            "caption": "On-hook",
+                            "value": 9
+                        },
+                        {
+                            "caption": "Missed Call",
+                            "value": 10
+                        },
+                        {
+                            "caption": "Registration failed",
+                            "value": 11
+                        },
+                        {
+                            "caption": "On Connected",
+                            "value": 12
+                        },
+                        {
+                            "caption": "On Disconnected",
+                            "value": 13
+                        },
+                        {
+                            "caption": "Log on",
+                            "value": 14
+                        },
+                        {
+                            "caption": "Log off",
+                            "value": 15
+                        },
+                        {
+                            "caption": "Hold call",
+                            "value": 16
+                        },
+                        {
+                            "caption": "Unhold Call",
+                            "value": 17
+                        },
+                        {
+                            "caption": "Transfer Call",
+                            "value": 18
+                        },
+                        {
+                            "caption": "Blind Transfer",
+                            "value": 19
+                        },
+                        {
+                            "caption": "Attended Transfer",
+                            "value": 20
+                        },
+                        {
+                            "caption": "Received SIP INVITE",
+                            "value": 21
+                        },
+                        {
+                            "caption": "Line Key Long Press",
+                            "value": 22
+                        },
+                        {
+                            "caption": "Check for Blacklisting",
+                            "value": 23
+                        },
+                        {
+                            "caption": "Received NOTIFY Subscription",
+                            "value": 24
+                        },
+                        {
+                            "caption": "Received CSTA Message Firetest",
+                            "value": 25
+                        }
+                    ]
+                },
+                {
+                    "type": "ValidationTextBox",
+                    "name": "actionUrl",
+                    "caption": "Action URL"
+                }
+            ],
+            "onEdit": [
+                "echo 'Are you sure?\n",
+                "Applying the changes, will override the edited action URLs in your phone.\n",
+                "For seeing the current action URLs, press the button \"See current action URLs\"';"
+            ],
+            "onAdd": [
+                "echo 'Are you sure?\n",
+                "Applying the changes, will override the edited action URLs in your phone.\n",
+                "For seeing the current action URLs, press the button \"See current action URLs\"';"
+            ]
         }
     ]
 }
