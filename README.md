@@ -29,5 +29,5 @@ Different building automation systems (e.g. [KNX](https://www.knx.org/knx-en/for
 ```
 Maintainer: Simón Golpe Varela
 Support: simon.golpe@snom.com
-Last update: January 2024
+Last update: February 2024
 ```

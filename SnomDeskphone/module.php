@@ -440,7 +440,7 @@ class SnomDeskphone extends IPSModuleStrict
                             $message = "Snom D8xx not supported. HTTP $http_code";
                         } elseif ($loginFailed) {
                             if (str_contains($response, "unsuccessful login attempts")) {
-                                $message = "Unsuccessful login attempts.Wait...";
+                                $message = "Unsuccessful login attempts.\nReopen this instance after 1 minute.";
                             } else {
                                 $message = "Login failed";
                             }
