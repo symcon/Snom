@@ -61,5 +61,5 @@ Each single function key can be configured for one of this modi:
 ```
 Maintainer: Simón Golpe Varela
 Support: simon.golpe@snom.com
-Last update: January 2024
+Last update: February 2024
 ```
