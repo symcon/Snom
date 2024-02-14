@@ -178,6 +178,11 @@ class SnomDeskphone extends IPSModuleStrict
         $this->UpdateFormField("StatusVariableId", "visible", $StatusVariable);
     }
 
+    public function setActionUrlVariable(string $actionValue) {
+        $action = json_decode($actionValue, true);
+        $this->UpdateFormField("urlAction", "value", $action['parameters']['TARGET']);
+    }
+
     public function setFkeysSettings(): void 
     {
         $settingsUrls = $this->getFkeySettingsUrls();
@@ -236,6 +241,11 @@ class SnomDeskphone extends IPSModuleStrict
             default:
                 return urlencode("none");
         }
+    }
+
+    public function setActionUrls(): void 
+    {
+        $this->SendDebug("action urls", print_r("set here", true), 0);
     }
 
     public function fkeysAreUnique(array $fkeys_settings): bool
