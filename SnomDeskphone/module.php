@@ -252,9 +252,31 @@ class SnomDeskphone extends IPSModuleStrict
         return $fkeys_are_unique;
     }
 
+    public function getIps(): array 
+    {
+        $options = [];
+        $ricohDevices = [];
+        $devices = ZC_QueryServiceType(38338, "_http._tcp", "");
+        foreach ($devices as $device) {
+            if (str_contains($device["Name"], "RICOH")) {
+                array_push($ricohDevices, $device["Name"]);
+            }
+        }
+        $ricohIps =[];
+        foreach ($ricohDevices as $ricohDevice) {
+            $deviceIp = ZC_QueryService(38338, $ricohDevice, "_http._tcp", "local.")[0]["IPv4"][0];
+            // echo var_dump($deviceInfo);
+            array_push($options, ["caption" => $deviceIp, "value" => $deviceIp]);
+        }
+        // echo var_dump($ricohIps);
+        return $options;
+    }
+
     public function GetConfigurationForm(): string
     {
         $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
+        // echo var_dump();
+        $data["elements"][8]["options"] = $this->getIps();
         $device_info = array(
             "is snom phone" => false,
             "mac address" => '00:04:13:',

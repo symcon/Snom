@@ -345,6 +345,12 @@
                 "For seeing the current fkey settings, press the button \"See current function keys settings\"';",
                 "SNMD_setFkeysSettings($id);"
             ]
+        },
+        {
+            "type": "Select",
+            "name": "ips",
+            "caption": "found ips",
+            "options": []
         }
     ]
 }
