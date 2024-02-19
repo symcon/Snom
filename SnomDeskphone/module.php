@@ -306,6 +306,13 @@ class SnomDeskphone extends IPSModuleStrict
                         $data["elements"][6]["enabled"] = true;
                         $data["elements"][7]["visible"] = true;
                         break;
+                    case 307:
+                        $message = "Accepts your Snom phone HTTP or HTTPS?\nRedirect $httpCode";
+                        $data["elements"][2]["items"][2]["visible"] = false;
+                        $data["elements"][2]["items"][3]["visible"] = false;
+                        $data["elements"][6]["enabled"] = false;
+                        $data["elements"][7]["visible"] = false;
+                        break;
                     case 401:
                         $message = "Needs credentials. $httpCode";
                         $data["elements"][2]["items"][2]["visible"] = true;
@@ -320,7 +327,11 @@ class SnomDeskphone extends IPSModuleStrict
                         $data["elements"][7]["visible"] = false;
                         break;
                     default:
-                        echo $response;
+                        $data["elements"][2]["items"][2]["visible"] = false;
+                        $data["elements"][2]["items"][3]["visible"] = false;
+                        $data["elements"][6]["enabled"] = false;
+                        $data["elements"][7]["visible"] = false;
+                        echo $httpContent;
                 }
             }
             $data["elements"][2]["items"][4]["caption"] = $message;
@@ -334,6 +345,7 @@ class SnomDeskphone extends IPSModuleStrict
 
         $data["elements"][7]["columns"][0]["edit"]["options"] = $this->getFkeysColumnsOptions();
         $data["elements"][7]["form"] = "return json_decode(SNMD_UpdateForm(\$id, (array) \$FkeysSettings, \$FkeysSettings['Functionality'] ?? false, \$FkeysSettings['StatusVariable'] ?? true), true);";
+        $this->setFkeysSettings();
 
         return json_encode($data);
     }

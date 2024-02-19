@@ -336,14 +336,12 @@
             "onEdit": [
                 "echo 'Are you sure?\n",
                 "Applying the changes, will override the edited function(s) key(s) settings in your phone.\n",
-                "For seeing the current fkey settings, press the button \"See current function keys settings\"';",
-                "SNMD_setFkeysSettings($id);"
+                "For seeing the current fkey settings, press the button \"See current function keys settings\"';"
             ],
             "onAdd": [
                 "echo 'Are you sure?\n",
                 "Applying the changes, will override the edited function(s) key(s) settings in your phone.\n",
-                "For seeing the current fkey settings, press the button \"See current function keys settings\"';",
-                "SNMD_setFkeysSettings($id);"
+                "For seeing the current fkey settings, press the button \"See current function keys settings\"';"
             ]
         }
     ]
