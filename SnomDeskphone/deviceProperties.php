@@ -2,6 +2,7 @@
 
 class DeviceProperties
 {
+    const PHONE_MODELS = ["snomD335", "snomD385", "snomD735", "snomD785"];
     const EXPANSION_MODULES = ["D7C", "D7", "D3"];
     const MAX_EXPANSION_FKEYS = 144;
     const D385_EXPANSION_OFFSET = 126;

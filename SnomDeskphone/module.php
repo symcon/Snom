@@ -3,9 +3,14 @@
 require_once("deviceProperties.php");
 require_once("minibrowser.php");
 
+// Fkey functionality
 const DISPLAY_STATUS = 1;
 const UPDATE_LED = 2;
 const TRIGGER_ACTION_UPDATE_LED = 3;
+
+// Phone informations
+const MAC_ADDRESS = 1;
+const PHONE_MODEL = 2;
 
 class SnomDeskphone extends IPSModuleStrict
 {
@@ -255,142 +260,123 @@ class SnomDeskphone extends IPSModuleStrict
     public function GetConfigurationForm(): string
     {
         $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
-        $device_info = array(
-            "is snom phone" => false,
-            "mac address" => '00:04:13:',
-            "phone model" => '',
-        );
-        $phone_ip = $this->ReadPropertyString("PhoneIP");
+        $phoneIp = $this->ReadPropertyString("PhoneIP");
+        $message = $phoneIp ? $this->PingPhone($phoneIp) : "";
+        $data["elements"][2]["items"][4]["visible"] = true;
 
-        if ($phone_ip and Sys_Ping($phone_ip, 2000)) {
-            $device_info = $this->getDeviceInformation();
-        }
-
-        $data["elements"][3]["value"] = $device_info['mac address'];
-        $data["elements"][4]["value"] = $device_info['phone model'];
-
-        if (!$phone_ip) {
+        if ($this->instanceIpExists()) {
+            $message = "Instance with IP $phoneIp already exists";
+            $data["elements"][2]["items"][4]["caption"] = $message;
             $data["elements"][6]["enabled"] = false;
             $data["elements"][7]["visible"] = false;
-        } elseif ($device_info['is snom phone']) {
-            $isFullMacAddress = substr_count($device_info["mac address"], ':')  === 5;
-            $phone_ip = $this->ReadPropertyString("PhoneIP");
+        } elseif (str_contains($message, "is reachable")) {
             $protocol = $this->ReadPropertyString("Protocol");
-            $url = "$protocol://$phone_ip";
-            $message = $this->httpGetRequest($url, return_message: true);
+            $url = "$protocol://$phoneIp/info.htm";
+            $response = $this->httpGetRequest($url, return_message:true, headerOutput: false);
+            $httpCode = key($response);
+            $httpContent = $response[$httpCode];
+            $message = "Only " . implode(", ", DeviceProperties::PHONE_MODELS) . " supported.\nNot found $httpCode";
+            $isSnomD8xx = str_contains($httpContent, "<title>Phone Manager</title>");
 
-            if (!$isFullMacAddress) {
-                if ($message === "401") {
-                    $data["elements"][2]["items"][2]["visible"] = true;
-                    $data["elements"][2]["items"][3]["visible"] = true;
-                    $data["elements"][6]["enabled"] = false;
-                    $data["elements"][7]["visible"] = false;
-                } elseif ($message === "Login failed") {
-                    $data["elements"][2]["items"][2]["visible"] = true;
-                    $data["elements"][2]["items"][3]["visible"] = true;
-                    $data["elements"][2]["items"][4]["caption"] = $message;
-                    $data["elements"][2]["items"][4]["visible"] = true;
-                    $data["elements"][6]["enabled"] = false;
-                    $data["elements"][7]["visible"] = false;
-                } else {
-                    $data["elements"][2]["items"][4]["caption"] = $message;
-                    $data["elements"][2]["items"][4]["visible"] = true;
-                    $data["elements"][6]["enabled"] = false;
-                    $data["elements"][7]["visible"] = false;
-                }
-            } elseif ($this->instanceIpExists()) {
-                $data["elements"][2]["items"][4]["caption"] = "Instance with IP $phone_ip already exists";
-                $data["elements"][2]["items"][4]["visible"] = true;
+            if ($isSnomD8xx) { 
+                $data["elements"][2]["items"][2]["visible"] = false;
+                $data["elements"][2]["items"][3]["visible"] = false;
                 $data["elements"][6]["enabled"] = false;
                 $data["elements"][7]["visible"] = false;
             } else {
-                $this->SetSummary($phone_ip);
-                $needs_credentials = $this->ReadPropertyString("Username") and $this->ReadPropertyString("Password");
-
-                if ($needs_credentials) {
-                    $data["elements"][2]["items"][2]["visible"] = true;
-                    $data["elements"][2]["items"][3]["visible"] = true;
+                switch ($httpCode) {
+                    case 0:
+                        $message = $httpContent;
+                        $data["elements"][2]["items"][2]["visible"] = false;
+                        $data["elements"][2]["items"][3]["visible"] = false;
+                        $data["elements"][6]["enabled"] = false;
+                        $data["elements"][7]["visible"] = false;
+                        break;
+                    case 200:
+                        $message = $httpCode;
+                        $data["elements"][2]["items"][2]["visible"] = true;
+                        $data["elements"][2]["items"][3]["visible"] = true;
+                        $macAddress = $this->getPhoneInformation($httpContent, MAC_ADDRESS);
+                        $this->SetValue('PhoneMac', $macAddress);
+                        $data["elements"][3]["value"] = $macAddress;
+                        $phoneModel = $this->getPhoneInformation($httpContent, PHONE_MODEL);
+                        $this->SetValue('PhoneModel', $phoneModel);
+                        $this->SetSummary($phoneIp);
+                        $data["elements"][4]["value"] = $phoneModel;
+                        $data["elements"][6]["enabled"] = true;
+                        $data["elements"][7]["visible"] = true;
+                        break;
+                    case 307:
+                        $message = "Accepts your Snom phone HTTP or HTTPS?\nRedirect $httpCode";
+                        $data["elements"][2]["items"][2]["visible"] = false;
+                        $data["elements"][2]["items"][3]["visible"] = false;
+                        $data["elements"][6]["enabled"] = false;
+                        $data["elements"][7]["visible"] = false;
+                        break;
+                    case 401:
+                        $message = "Needs credentials. $httpCode";
+                        $data["elements"][2]["items"][2]["visible"] = true;
+                        $data["elements"][2]["items"][3]["visible"] = true;
+                        $data["elements"][6]["enabled"] = false;
+                        $data["elements"][7]["visible"] = false;
+                        break;
+                    case 404:
+                        $data["elements"][2]["items"][2]["visible"] = false;
+                        $data["elements"][2]["items"][3]["visible"] = false;
+                        $data["elements"][6]["enabled"] = false;
+                        $data["elements"][7]["visible"] = false;
+                        break;
+                    default:
+                        $data["elements"][2]["items"][2]["visible"] = false;
+                        $data["elements"][2]["items"][3]["visible"] = false;
+                        $data["elements"][6]["enabled"] = false;
+                        $data["elements"][7]["visible"] = false;
+                        echo $httpContent;
                 }
-
-                $data["elements"][2]["items"][4]["visible"] = false;
-                $data["elements"][6]["visible"] = true;
             }
+            $data["elements"][2]["items"][4]["caption"] = $message;
         } else {
-            $data["elements"][2]["items"][4]["visible"] = true;
+            $data["elements"][2]["items"][2]["visible"] = false;
+            $data["elements"][2]["items"][3]["visible"] = false;
+            $data["elements"][2]["items"][4]["caption"] = $message;
             $data["elements"][6]["enabled"] = false;
             $data["elements"][7]["visible"] = false;
         }
 
         $data["elements"][7]["columns"][0]["edit"]["options"] = $this->getFkeysColumnsOptions();
         $data["elements"][7]["form"] = "return json_decode(SNMD_UpdateForm(\$id, (array) \$FkeysSettings, \$FkeysSettings['Functionality'] ?? false, \$FkeysSettings['StatusVariable'] ?? true), true);";
+        $this->setFkeysSettings();
 
         return json_encode($data);
     }
 
-    public function getDeviceInformation(): array
+    public function getPhoneInformation(string $response, int $property): string
     {
-        $mac_address = $this->getMacAddress();
+        $information = "Searching phone information...";
 
-        if (str_contains($mac_address, '00:04:13:') or str_contains($mac_address, '0:4:13:')) { // for MacOS '0:4:13:'
-            $phone_ip = $this->ReadPropertyString("PhoneIP");
-            $protocol = $this->ReadPropertyString("Protocol");
-            $url = "$protocol://$phone_ip/settings.xml";
-            $response = $this->httpGetRequest($url, headerOutput: false);
-            $phone_settings_xml = @simplexml_load_string($response);
-
-            if ($phone_settings_xml) {
-                $phone_model = (string) $phone_settings_xml->{'phone-settings'}->phone_type[0];
-                $this->SetValue('PhoneModel', $phone_model);
-                $this->SetValue('PhoneMac', $mac_address);
-
-                return array(
-                    "is snom phone" => true,
-                    "mac address" => $mac_address,
-                    "phone model" => $phone_model,
-                );
-            } else {
-                return array(
-                    "is snom phone" => true,
-                    "mac address" => '00:04:13:',
-                    "phone model" => '',
-                );
-            }
-        } else {
-            return array(
-                "is snom phone" => false,
-                "mac address" => '00:04:13:',
-                "phone model" => '',
-            );
-        }
-    }
-
-    public function getMacAddress(): string
-    {
-        $mac_address = "none";
-        $phone_ip = $this->ReadPropertyString("PhoneIP");
-        exec('uname', $isLinux, $exec_status);
-
-        if ($isLinux) {
-            // symbox 7.0 november 2023
-            exec('arp ' . $phone_ip . ' | awk \'{print $4}\'', $output, $exec_status);
-            $mac_address = $output[0];
-
-            if (!str_contains($mac_address, ':')) {
-                // raspberry os
-                exec('arp ' . $phone_ip . ' | awk \'{print $3}\'', $output_raspberrypi, $exec_status);
-                $mac_address = $output_raspberrypi[1];
-            }
-        } else {
-            // windows
-            exec('arp -a ' . $phone_ip, $output, $exec_status);
-            $output_array = explode(' ', $output[3]);
-            $mac_address = str_replace("-", ":", $output_array[11]);
+        switch ($property) {
+            case MAC_ADDRESS:
+                $information = "searching MAC";
+                $pattern = "/MAC Address<\/TD><TD>[0-9A-F]{12}/i";
+                preg_match($pattern, $response, $matches);
+                $information = str_replace("MAC Address</TD><TD>","",$matches[0]);
+                break;
+            case PHONE_MODEL:
+                $information = "searching phone model...";
+                $pattern = "/<TITLE>snom D[0-9]{3}/i";
+                preg_match($pattern, $response, $matches);
+                $phoneModel = str_replace(["<TITLE>", " "],"",$matches[0]);
+                $isValidPhoneModel = in_array($phoneModel, DeviceProperties::PHONE_MODELS);
+                $information = $isValidPhoneModel ? $phoneModel : "Not found";
+                break;
+            default:
+                $information = "Not able to get information";
         }
 
-        return $mac_address;
+        return $information;
     }
 
-    public function httpGetRequest(string $url, bool $return_message = false, bool $headerOutput = true): bool|string
+    public function httpGetRequest(string $url, bool $return_message = false, bool $headerOutput = true): bool|string|array
     {
         $protocol = $this->ReadPropertyString("Protocol");
         $this->SendDebug("url", print_r($url, true), 0);
@@ -425,45 +411,21 @@ class SnomDeskphone extends IPSModuleStrict
         }
 
         $response = curl_exec($handler);
+        
 
         if ($return_message) {
             $curl_errno = curl_errno($handler);
             $message = "Curl handle error";
 
             if (!$curl_errno) {
-                switch ($http_code = curl_getinfo($handler, CURLINFO_HTTP_CODE)) {
-                    case 200:
-                        $isSnomD8xx = str_contains($response, "<title>Phone Manager</title>");
-                        $loginFailed = str_contains($response, "Login failed!");
-
-                        if ($isSnomD8xx) {
-                            $message = "Snom D8xx not supported. HTTP $http_code";
-                        } elseif ($loginFailed) {
-                            if (str_contains($response, "unsuccessful login attempts")) {
-                                $message = "Unsuccessful login attempts.\nReopen this instance after 1 minute.";
-                            } else {
-                                $message = "Login failed";
-                            }
-                        } else {
-                            $message = "$http_code $response";
-                        }
-                        break;
-                    case 303:
-                        $message = "Snom M900 not supported. HTTP $http_code";
-                        break;
-                    case 401:
-                        $message = "$http_code";
-                        break;
-                    default:
-                        $message = "$http_code";
-                }
+                $message = [curl_getinfo($handler, CURLINFO_HTTP_CODE) => $response];
             } else {
                 switch (curl_errno($handler)) {
                     case 7:
-                        $message = "Accepts your Snom phone HTTP or HTTPS?\n" . curl_error($handler);
+                        $message = [0 => "Accepts your Snom phone HTTP or HTTPS?\n" . curl_error($handler)];
                         break;
                     default:
-                        $message = curl_error($handler) . "\n(Curl error " . curl_errno($handler) . " " .  " HTTP: " . curl_getinfo($handler, CURLINFO_HTTP_CODE) . ")";
+                        $message = [0 => curl_error($handler) . "\n(Curl error " . curl_errno($handler) . " " .  " HTTP: " . curl_getinfo($handler, CURLINFO_HTTP_CODE) . ")"];
                 }
             }
 
