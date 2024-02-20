@@ -269,8 +269,7 @@ class SnomDeskphone extends IPSModuleStrict
             $data["elements"][7]["visible"] = false;
         } elseif (str_contains($message, "is reachable")) {
             $protocol = $this->ReadPropertyString("Protocol");
-            $url = "$protocol://$phoneIp/info.htm";
-            $response = $this->httpGetRequest($url, return_message:true, headerOutput: false);
+            $response = $this->httpGetRequest("$protocol://$phoneIp/info.htm", return_message:true, headerOutput: false);
             $httpCode = key($response);
             $httpContent = $response[$httpCode];
             $message = "Only " . implode(", ", DeviceProperties::PHONE_MODELS) . " supported.\nNot found $httpCode";
@@ -295,6 +294,9 @@ class SnomDeskphone extends IPSModuleStrict
                             $phoneModel = $this->getPhoneInformation($httpContent, PHONE_MODEL);
                             $this->SetValue('PhoneModel', $phoneModel);
                             $this->SetSummary($phoneIp);
+
+                            $phoneSettings = $this->getPhoneSettings();
+
                             $data["elements"][4]["value"] = $phoneModel;
                             $data["elements"][2]["items"][4]["visible"] = false;
 
@@ -363,6 +365,19 @@ class SnomDeskphone extends IPSModuleStrict
         }
 
         return $information;
+    }
+
+    public function getPhoneSettings(): string
+    {
+        $phoneSettings = "no settings";
+        $protocol = $this->ReadPropertyString("Protocol");
+        $phoneIp = $this->ReadPropertyString("PhoneIP");
+        $response = $this->httpGetRequest("$protocol://$phoneIp/settings.xml", return_message:true, headerOutput: false);
+        $httpCode = key($response);
+        $phoneSettings = $response[$httpCode];
+        echo $phoneSettings;
+
+        return $phoneSettings;
     }
 
     public function httpGetRequest(string $url, bool $return_message = false, bool $headerOutput = true): bool|string|array
