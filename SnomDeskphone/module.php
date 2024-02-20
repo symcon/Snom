@@ -291,17 +291,15 @@ class SnomDeskphone extends IPSModuleStrict
                             $macAddress = $this->getPhoneInformation($httpContent, MAC_ADDRESS);
                             $this->SetValue('PhoneMac', $macAddress);
                             $data["elements"][3]["value"] = $macAddress;
-                            $phoneModel = $this->getPhoneInformation($httpContent, PHONE_MODEL);
-                            $this->SetValue('PhoneModel', $phoneModel);
+                            $data["elements"][2]["items"][4]["visible"] = false;
+                            $phoneSettings = $this->getPhoneSettings();
+                            $this->SetValue('PhoneModel', $phoneSettings["phone_type"]);
+                            $data["elements"][4]["value"] = $phoneSettings["phone_type"];
                             $this->SetSummary($phoneIp);
 
-                            $phoneSettings = $this->getPhoneSettings();
-
-                            $data["elements"][4]["value"] = $phoneModel;
-                            $data["elements"][2]["items"][4]["visible"] = false;
-
-                            // TODO: read from settings.xml if phone needs credentials
-                            if ($this->ReadPropertyString("Username")) {
+                            // works also with wrong credentials!!!
+                            if ((string)$phoneSettings["http_user"]) {
+                                $this->SendDebug("credential", print_r($phoneSettings["http_user"], true), 0);
                                 $data["elements"][2]["items"][2]["visible"] = true;
                                 $data["elements"][2]["items"][3]["visible"] = true;
                             }
@@ -367,15 +365,18 @@ class SnomDeskphone extends IPSModuleStrict
         return $information;
     }
 
-    public function getPhoneSettings(): string
+    public function getPhoneSettings(): array
     {
-        $phoneSettings = "no settings";
         $protocol = $this->ReadPropertyString("Protocol");
         $phoneIp = $this->ReadPropertyString("PhoneIP");
         $response = $this->httpGetRequest("$protocol://$phoneIp/settings.xml", return_message:true, headerOutput: false);
         $httpCode = key($response);
-        $phoneSettings = $response[$httpCode];
-        echo $phoneSettings;
+        $phoneSettingsXml = @simplexml_load_string($response[$httpCode]);
+        $phoneSettings = [];
+
+        foreach ((array)$phoneSettingsXml->{'phone-settings'} as $setting => $value) {
+            $phoneSettings[$setting] = $value;
+        }
 
         return $phoneSettings;
     }
