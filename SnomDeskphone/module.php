@@ -262,11 +262,9 @@ class SnomDeskphone extends IPSModuleStrict
         $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
         $phoneIp = $this->ReadPropertyString("PhoneIP");
         $message = $phoneIp ? $this->PingPhone($phoneIp) : "";
-        $data["elements"][2]["items"][4]["visible"] = true;
 
         if ($this->instanceIpExists()) {
             $message = "Instance with IP $phoneIp already exists";
-            $data["elements"][2]["items"][4]["caption"] = $message;
             $data["elements"][6]["enabled"] = false;
             $data["elements"][7]["visible"] = false;
         } elseif (str_contains($message, "is reachable")) {
@@ -279,70 +277,61 @@ class SnomDeskphone extends IPSModuleStrict
             $isSnomD8xx = str_contains($httpContent, "<title>Phone Manager</title>");
 
             if ($isSnomD8xx) { 
-                $data["elements"][2]["items"][2]["visible"] = false;
-                $data["elements"][2]["items"][3]["visible"] = false;
                 $data["elements"][6]["enabled"] = false;
                 $data["elements"][7]["visible"] = false;
             } else {
                 switch ($httpCode) {
                     case 0:
                         $message = $httpContent;
-                        $data["elements"][2]["items"][2]["visible"] = false;
-                        $data["elements"][2]["items"][3]["visible"] = false;
-                        $data["elements"][6]["enabled"] = false;
-                        $data["elements"][7]["visible"] = false;
                         break;
                     case 200:
-                        $message = $httpCode;
-                        $data["elements"][2]["items"][2]["visible"] = true;
-                        $data["elements"][2]["items"][3]["visible"] = true;
-                        $macAddress = $this->getPhoneInformation($httpContent, MAC_ADDRESS);
-                        $this->SetValue('PhoneMac', $macAddress);
-                        $data["elements"][3]["value"] = $macAddress;
-                        $phoneModel = $this->getPhoneInformation($httpContent, PHONE_MODEL);
-                        $this->SetValue('PhoneModel', $phoneModel);
-                        $this->SetSummary($phoneIp);
-                        $data["elements"][4]["value"] = $phoneModel;
-                        $data["elements"][6]["enabled"] = true;
-                        $data["elements"][7]["visible"] = true;
+                        if (str_contains($httpContent, "Login failed!")) {
+                            $message = "Unsuccessful login attempts.\nRetry after 1 minute";
+                        } else {
+                            $message = $httpCode;
+                            $macAddress = $this->getPhoneInformation($httpContent, MAC_ADDRESS);
+                            $this->SetValue('PhoneMac', $macAddress);
+                            $data["elements"][3]["value"] = $macAddress;
+                            $phoneModel = $this->getPhoneInformation($httpContent, PHONE_MODEL);
+                            $this->SetValue('PhoneModel', $phoneModel);
+                            $this->SetSummary($phoneIp);
+                            $data["elements"][4]["value"] = $phoneModel;
+                            $data["elements"][2]["items"][4]["visible"] = false;
+
+                            // TODO: read from settings.xml if phone needs credentials
+                            if ($this->ReadPropertyString("Username")) {
+                                $data["elements"][2]["items"][2]["visible"] = true;
+                                $data["elements"][2]["items"][3]["visible"] = true;
+                            }
+                            $data["elements"][6]["enabled"] = true;
+                            $data["elements"][7]["visible"] = true;
+                        }
+                        break;
+                    case 301:
+                        $message = "Moved permanently $httpCode";
+                        break;
+                    case 302:
+                        $message = "Moved $httpCode";
                         break;
                     case 307:
                         $message = "Accepts your Snom phone HTTP or HTTPS?\nRedirect $httpCode";
-                        $data["elements"][2]["items"][2]["visible"] = false;
-                        $data["elements"][2]["items"][3]["visible"] = false;
-                        $data["elements"][6]["enabled"] = false;
-                        $data["elements"][7]["visible"] = false;
                         break;
                     case 401:
                         $message = "Needs credentials. $httpCode";
                         $data["elements"][2]["items"][2]["visible"] = true;
                         $data["elements"][2]["items"][3]["visible"] = true;
-                        $data["elements"][6]["enabled"] = false;
-                        $data["elements"][7]["visible"] = false;
                         break;
                     case 404:
-                        $data["elements"][2]["items"][2]["visible"] = false;
-                        $data["elements"][2]["items"][3]["visible"] = false;
-                        $data["elements"][6]["enabled"] = false;
-                        $data["elements"][7]["visible"] = false;
+                        $message = "Not found. $httpCode";
                         break;
                     default:
-                        $data["elements"][2]["items"][2]["visible"] = false;
-                        $data["elements"][2]["items"][3]["visible"] = false;
-                        $data["elements"][6]["enabled"] = false;
-                        $data["elements"][7]["visible"] = false;
+                        $message = "Not handled HTTP code $httpCode";
                         echo $httpContent;
                 }
             }
-            $data["elements"][2]["items"][4]["caption"] = $message;
-        } else {
-            $data["elements"][2]["items"][2]["visible"] = false;
-            $data["elements"][2]["items"][3]["visible"] = false;
-            $data["elements"][2]["items"][4]["caption"] = $message;
-            $data["elements"][6]["enabled"] = false;
-            $data["elements"][7]["visible"] = false;
         }
 
+        $data["elements"][2]["items"][4]["caption"] = $message;
         $data["elements"][7]["columns"][0]["edit"]["options"] = $this->getFkeysColumnsOptions();
         $data["elements"][7]["form"] = "return json_decode(SNMD_UpdateForm(\$id, (array) \$FkeysSettings, \$FkeysSettings['Functionality'] ?? false, \$FkeysSettings['StatusVariable'] ?? true), true);";
         $this->setFkeysSettings();
