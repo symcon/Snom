@@ -49,8 +49,7 @@
                 {
                     "type": "Label",
                     "caption": "No Snom phone with this IP address",
-                    "name": "NotSnomPhone",
-                    "visible": false
+                    "name": "NotSnomPhone"
                 }
             ]
         },
@@ -78,6 +77,7 @@
             "caption": "See current function keys settings",
             "name": "PhoneWuiLink",
             "link": true,
+            "enabled": false,
             "onClick": "echo 'http://' . $PhoneIP . '/fkey.htm';"
         },
         {
@@ -86,6 +86,7 @@
             "name": "FkeysSettings",
             "add": true,
             "delete": true,
+            "visible": false,
             "columns": [
                 {
                     "caption": "Function key",
