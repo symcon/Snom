@@ -363,9 +363,9 @@ class SnomDeskphone extends IPSModuleStrict
                 break;
             case PHONE_MODEL:
                 $information = "searching phone model...";
-                $pattern = "/<TITLE>snom D[0-9]{3}/i";
+                $pattern = "/Hardware: D[0-9]{3}/i";
                 preg_match($pattern, $response, $matches);
-                $phoneModel = str_replace(["<TITLE>", " "],"",$matches[0]);
+                $phoneModel = str_replace("Hardware: ", "snom", $matches[0]);
                 $isValidPhoneModel = in_array($phoneModel, DeviceProperties::PHONE_MODELS);
                 $information = $isValidPhoneModel ? $phoneModel : "Not found";
                 break;
