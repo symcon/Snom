@@ -357,9 +357,9 @@ class SnomDeskphone extends IPSModuleStrict
         switch ($property) {
             case MAC_ADDRESS:
                 $information = "searching MAC";
-                $pattern = "/MAC Address<\/TD><TD>[0-9A-F]{12}/i";
+                $pattern = "/Mac:[0-9A-F]{12}/i";
                 preg_match($pattern, $response, $matches);
-                $information = str_replace("MAC Address</TD><TD>","",$matches[0]);
+                $information = str_replace("Mac:","",$matches[0]);
                 break;
             case PHONE_MODEL:
                 $information = "searching phone model...";
