@@ -600,14 +600,12 @@
             "onEdit": [
                 "echo 'Are you sure?\n",
                 "Applying the changes, will override the edited action URLs in your phone.\n",
-                "For seeing the current action URLs, press the button \"See current action URLs\"';",
-                "SNMD_setActionUrls($id);"
+                "For seeing the current action URLs, press the button \"See current action URLs\"';"
             ],
             "onAdd": [
                 "echo 'Are you sure?\n",
                 "Applying the changes, will override the edited action URLs in your phone.\n",
-                "For seeing the current action URLs, press the button \"See current action URLs\"';",
-                "SNMD_setActionUrls($id);"
+                "For seeing the current action URLs, press the button \"See current action URLs\"';"
             ]
         }
     ]

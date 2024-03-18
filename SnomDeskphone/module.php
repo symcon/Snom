@@ -243,11 +243,6 @@ class SnomDeskphone extends IPSModuleStrict
         }
     }
 
-    public function setActionUrls(): void 
-    {
-        $this->SendDebug("action urls", print_r("set here", true), 0);
-    }
-
     public function fkeysAreUnique(array $fkeys_settings): bool
     {
         $fkeys_are_unique = true;
@@ -268,6 +263,11 @@ class SnomDeskphone extends IPSModuleStrict
         return $fkeys_are_unique;
     }
 
+    public function setActionUrls(): void 
+    {
+        $this->SendDebug("action urls", print_r("set here", true), 0);
+    }
+
     public function GetConfigurationForm(): string
     {
         $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
@@ -280,6 +280,8 @@ class SnomDeskphone extends IPSModuleStrict
             $data["elements"][2]["items"][4]["caption"] = $message;
             $data["elements"][6]["enabled"] = false;
             $data["elements"][7]["visible"] = false;
+            $data["elements"][8]["enabled"] = false;
+            $data["elements"][9]["visible"] = false;
         } elseif (str_contains($message, "is reachable")) {
             $protocol = $this->ReadPropertyString("Protocol");
             $url = "$protocol://$phoneIp/info.htm";
@@ -294,6 +296,8 @@ class SnomDeskphone extends IPSModuleStrict
                 $data["elements"][2]["items"][3]["visible"] = false;
                 $data["elements"][6]["enabled"] = false;
                 $data["elements"][7]["visible"] = false;
+                $data["elements"][8]["enabled"] = false;
+                $data["elements"][9]["visible"] = false;
             } else {
                 switch ($httpCode) {
                     case 0:
@@ -302,6 +306,8 @@ class SnomDeskphone extends IPSModuleStrict
                         $data["elements"][2]["items"][3]["visible"] = false;
                         $data["elements"][6]["enabled"] = false;
                         $data["elements"][7]["visible"] = false;
+                        $data["elements"][8]["enabled"] = false;
+                        $data["elements"][9]["visible"] = false;
                         break;
                     case 200:
                         $message = $httpCode;
@@ -316,6 +322,8 @@ class SnomDeskphone extends IPSModuleStrict
                         $data["elements"][4]["value"] = $phoneModel;
                         $data["elements"][6]["enabled"] = true;
                         $data["elements"][7]["visible"] = true;
+                        $data["elements"][8]["enabled"] = true;
+                        $data["elements"][9]["visible"] = true;
                         break;
                     case 307:
                         $message = "Accepts your Snom phone HTTP or HTTPS?\nRedirect $httpCode";
@@ -323,6 +331,8 @@ class SnomDeskphone extends IPSModuleStrict
                         $data["elements"][2]["items"][3]["visible"] = false;
                         $data["elements"][6]["enabled"] = false;
                         $data["elements"][7]["visible"] = false;
+                        $data["elements"][8]["enabled"] = false;
+                        $data["elements"][9]["visible"] = false;
                         break;
                     case 401:
                         $message = "Needs credentials. $httpCode";
@@ -330,6 +340,8 @@ class SnomDeskphone extends IPSModuleStrict
                         $data["elements"][2]["items"][3]["visible"] = true;
                         $data["elements"][6]["enabled"] = false;
                         $data["elements"][7]["visible"] = false;
+                        $data["elements"][8]["enabled"] = false;
+                        $data["elements"][9]["visible"] = false;
                         break;
                     case 404:
                         $data["elements"][2]["items"][2]["visible"] = false;
@@ -342,6 +354,8 @@ class SnomDeskphone extends IPSModuleStrict
                         $data["elements"][2]["items"][3]["visible"] = false;
                         $data["elements"][6]["enabled"] = false;
                         $data["elements"][7]["visible"] = false;
+                        $data["elements"][8]["enabled"] = false;
+                        $data["elements"][9]["visible"] = false;
                         echo $httpContent;
                 }
             }
@@ -352,11 +366,14 @@ class SnomDeskphone extends IPSModuleStrict
             $data["elements"][2]["items"][4]["caption"] = $message;
             $data["elements"][6]["enabled"] = false;
             $data["elements"][7]["visible"] = false;
+            $data["elements"][8]["enabled"] = false;
+            $data["elements"][9]["visible"] = false;
         }
 
         $data["elements"][7]["columns"][0]["edit"]["options"] = $this->getFkeysColumnsOptions();
         $data["elements"][7]["form"] = "return json_decode(SNMD_UpdateForm(\$id, (array) \$FkeysSettings, \$FkeysSettings['Functionality'] ?? false, \$FkeysSettings['StatusVariable'] ?? true), true);";
         $this->setFkeysSettings();
+        $this->setActionUrls();
 
         return json_encode($data);
     }
