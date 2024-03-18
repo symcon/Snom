@@ -471,9 +471,19 @@
                     }
                 },
                 {
+                    "caption": "Blink",
+                    "name": "blink",
+                    "width": "100px",
+                    "align": "center",
+                    "add": false,
+                    "edit": {
+                        "type": "CheckBox"
+                    }
+                },
+                {
                     "caption": "Action",
                     "name": "urlAction",
-                    "width": "100px",
+                    "width": "400px",
                     "align": "center",
                     "add": 0,
                     "edit": {
@@ -589,6 +599,11 @@
                             "value": "action_firewall_test"
                         }
                     ]
+                },
+                {
+                    "type": "CheckBox",
+                    "name": "blink",
+                    "caption": "Blink"
                 },
                 {
                     "type": "SelectAction",

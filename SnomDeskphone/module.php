@@ -121,15 +121,21 @@ class SnomDeskphone extends IPSModuleStrict
             $this->SendDebug("SNOM MINIBROWSER", print_r($xml->minibrowser, true), 0);
             $xml->executeMinibrowser();
         } else {
-            if ($_GET["blink"] === "start") {
-                $this->SendDebug("blink", print_r($_GET["blink"], true), 0);
-            } elseif ($_GET["blink"] === "stop") {
-                $this->SendDebug("blink", print_r($_GET["blink"], true), 0);
-            } elseif ($_GET["blink"] === "") {
-                $this->SendDebug("blink", print_r($_GET["blink"], true), 0);
-            } else {
-                $this->SendDebug("blink", print_r("no blink", true), 0);
-                $action = json_decode($_GET["value"], true);
+            $action = json_decode($_GET["value"], true);
+
+            if ($action['parameters']["VALUE"]) {
+                IPS_RunAction($action['actionID'], $action['parameters']);
+                IPS_Sleep(3000);
+
+                if (filter_var($_GET["blink"], FILTER_VALIDATE_BOOLEAN)) {
+                    $this->SendDebug("blink", print_r("blinking", true), 0);
+                    RequestAction($_GET["variableId"], false);
+                    IPS_Sleep(3000);
+                    RequestAction($_GET["variableId"], true);
+                    IPS_Sleep(3000);
+                }
+            } else{
+                $this->SendDebug("blink", print_r("off", true), 0);
                 IPS_RunAction($action['actionID'], $action['parameters']);
             }
         }
@@ -293,9 +299,13 @@ class SnomDeskphone extends IPSModuleStrict
             $action = json_decode($actionSetting["urlAction"], true);
             $variableIdToWrite = $action["parameters"]["TARGET"];
             $valueToWrite = $actionSetting["urlAction"];
+            $blink = $actionSetting["blink"];
+            // echo var_dump($actionSetting);
+            // echo $blink;
+
             $instanceHook = sprintf("http://%s:3777/hook/snom/%d/", $this->ReadPropertyString("LocalIP"), $this->InstanceID);
-            // $hookParameters = "?xml=false&variableId=$variableIdToWrite&value=$valueToWrite&blink=start";
-            $hookParameters = "?xml=false&variableId=$variableIdToWrite&value=$valueToWrite";
+            $hookParameters = "?xml=false&variableId=$variableIdToWrite&value=$valueToWrite&blink=$blink";
+            // $hookParameters = "?xml=false&variableId=$variableIdToWrite&value=$valueToWrite";
             $actionUrl = urlencode("$instanceHook$hookParameters");
             $urlParameters = sprintf("settings=save&store_settings=save&%s=%s", $actionSetting["phoneEvent"], $actionUrl);
             $phoneIp = $this->ReadPropertyString("PhoneIP");
