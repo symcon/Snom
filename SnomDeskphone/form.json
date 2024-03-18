@@ -369,103 +369,103 @@
                         "options": [
                             {
                                 "caption": "DND on",
-                                "value": 1
+                                "value": "action_dnd_on_url"
                             },
                             {
                                 "caption": "DND off",
-                                "value": 2
+                                "value": "action_dnd_off_url"
                             },
                             {
                                 "caption": "Call Forwarding on",
-                                "value": 3
+                                "value": "action_redirection_on_url"
                             },
                             {
                                 "caption": "Call Forwarding off",
-                                "value": 4
+                                "value": "action_redirection_off_url"
                             },
                             {
                                 "caption": "Incoming Call",
-                                "value": 5
+                                "value": "action_incoming_url"
                             },
                             {
                                 "caption": "Outgoing Call",
-                                "value": 6
+                                "value": "action_outgoing_url"
                             },
                             {
                                 "caption": "Setup finished",
-                                "value": 7
+                                "value": "action_setup_url"
                             },
                             {
                                 "caption": "Off-hook",
-                                "value": 8
+                                "value": "action_offhook_url"
                             },
                             {
                                 "caption": "On-hook",
-                                "value": 9
+                                "value": "action_onhook_url"
                             },
                             {
                                 "caption": "Missed Call",
-                                "value": 10
+                                "value": "action_missed_url"
                             },
                             {
                                 "caption": "Registration failed",
-                                "value": 11
+                                "value": "action_reg_failed"
                             },
                             {
                                 "caption": "On Connected",
-                                "value": 12
+                                "value": "action_connected_url"
                             },
                             {
                                 "caption": "On Disconnected",
-                                "value": 13
+                                "value": "action_disconnected_url"
                             },
                             {
                                 "caption": "Log on",
-                                "value": 14
+                                "value": "action_log_on_url"
                             },
                             {
                                 "caption": "Log off",
-                                "value": 15
+                                "value": "action_log_off_url"
                             },
                             {
                                 "caption": "Hold call",
-                                "value": 16
+                                "value": "action_hold"
                             },
                             {
                                 "caption": "Unhold Call",
-                                "value": 17
+                                "value": "action_unhold"
                             },
                             {
                                 "caption": "Transfer Call",
-                                "value": 18
+                                "value": "action_transfer"
                             },
                             {
                                 "caption": "Blind Transfer",
-                                "value": 19
+                                "value": "action_blind_transfer"
                             },
                             {
                                 "caption": "Attended Transfer",
-                                "value": 20
+                                "value": "action_attended_transfer"
                             },
                             {
                                 "caption": "Received SIP INVITE",
-                                "value": 21
+                                "value": "action_received_attended_transfer"
                             },
                             {
                                 "caption": "Line Key Long Press",
-                                "value": 22
+                                "value": "action_longpress_url"
                             },
                             {
                                 "caption": "Check for Blacklisting",
-                                "value": 23
+                                "value": "action_blacklist_url"
                             },
                             {
                                 "caption": "Received NOTIFY Subscription",
-                                "value": 24
+                                "value": "action_received_subscr_notify_url"
                             },
                             {
                                 "caption": "Received CSTA Message Firetest",
-                                "value": 25
+                                "value": "action_firewall_test"
                             }
                         ]
                     }
@@ -490,103 +490,103 @@
                     "options": [
                         {
                             "caption": "DND on",
-                            "value": 1
+                            "value": "action_dnd_on_url"
                         },
                         {
                             "caption": "DND off",
-                            "value": 2
+                            "value": "action_dnd_off_url"
                         },
                         {
                             "caption": "Call Forwarding on",
-                            "value": 3
+                            "value": "action_redirection_on_url"
                         },
                         {
                             "caption": "Call Forwarding off",
-                            "value": 4
+                            "value": "action_redirection_off_url"
                         },
                         {
                             "caption": "Incoming Call",
-                            "value": 5
+                            "value": "action_incoming_url"
                         },
                         {
                             "caption": "Outgoing Call",
-                            "value": 6
+                            "value": "action_outgoing_url"
                         },
                         {
                             "caption": "Setup finished",
-                            "value": 7
+                            "value": "action_setup_url"
                         },
                         {
                             "caption": "Off-hook",
-                            "value": 8
+                            "value": "action_offhook_url"
                         },
                         {
                             "caption": "On-hook",
-                            "value": 9
+                            "value": "action_onhook_url"
                         },
                         {
                             "caption": "Missed Call",
-                            "value": 10
+                            "value": "action_missed_url"
                         },
                         {
                             "caption": "Registration failed",
-                            "value": 11
+                            "value": "action_reg_failed"
                         },
                         {
                             "caption": "On Connected",
-                            "value": 12
+                            "value": "action_connected_url"
                         },
                         {
                             "caption": "On Disconnected",
-                            "value": 13
+                            "value": "action_disconnected_url"
                         },
                         {
                             "caption": "Log on",
-                            "value": 14
+                            "value": "action_log_on_url"
                         },
                         {
                             "caption": "Log off",
-                            "value": 15
+                            "value": "action_log_off_url"
                         },
                         {
                             "caption": "Hold call",
-                            "value": 16
+                            "value": "action_hold"
                         },
                         {
                             "caption": "Unhold Call",
-                            "value": 17
+                            "value": "action_unhold"
                         },
                         {
                             "caption": "Transfer Call",
-                            "value": 18
+                            "value": "action_transfer"
                         },
                         {
                             "caption": "Blind Transfer",
-                            "value": 19
+                            "value": "action_blind_transfer"
                         },
                         {
                             "caption": "Attended Transfer",
-                            "value": 20
+                            "value": "action_attended_transfer"
                         },
                         {
                             "caption": "Received SIP INVITE",
-                            "value": 21
+                            "value": "action_received_attended_transfer"
                         },
                         {
                             "caption": "Line Key Long Press",
-                            "value": 22
+                            "value": "action_longpress_url"
                         },
                         {
                             "caption": "Check for Blacklisting",
-                            "value": 23
+                            "value": "action_blacklist_url"
                         },
                         {
                             "caption": "Received NOTIFY Subscription",
-                            "value": 24
+                            "value": "action_received_subscr_notify_url"
                         },
                         {
                             "caption": "Received CSTA Message Firetest",
-                            "value": 25
+                            "value": "action_firewall_test"
                         }
                     ]
                 },

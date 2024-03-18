@@ -121,8 +121,17 @@ class SnomDeskphone extends IPSModuleStrict
             $this->SendDebug("SNOM MINIBROWSER", print_r($xml->minibrowser, true), 0);
             $xml->executeMinibrowser();
         } else {
-            $action = json_decode($_GET["value"], true);
-            IPS_RunAction($action['actionID'], $action['parameters']);
+            if ($_GET["blink"] === "start") {
+                $this->SendDebug("blink", print_r($_GET["blink"], true), 0);
+            } elseif ($_GET["blink"] === "stop") {
+                $this->SendDebug("blink", print_r($_GET["blink"], true), 0);
+            } elseif ($_GET["blink"] === "") {
+                $this->SendDebug("blink", print_r($_GET["blink"], true), 0);
+            } else {
+                $this->SendDebug("blink", print_r("no blink", true), 0);
+                $action = json_decode($_GET["value"], true);
+                IPS_RunAction($action['actionID'], $action['parameters']);
+            }
         }
     }
 
@@ -183,6 +192,7 @@ class SnomDeskphone extends IPSModuleStrict
         $this->UpdateFormField("urlAction", "value", $action['parameters']['TARGET']);
     }
 
+    // Function keys settings
     public function setFkeysSettings(): void 
     {
         $settingsUrls = $this->getFkeySettingsUrls();
@@ -263,9 +273,36 @@ class SnomDeskphone extends IPSModuleStrict
         return $fkeys_are_unique;
     }
 
+    // Action urls settings
     public function setActionUrls(): void 
     {
-        $this->SendDebug("action urls", print_r("set here", true), 0);
+        $actionSettingsUrls = $this->getActionSettingsUrls();
+
+        foreach ($actionSettingsUrls as $actionSettingsUrl) {
+            $this->httpGetRequest($actionSettingsUrl);
+        }
+    }
+
+    public function getActionSettingsUrls(): array 
+    {
+        $actionSettings = json_decode($this->ReadPropertyString("ActionUrlSettings"), true);
+        $protocol = $this->ReadPropertyString("Protocol");
+        $actionSettingsUrls = array();
+
+        foreach ($actionSettings as $actionSetting) {
+            $action = json_decode($actionSetting["urlAction"], true);
+            $variableIdToWrite = $action["parameters"]["TARGET"];
+            $valueToWrite = $actionSetting["urlAction"];
+            $instanceHook = sprintf("http://%s:3777/hook/snom/%d/", $this->ReadPropertyString("LocalIP"), $this->InstanceID);
+            // $hookParameters = "?xml=false&variableId=$variableIdToWrite&value=$valueToWrite&blink=start";
+            $hookParameters = "?xml=false&variableId=$variableIdToWrite&value=$valueToWrite";
+            $actionUrl = urlencode("$instanceHook$hookParameters");
+            $urlParameters = sprintf("settings=save&store_settings=save&%s=%s", $actionSetting["phoneEvent"], $actionUrl);
+            $phoneIp = $this->ReadPropertyString("PhoneIP");
+            array_push($actionSettingsUrls, "$protocol://$phoneIp/dummy.htm?$urlParameters");
+        }
+
+        return $actionSettingsUrls;
     }
 
     public function GetConfigurationForm(): string
