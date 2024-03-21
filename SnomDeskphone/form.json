@@ -471,16 +471,6 @@
                     }
                 },
                 {
-                    "caption": "Blink",
-                    "name": "blink",
-                    "width": "100px",
-                    "align": "center",
-                    "add": false,
-                    "edit": {
-                        "type": "CheckBox"
-                    }
-                },
-                {
                     "caption": "Action",
                     "name": "urlAction",
                     "width": "400px",
@@ -488,6 +478,16 @@
                     "add": 0,
                     "edit": {
                         "type": "SelectAction"
+                    }
+                },
+                {
+                    "caption": "Blink",
+                    "name": "blink",
+                    "width": "100px",
+                    "align": "center",
+                    "add": false,
+                    "edit": {
+                        "type": "CheckBox"
                     }
                 }
             ],
@@ -601,15 +601,15 @@
                     ]
                 },
                 {
-                    "type": "CheckBox",
-                    "name": "blink",
-                    "caption": "Blink"
-                },
-                {
                     "type": "SelectAction",
                     "name": "urlAction",
                     "caption": "Action",
                     "onChange": "SNMD_setActionUrlVariable($id, $urlAction);"
+                },
+                {
+                    "type": "CheckBox",
+                    "name": "blink",
+                    "caption": "Blink"
                 }
             ],
             "onEdit": [

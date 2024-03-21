@@ -122,21 +122,37 @@ class SnomDeskphone extends IPSModuleStrict
             $xml->executeMinibrowser();
         } else {
             $action = json_decode($_GET["value"], true);
+            IPS_RunAction($action['actionID'], $action['parameters']);
+
+            $timerName = "timer" . $_GET["variableId"];
 
             if ($action['parameters']["VALUE"]) {
-                IPS_RunAction($action['actionID'], $action['parameters']);
-                IPS_Sleep(3000);
-
                 if (filter_var($_GET["blink"], FILTER_VALIDATE_BOOLEAN)) {
                     $this->SendDebug("blink", print_r("blinking", true), 0);
-                    RequestAction($_GET["variableId"], false);
-                    IPS_Sleep(3000);
-                    RequestAction($_GET["variableId"], true);
-                    IPS_Sleep(3000);
+                    $timerId = IPS_GetScriptIDByName($timerName, 0);
+                    
+                    if (!$timerId) {
+                        $timerId = IPS_CreateScript(0);
+                        IPS_SetName($timerId, $timerName);
+                        $var = $_GET["variableId"];
+                        $content = "
+                        <?
+                            if (GetValueBoolean($var)) {
+                                RequestAction($var, false);
+                            } else {
+                                RequestAction($var, true);
+                            }
+                        ?>
+                        ";
+                        IPS_SetScriptContent($timerId, $content);
+                    }
+
+                    IPS_SetScriptTimer($timerId, 3);
                 }
-            } else{
+            } else {
                 $this->SendDebug("blink", print_r("off", true), 0);
-                IPS_RunAction($action['actionID'], $action['parameters']);
+                $timerId = IPS_GetScriptIDByName($timerName, 0);
+                IPS_SetScriptTimer($timerId, 0);
             }
         }
     }
@@ -300,9 +316,6 @@ class SnomDeskphone extends IPSModuleStrict
             $variableIdToWrite = $action["parameters"]["TARGET"];
             $valueToWrite = $actionSetting["urlAction"];
             $blink = $actionSetting["blink"];
-            // echo var_dump($actionSetting);
-            // echo $blink;
-
             $instanceHook = sprintf("http://%s:3777/hook/snom/%d/", $this->ReadPropertyString("LocalIP"), $this->InstanceID);
             $hookParameters = "?xml=false&variableId=$variableIdToWrite&value=$valueToWrite&blink=$blink";
             // $hookParameters = "?xml=false&variableId=$variableIdToWrite&value=$valueToWrite";
