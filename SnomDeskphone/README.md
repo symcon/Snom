@@ -7,6 +7,9 @@ After configurating an instance of this module, the user of the Snom deskphone c
 Pressing a function key of the Deskphone the user can, for example, control the lights, doors or blinds of a KNX system.  
 The LEDS of the function keys can be used for visualizing the status of the different parts of a facility, for example, an LED on the phone turns red if an alarm is triggered.  
 
+It is also possible to trigger actions in the facility, when an event in the phone happens (e.g. switch on a light when an incoming call happens and switch it of when the user pick up the phone handset).  
+[These are the possible phone events](https://service.snom.com/display/wiki/Action+URLs#ActionURLs-Events).  
+
 ## Installing through the Module Store
 Before being able to use the Snom module, it needs to be installed through the [Module Store](https://www.symcon.de/en/service/documentation/components/management-console/module-store/). The module can be found by searching for "Snom".
 
