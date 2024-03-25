@@ -2,7 +2,7 @@
 
 class DeviceProperties
 {
-    const PHONE_MODELS = ["snomD335", "snomD385", "snomD735", "snomD785"];
+    const PHONE_MODELS = ["snomD335", "snomD385", "snomD713", "snomD735", "snomD785"];
     const EXPANSION_MODULES = ["D7C", "D7", "D3"];
     const MAX_EXPANSION_FKEYS = 144;
     const D385_EXPANSION_OFFSET = 126;
@@ -11,6 +11,7 @@ class DeviceProperties
         "snomD335" => 32,
         "snomD385" => 48,
         "snomD735" => 32,
+        "snomD713" => 4,
         "snomD785" => 24,
         "snomD862" => 32,
         "snomD865" => 40,
@@ -22,6 +23,7 @@ class DeviceProperties
     const HAS_SMART_LABEL = array(
         "snomD335" => false,
         "snomD385" => false,
+        "snomD713" => true,
         "snomD735" => true,
         "snomD785" => true,
         "snomD862" => false,
@@ -34,6 +36,7 @@ class DeviceProperties
     const FKEY_LED_OFFSET = array(
         "snomD335" => 2,
         "snomD385" => 2,
+        "snomD713" => 1,
         "snomD735" => 5,
         "snomD785" => 5,
         "snomD862" => 5,
