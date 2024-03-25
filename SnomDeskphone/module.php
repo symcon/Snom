@@ -123,37 +123,6 @@ class SnomDeskphone extends IPSModuleStrict
         } else {
             $action = json_decode($_GET["value"], true);
             IPS_RunAction($action['actionID'], $action['parameters']);
-
-            $timerName = "timer" . $_GET["variableId"];
-
-            if ($action['parameters']["VALUE"]) {
-                if (filter_var($_GET["blink"], FILTER_VALIDATE_BOOLEAN)) {
-                    $this->SendDebug("blink", print_r("blinking", true), 0);
-                    $timerId = IPS_GetScriptIDByName($timerName, 0);
-                    
-                    if (!$timerId) {
-                        $timerId = IPS_CreateScript(0);
-                        IPS_SetName($timerId, $timerName);
-                        $var = $_GET["variableId"];
-                        $content = "
-                        <?
-                            if (GetValueBoolean($var)) {
-                                RequestAction($var, false);
-                            } else {
-                                RequestAction($var, true);
-                            }
-                        ?>
-                        ";
-                        IPS_SetScriptContent($timerId, $content);
-                    }
-
-                    IPS_SetScriptTimer($timerId, 3);
-                }
-            } else {
-                $this->SendDebug("blink", print_r("off", true), 0);
-                $timerId = IPS_GetScriptIDByName($timerName, 0);
-                IPS_SetScriptTimer($timerId, 0);
-            }
         }
     }
 
@@ -315,9 +284,8 @@ class SnomDeskphone extends IPSModuleStrict
             $action = json_decode($actionSetting["urlAction"], true);
             $variableIdToWrite = $action["parameters"]["TARGET"];
             $valueToWrite = $actionSetting["urlAction"];
-            $blink = $actionSetting["blink"];
             $instanceHook = sprintf("http://%s:3777/hook/snom/%d/", $this->ReadPropertyString("LocalIP"), $this->InstanceID);
-            $hookParameters = "?xml=false&variableId=$variableIdToWrite&value=$valueToWrite&blink=$blink";
+            $hookParameters = "?xml=false&variableId=$variableIdToWrite&value=$valueToWrite";
             // $hookParameters = "?xml=false&variableId=$variableIdToWrite&value=$valueToWrite";
             $actionUrl = urlencode("$instanceHook$hookParameters");
             $urlParameters = sprintf("settings=save&store_settings=save&%s=%s", $actionSetting["phoneEvent"], $actionUrl);

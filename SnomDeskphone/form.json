@@ -479,16 +479,6 @@
                     "edit": {
                         "type": "SelectAction"
                     }
-                },
-                {
-                    "caption": "Blink",
-                    "name": "blink",
-                    "width": "100px",
-                    "align": "center",
-                    "add": false,
-                    "edit": {
-                        "type": "CheckBox"
-                    }
                 }
             ],
             "values": [],
@@ -605,11 +595,6 @@
                     "name": "urlAction",
                     "caption": "Action",
                     "onChange": "SNMD_setActionUrlVariable($id, $urlAction);"
-                },
-                {
-                    "type": "CheckBox",
-                    "name": "blink",
-                    "caption": "Blink"
                 }
             ],
             "onEdit": [
