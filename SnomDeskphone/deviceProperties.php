@@ -40,6 +40,34 @@ class DeviceProperties
         "snomD865" => 5,
     );
 
+    const ACTION_URLS = array(
+        "DND on" => "action_dnd_on_url",
+        "DND off" => "action_dnd_off_url",
+        "Call Forwarding on" => "action_redirection_on_url",
+        "Call Forwarding off" => "action_redirection_off_url",
+        "Incoming Call" => "action_incoming_url",
+        "Outgoing Call" => "action_outgoing_url",
+        "Setup finished" => "action_setup_url",
+        "Off-hook" => "action_offhook_url",
+        "On-hook" => "action_onhook_url",
+        "Missed Call" => "action_missed_url",
+        "Registration failed" => "action_reg_failed",
+        "On Connected" => "action_connected_url",
+        "On Disconnected" => "action_disconnected_url",
+        "Log on" => "action_log_on_url",
+        "Log off" => "action_log_off_url",
+        "Hold call" => "action_hold",
+        "Unhold Call" => "action_unhold",
+        "Transfer Call" => "action_transfer",
+        "Blind Transfer" =>"action_blind_transfer",
+        "Attended Transfer" => "action_attended_transfer",
+        "Received SIP INVITE" => "action_received_attended_transfer",
+        "Line Key Long Press" => "action_longpress_url",
+        "Check for Blacklisting" => "action_blacklist_url",
+        "Received NOTIFY Subscription" => "action_received_subscr_notify_url",
+        "Received CSTA Message Firetest" => "action_firewall_test"
+    );
+
     public static function getFkeysRange(string $phoneType): array
     {
         return range(1, self::FKEYS_NO[$phoneType]);

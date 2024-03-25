@@ -366,114 +366,23 @@
                     "add": 0,
                     "edit": {
                         "type": "Select",
-                        "options": [
-                            {
-                                "caption": "DND on",
-                                "value": "action_dnd_on_url"
-                            },
-                            {
-                                "caption": "DND off",
-                                "value": "action_dnd_off_url"
-                            },
-                            {
-                                "caption": "Call Forwarding on",
-                                "value": "action_redirection_on_url"
-                            },
-                            {
-                                "caption": "Call Forwarding off",
-                                "value": "action_redirection_off_url"
-                            },
-                            {
-                                "caption": "Incoming Call",
-                                "value": "action_incoming_url"
-                            },
-                            {
-                                "caption": "Outgoing Call",
-                                "value": "action_outgoing_url"
-                            },
-                            {
-                                "caption": "Setup finished",
-                                "value": "action_setup_url"
-                            },
-                            {
-                                "caption": "Off-hook",
-                                "value": "action_offhook_url"
-                            },
-                            {
-                                "caption": "On-hook",
-                                "value": "action_onhook_url"
-                            },
-                            {
-                                "caption": "Missed Call",
-                                "value": "action_missed_url"
-                            },
-                            {
-                                "caption": "Registration failed",
-                                "value": "action_reg_failed"
-                            },
-                            {
-                                "caption": "On Connected",
-                                "value": "action_connected_url"
-                            },
-                            {
-                                "caption": "On Disconnected",
-                                "value": "action_disconnected_url"
-                            },
-                            {
-                                "caption": "Log on",
-                                "value": "action_log_on_url"
-                            },
-                            {
-                                "caption": "Log off",
-                                "value": "action_log_off_url"
-                            },
-                            {
-                                "caption": "Hold call",
-                                "value": "action_hold"
-                            },
-                            {
-                                "caption": "Unhold Call",
-                                "value": "action_unhold"
-                            },
-                            {
-                                "caption": "Transfer Call",
-                                "value": "action_transfer"
-                            },
-                            {
-                                "caption": "Blind Transfer",
-                                "value": "action_blind_transfer"
-                            },
-                            {
-                                "caption": "Attended Transfer",
-                                "value": "action_attended_transfer"
-                            },
-                            {
-                                "caption": "Received SIP INVITE",
-                                "value": "action_received_attended_transfer"
-                            },
-                            {
-                                "caption": "Line Key Long Press",
-                                "value": "action_longpress_url"
-                            },
-                            {
-                                "caption": "Check for Blacklisting",
-                                "value": "action_blacklist_url"
-                            },
-                            {
-                                "caption": "Received NOTIFY Subscription",
-                                "value": "action_received_subscr_notify_url"
-                            },
-                            {
-                                "caption": "Received CSTA Message Firetest",
-                                "value": "action_firewall_test"
-                            }
-                        ]
+                        "options": []
+                    }
+                },
+                {
+                    "caption": "Action variable",
+                    "name": "urlActionVariableId",
+                    "width": "500px",
+                    "align": "center",
+                    "add": 0,
+                    "edit": {
+                        "type": "SelectVariable"
                     }
                 },
                 {
                     "caption": "Action",
                     "name": "urlAction",
-                    "width": "400px",
+                    "width": "200px",
                     "align": "center",
                     "add": 0,
                     "edit": {
@@ -487,108 +396,13 @@
                     "type": "Select",
                     "name": "phoneEvent",
                     "caption": "Phone event",
-                    "options": [
-                        {
-                            "caption": "DND on",
-                            "value": "action_dnd_on_url"
-                        },
-                        {
-                            "caption": "DND off",
-                            "value": "action_dnd_off_url"
-                        },
-                        {
-                            "caption": "Call Forwarding on",
-                            "value": "action_redirection_on_url"
-                        },
-                        {
-                            "caption": "Call Forwarding off",
-                            "value": "action_redirection_off_url"
-                        },
-                        {
-                            "caption": "Incoming Call",
-                            "value": "action_incoming_url"
-                        },
-                        {
-                            "caption": "Outgoing Call",
-                            "value": "action_outgoing_url"
-                        },
-                        {
-                            "caption": "Setup finished",
-                            "value": "action_setup_url"
-                        },
-                        {
-                            "caption": "Off-hook",
-                            "value": "action_offhook_url"
-                        },
-                        {
-                            "caption": "On-hook",
-                            "value": "action_onhook_url"
-                        },
-                        {
-                            "caption": "Missed Call",
-                            "value": "action_missed_url"
-                        },
-                        {
-                            "caption": "Registration failed",
-                            "value": "action_reg_failed"
-                        },
-                        {
-                            "caption": "On Connected",
-                            "value": "action_connected_url"
-                        },
-                        {
-                            "caption": "On Disconnected",
-                            "value": "action_disconnected_url"
-                        },
-                        {
-                            "caption": "Log on",
-                            "value": "action_log_on_url"
-                        },
-                        {
-                            "caption": "Log off",
-                            "value": "action_log_off_url"
-                        },
-                        {
-                            "caption": "Hold call",
-                            "value": "action_hold"
-                        },
-                        {
-                            "caption": "Unhold Call",
-                            "value": "action_unhold"
-                        },
-                        {
-                            "caption": "Transfer Call",
-                            "value": "action_transfer"
-                        },
-                        {
-                            "caption": "Blind Transfer",
-                            "value": "action_blind_transfer"
-                        },
-                        {
-                            "caption": "Attended Transfer",
-                            "value": "action_attended_transfer"
-                        },
-                        {
-                            "caption": "Received SIP INVITE",
-                            "value": "action_received_attended_transfer"
-                        },
-                        {
-                            "caption": "Line Key Long Press",
-                            "value": "action_longpress_url"
-                        },
-                        {
-                            "caption": "Check for Blacklisting",
-                            "value": "action_blacklist_url"
-                        },
-                        {
-                            "caption": "Received NOTIFY Subscription",
-                            "value": "action_received_subscr_notify_url"
-                        },
-                        {
-                            "caption": "Received CSTA Message Firetest",
-                            "value": "action_firewall_test"
-                        }
-                    ]
+                    "options": []
+                },
+                {
+                    "type": "SelectVariable",
+                    "name": "urlActionVariableId",
+                    "caption": "Action variable",
+                    "visible": false
                 },
                 {
                     "type": "SelectAction",

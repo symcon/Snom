@@ -180,6 +180,7 @@ class SnomDeskphone extends IPSModuleStrict
 
     public function setActionUrlVariable(string $actionValue) {
         $action = json_decode($actionValue, true);
+        $this->UpdateFormField("urlActionVariableId", "value", $action['parameters']['TARGET']);
         $this->UpdateFormField("urlAction", "value", $action['parameters']['TARGET']);
     }
 
@@ -286,7 +287,6 @@ class SnomDeskphone extends IPSModuleStrict
             $valueToWrite = $actionSetting["urlAction"];
             $instanceHook = sprintf("http://%s:3777/hook/snom/%d/", $this->ReadPropertyString("LocalIP"), $this->InstanceID);
             $hookParameters = "?xml=false&variableId=$variableIdToWrite&value=$valueToWrite";
-            // $hookParameters = "?xml=false&variableId=$variableIdToWrite&value=$valueToWrite";
             $actionUrl = urlencode("$instanceHook$hookParameters");
             $urlParameters = sprintf("settings=save&store_settings=save&%s=%s", $actionSetting["phoneEvent"], $actionUrl);
             $phoneIp = $this->ReadPropertyString("PhoneIP");
@@ -399,7 +399,9 @@ class SnomDeskphone extends IPSModuleStrict
         }
 
         $data["elements"][7]["columns"][0]["edit"]["options"] = $this->getFkeysColumnsOptions();
-        $data["elements"][7]["form"] = "return json_decode(SNMD_UpdateForm(\$id, (array) \$FkeysSettings, \$FkeysSettings['Functionality'] ?? false, \$FkeysSettings['StatusVariable'] ?? true), true);";
+        $data["elements"][7]["form"] = "return json_decode(SNMD_UpdateFkeysForm(\$id, (array) \$FkeysSettings, \$FkeysSettings['Functionality'] ?? false, \$FkeysSettings['StatusVariable'] ?? true), true);";
+        $data["elements"][9]["columns"][0]["edit"]["options"] = $this->getActionUrlsColumnsOptions();
+        $data["elements"][9]["form"] = "return json_decode(SNMD_UpdateActionUrlsForm(\$id, (array) \$ActionUrlSettings), true);";
         $this->setFkeysSettings();
         $this->setActionUrls();
 
@@ -494,7 +496,9 @@ class SnomDeskphone extends IPSModuleStrict
         return $response;
     }
 
-    public function UpdateForm(array $fkeysSettings, int $functionality, bool $StatusVariable): string
+
+    // Function keys
+    public function UpdateFkeysForm(array $fkeysSettings, int $functionality, bool $StatusVariable): string
     {
         $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
         $data["elements"][7]["form"][0]["options"] = $this->getFkeysFormOptions($fkeysSettings);
@@ -643,5 +647,100 @@ class SnomDeskphone extends IPSModuleStrict
         }
 
         return $connectedExpansionModule;
+    }
+
+    // Action URLs
+    public function UpdateActionUrlsForm(array $ActionUrlSettings): string
+    {
+        $data = json_decode(file_get_contents(__DIR__ . "/form.json"), true);
+        $data["elements"][9]["form"][0]["options"] = $this->getActionUrlsFormOptions($ActionUrlSettings);
+        $data["elements"][9]["form"][0]["value"] = $this->getSelectedActionUrl($ActionUrlSettings);
+
+        return json_encode($data["elements"][9]["form"]);
+    }
+
+    public function getActionUrlsFormOptions(array $ActionUrlSettings): array
+    {
+        $currentActionUrls = $this->getCurrentActionUrls($ActionUrlSettings);
+        $options = $this->getCurrentActionUrlOptionOnEdit($ActionUrlSettings, $currentActionUrls);
+
+        foreach (DeviceProperties::ACTION_URLS as $caption => $action) {
+            if (!in_array($action, $currentActionUrls)) {
+                array_push($options, ["caption" => $caption, "value" => $action]);
+            }
+        }
+
+        return $options;
+    }
+
+    public function getCurrentActionUrls(array $ActionUrlSettings): array
+    {
+        $currentActionUrls = [];
+
+        foreach ($ActionUrlSettings as $key => $value) {
+            if (str_contains($key, 'array')) {
+                foreach ($value as $actionUrlSettings) {
+                    array_push($currentActionUrls, $actionUrlSettings["phoneEvent"]);
+                }
+            }
+        }
+
+        return $currentActionUrls;
+    }
+
+    public function getSelectedActionUrl(array $ActionUrlSettings): string
+    {
+        $selected = "";
+
+        foreach ($ActionUrlSettings as $key => $value) {
+            if (str_contains($key, 'selected')) {
+                $selected_index = $value;
+            }
+            if (str_contains($key, 'array')) {
+                foreach ($value as $index => $actionSettings) {
+                    
+                    if ($index === $selected_index) {
+                        $selected = array_search($actionSettings["phoneEvent"], DeviceProperties::ACTION_URLS);
+                    } else {
+                        $selected = $actionSettings["phoneEvent"];
+                    }
+                }
+            }
+        }
+
+        return $selected;
+    }
+
+    public function getActionUrlsColumnsOptions(): array
+    {
+        $options = [];
+
+        foreach (DeviceProperties::ACTION_URLS as $caption => $action) {
+            array_push($options, ["caption" => $caption, "value" => $action]);
+        }
+
+        return $options;
+    }
+
+    public function getCurrentActionUrlOptionOnEdit(array $ActionUrlSettings, array $currentActionUrls): array
+    {
+        $selected = -2;
+
+        foreach ($ActionUrlSettings as $key => $value) {
+            if (str_contains($key, 'selected')) {
+                $selected = $value;
+            }
+        }
+
+        $options = [];
+
+        if ($selected === -2) {
+            echo "Invalid selected row $selected";
+        } elseif ($selected != -1) {
+            $caption = array_search($currentActionUrls[$selected], DeviceProperties::ACTION_URLS);
+            array_push($options, ["caption" => $caption, "value" => $currentActionUrls[$selected]]);
+        }
+
+        return $options;
     }
 }
