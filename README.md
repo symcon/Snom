@@ -14,7 +14,7 @@ Different building automation systems (e.g. [KNX](https://www.knx.org/knx-en/for
 
 ## Limitations
 - Supported Snom deskphones: 
->>[Snom D335](https://www.snom.com/de/produkte/tischtelefone/d3xx/snom-d335/), [Snom D385](https://www.snom.com/de/produkte/tischtelefone/d3xx/snom-d385/), [Snom D735](https://www.snom.com/de/produkte/tischtelefone/d7xx/snom-d735/), [Snom D785](https://www.snom.com/de/produkte/tischtelefone/d7xx/snom-d785/)
+>>[Snom D335](https://www.snom.com/en/products/desk-phones/d3xx/snom-d335/), [Snom D385](https://www.snom.com/en/products/desk-phones/d3xx/snom-d385/), [Snom D713](https://www.snom.com/en/products/desk-phones/d7xx/snom-d713/), [Snom D735](https://www.snom.com/en/products/desk-phones/d7xx/snom-d735/), [Snom D785](https://www.snom.com/en/products/desk-phones/d7xx/snom-d785/)
 - Supported Snom expansion modules :
 >>[Snom D7C](https://www.snom.com/en/products/desk-phones/d7xx/snom-d7c/), [Snom D7](https://www.snom.com/de/produkte/tischtelefone/d7xx/snom-d7-w/), [Snom D3](https://www.snom.com/de/produkte/tischtelefone/d3xx/snom-d3/)
 >>```
