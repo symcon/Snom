@@ -81,5 +81,5 @@ A form with following elements will pop up:
 ```
 Maintainer: Simón Golpe Varela
 Support: simon.golpe@snom.com
-Last update: February 2024
+Last update: March 2024
 ```
